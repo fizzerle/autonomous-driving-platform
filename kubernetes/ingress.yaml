@@ -12,3 +12,7 @@ spec:
           backend:
             serviceName: event-storage-service
             servicePort: 80
+        - path: /notificationstorage
+          backend:
+            serviceName: notification-storage-service
+            servicePort: 80
