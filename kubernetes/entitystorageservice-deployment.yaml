@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: entity-storage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: entity-storage
+  template:
+    metadata:
+      labels:
+        app: entity-storage
+    spec:
+      containers:
+        - name: entity-storage
+          image: e1426972/entitystorageservice:0.0.6-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          env:
+            - name: MONGO_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb
+                  key: database-name
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: database-user
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: database-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: entity-storage-service
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: entity-storage

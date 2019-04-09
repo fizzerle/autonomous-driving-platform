@@ -16,3 +16,7 @@ spec:
           backend:
             serviceName: notification-storage-service
             servicePort: 80
+        - path: /entitystorage
+          backend:
+            serviceName: entity-storage-service
+            servicePort: 80
