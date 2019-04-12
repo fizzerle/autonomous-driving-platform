@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: entity-storage
-          image: e1426972/entitystorageservice:0.0.6-SNAPSHOT
+          image: e1426972/entitystorageservice:latest
           imagePullPolicy: Always
           ports:
           - containerPort: 8080

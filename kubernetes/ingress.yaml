@@ -20,3 +20,7 @@ spec:
           backend:
             serviceName: entity-storage-service
             servicePort: 80
+        - path: /backendui
+          backend:
+            serviceName: backendui-service
+            servicePort: 80
