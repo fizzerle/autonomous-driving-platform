@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: notification-storage
+  labels:
+    app: notification-storage
 spec:
   replicas: 1
   selector:
@@ -38,7 +40,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: notification-storage-service
+  name: notification-storage
+  labels:
+    app: notification-storage
 spec:
   ports:
     - port: 80

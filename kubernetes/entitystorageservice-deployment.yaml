@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: entity-storage
+  labels:
+    app: entity-storage
 spec:
   replicas: 1
   selector:
@@ -38,7 +40,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: entity-storage-service
+  name: entity-storage
+  labels:
+    app: entity-storage
 spec:
   ports:
     - port: 80

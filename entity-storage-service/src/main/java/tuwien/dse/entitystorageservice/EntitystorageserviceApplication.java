@@ -20,13 +20,4 @@ public class EntitystorageserviceApplication {
         SpringApplication.run(EntitystorageserviceApplication.class, args);
     }
 
-    @Bean
-    public Docket swaggerPersonApi10() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("tuwien.dse.entitystorageservice.services.EntityStorageController"))
-                .paths(PathSelectors.any())
-                .build()
-                .apiInfo(new ApiInfoBuilder().version("1.0").title("Entity API").description("Documentation Entity API v1.0").build());
-    }
 }

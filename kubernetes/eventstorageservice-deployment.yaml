@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: event-storage
+  labels:
+    app: event-storage
 spec:
   replicas: 1
   selector:
@@ -14,7 +16,7 @@ spec:
     spec:
       containers:
         - name: event-storage
-          image: e1426972/eventstorageservice:0.0.6-SNAPSHOT
+          image: e1426972/eventstorageservice:latest
           imagePullPolicy: Always
           ports:
           - containerPort: 8080
@@ -38,7 +40,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: event-storage-service
+  name: event-storage
+  labels:
+    app: event-storage
 spec:
   ports:
     - port: 80
