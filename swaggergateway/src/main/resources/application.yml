@@ -8,9 +8,9 @@ logging:
 
 zuul:
     routes:
-        eventstorage:
+        event-storage:
             path: /eventstorage/**
-        notificationstorage:
+        notification-storage:
             path: /notificationstorage/**
         entity-storage:
             path: /entitystorage/**
