@@ -1,0 +1,29 @@
+spring:
+    cloud:
+        gateway:
+            discovery:
+                locator:
+                    enabled: true
+            routes:
+            -   id: event-storage
+                uri: lb://event-storage
+                predicates:
+                -   Path=/eventstorage/**
+                filters:
+                -   RewritePath=/eventstorage/(?<path>.*), /$\{path}
+            -   id: entity-storage
+                uri: lb://entity-storage
+                predicates:
+                    -   Path=/entitystorage/**
+                filters:
+                    -   RewritePath=/entitystorage/(?<path>.*), /$\{path}
+            -   id: notification-storage
+                uri: lb://notification-storage
+                predicates:
+                    -   Path=/notificationstorage/**
+                filters:
+                    -   RewritePath=/notificationstorage/(?<path>.*), /$\{path}
+
+logging:
+    pattern:
+        console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
