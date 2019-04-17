@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: notification-storage
-          image: e1426972/notificationstorageservice:0.0.6-SNAPSHOT
+          image: e1426972/notificationstorageservice:latest
           imagePullPolicy: Always
           ports:
           - containerPort: 8080

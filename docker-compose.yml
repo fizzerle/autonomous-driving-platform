@@ -19,3 +19,28 @@ services:
             RABBITMQ_DEFAULT_USER: rabbitmq
             RABBITMQ_DEFAULT_PASS: rabbitmq
             RABBITMQ_DEFAULT_VHOST: /
+  
+  event-storage:
+        image: e1426972/eventstorageservice
+        hostname: eventstorageservice
+        depends_on:
+          - rabbitmq
+          - mongo
+        ports:
+          - 8081:8080
+  entity-storage:
+        image: e1426972/entitystorageservice
+        hostname: entitystorageservice
+        depends_on:
+          - rabbitmq
+          - mongo
+        ports:
+          - 8082:8080
+  notification-storage:
+        image: e1426972/notificationstorageservice
+        hostname: notificationstorageservice
+        depends_on:
+          - rabbitmq
+          - mongo
+        ports:
+          - 8083:8080
