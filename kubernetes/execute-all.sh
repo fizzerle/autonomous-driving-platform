@@ -8,3 +8,4 @@ kubectl apply -f notificationstorageservice-deployment.yaml
 kubectl apply -f ingress.yaml
 kubectl apply -f backendui-deployment.yaml
 kubectl apply -f swaggergateway-deployment.yaml
+kubectl apply -f apigateway-deployment.yaml
