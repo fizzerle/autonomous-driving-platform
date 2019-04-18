@@ -102,9 +102,8 @@
         md12
       >
         <material-card
-          :text="'List of Crash Events for '+ select"
-          :title="'This is the list of Crash Events for '+ select"
-          color="red"
+          :title="'Map for the manufacturer '+ select"
+          color="blue"
         >
         <div>
           <div class="mapouter">
@@ -269,4 +268,8 @@ export default {
 }
 </script>
 <style>
+.gmap_canvas {
+  height:40em;
+  width: auto;
+}
 </style>
