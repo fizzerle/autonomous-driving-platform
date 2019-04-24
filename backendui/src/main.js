@@ -17,10 +17,14 @@ import i18n from '@/i18n'
 import router from '@/router'
 import store from '@/store'
 
+import VTooltip from 'v-tooltip'
+import Vuetify from 'vuetify'
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
 // Sync store with router
 sync(store, router)
 
 Vue.config.productionTip = false
+Vue.use(VTooltip)
 
 /* eslint-disable no-new */
 new Vue({
@@ -29,3 +33,7 @@ new Vue({
   store,
   render: h => h(App)
 }).$mount('#app')
+
+Vue.use(Vuetify, {
+  iconfont: 'md'
+})
