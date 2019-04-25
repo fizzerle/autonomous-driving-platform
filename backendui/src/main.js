@@ -20,6 +20,9 @@ import store from '@/store'
 import VTooltip from 'v-tooltip'
 import Vuetify from 'vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import * as VueGoogleMaps from 'vue2-google-maps'
+
+
 // Sync store with router
 sync(store, router)
 
@@ -36,4 +39,11 @@ new Vue({
 
 Vue.use(Vuetify, {
   iconfont: 'md'
+})
+
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: 'AIzaSyD8-YcjQLE9ix9_nW5faST8jXrT_UREfzU',
+    libraries: 'places',
+  }
 })
