@@ -10,11 +10,14 @@
   },
   "dependencies": {
     "chartist": "0.11.0",
+    "geolocation-utils": "^1.2.1",
     "node-sass": "^4.9.3",
     "sass-loader": "^7.1.0",
+    "v-tooltip": "^2.0.2",
     "vue": "^2.5.17",
     "vue-chartist": "^2.1.2",
     "vue-meta": "^1.5.2",
+    "vue2-google-maps": "^0.10.6",
     "vuetify": "^1.2.5"
   },
   "devDependencies": {

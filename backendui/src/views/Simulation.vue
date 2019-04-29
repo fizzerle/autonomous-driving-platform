@@ -36,7 +36,8 @@
                                 <input v-model.number="simSpeed" type="number" v-tooltip="'Number of simulationsteps executed per minute.'">
                             </v-flex>
                             <v-btn @click="onStep">Step</v-btn>
-                            <v-btn @click="onStart">Start</v-btn>
+                            <v-btn v-if="!running" @click="onStart">Start</v-btn>
+                            <v-btn v-if="running" @click="onStop">Stop</v-btn>
                             <v-btn @click="onReset">Reset</v-btn>
                             <p style="font-size: 20px; color: green; font-weight: bold; padding-left: 20px; padding-top: 15px" v-if="ended">Finished Simulation</p>
                         </v-layout>
@@ -56,8 +57,7 @@
                             </v-btn>
                         </template>
                         <v-card>
-                            <v-card-text>Start: {{car.start}}<br>End: {{car.end}}<br>Speed: {{car.speed}}</v-card-text>
-                        </v-card>
+                            <v-card-text>Start: {{car.start}}<br>End: {{car.end}}<br>Speed: {{car.speed}}<br><template v-if="car.crash">Crashes at destination</template></v-card-text>                        </v-card>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-form v-model="valid">
@@ -88,15 +88,23 @@
                             </v-flex>
 
                             <v-flex
+                                xs12
+                                md4
+                        >
+                            <v-text-field
+                                    v-model="speed"
+                                    :rules="speedRules"
+                                    label="Speed in km/h"
+                                    required
+                            ></v-text-field>
+                        </v-flex>
+
+                            <v-flex
                                     xs12
                                     md4
                             >
-                                <v-text-field
-                                        v-model="speed"
-                                        :rules="speedRules"
-                                        label="Speed in km/h"
-                                        required
-                                ></v-text-field>
+                                <input type="checkbox" id="crashCheckbox" v-model="crash">
+                                <label for="crashCheckbox">crashes</label>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -108,7 +116,7 @@
 
 </template>
 <script>
-import {createLocation,toLatLng, headingDistanceTo, moveTo, headingTo, distanceTo} from 'geolocation-utils'
+import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, getLongitude} from 'geolocation-utils'
 export default {
     data: () => ({
         started: false,
@@ -118,8 +126,9 @@ export default {
         center: { lat: 40.756, lng: -73.978 },
         markers: [],
         simStepSize: 1,
-        simSpeed: 10,
+        simSpeed: 120,
         speed:'',
+        crash:'',
         startCoord:'',
         endCoord:'',
         coordRules: [
@@ -130,23 +139,28 @@ export default {
             v => !!v || 'Speed is required',
             v => /^[0-9][0-9]?[0-9]?$/.test(v) || 'Speed must be a number with maximal 3 digits.'
         ],
+        crashRules: [
+            v => /^[0-9]*$/.test(v) || 'Crash must be a number.'
+        ],
         cars: [
             {
                 name: "car1",
                 start: "40.731444, -73.996990",
                 end:  "40.803244, -73.944627",
-                speed: 40
+                speed: 40,
+                crash: false
             },
             {
                 name: "car2",
                 start: "40.803244, -73.944627",
                 end:  "40.731444, -73.996990",
-                speed: 50
+                speed: 50,
+                crash: true
             }
         ],
         selectedCar: null,
         simulationCars: [],
-
+        autoSimulation: null
 
     }),
     methods: {
@@ -155,19 +169,20 @@ export default {
         },
         addCar: function () {
             if (this.valid) {
-                this.cars.push({name: "car"+ (this.cars.length+1), startCoord: this.start, endCoord: this.end, speed: this.speed});
+                this.cars.push({name: "car"+ (this.cars.length+1), startCoord: this.start, endCoord: this.end, speed: this.speed, crash: this.crash});
             }
         },
         createSimulationCars: function () {
             this.simulationCars = [];
             for (const car of this.cars) {
                 /* start and end */
-                var start = this.locationFromString(car.start);
-                var destination = this.locationFromString(car.end);
-                var velocity = car.speed;
-                var currentposition = start;
-                var heading = headingTo(start,destination);
-                var distance = distanceTo(start,destination);
+                let start = this.locationFromString(car.start);
+                let destination = this.locationFromString(car.end);
+                let velocity = car.speed;
+                let currentposition = start;
+                let heading = headingTo(start,destination);
+                let distance = distanceTo(start,destination);
+                let crash = car.crash;
                 this.simulationCars.push({
                     label: car.name.substring(3),
                     start: start,
@@ -176,15 +191,16 @@ export default {
                     cpos: currentposition,
                     heading: heading,
                     distance: distance,
-                    reached: false
+                    reached: false,
+                    crash: crash
                 });
             }
             this.markCurrentLocations();
         },
         locationFromString: function(string) {
-            var help = string.split(', ');
-            var lat = parseFloat(help[0]);
-            var lng = parseFloat(help[1]);
+            let help = string.split(', ');
+            let lat = parseFloat(help[0]);
+            let lng = parseFloat(help[1]);
             return createLocation(lat,lng,'LatLng')
         },
         markCurrentLocations: function() {
@@ -198,18 +214,25 @@ export default {
         },
         simulateStepForCar: function(car) {
             if (!car.reached) {
-                var distance = 1000 * (this.simStepSize/60) * car.vel;
+                let distance = 1000 * (this.simStepSize/60) * car.vel;
                 car.cpos = toLatLng(moveTo(car.cpos, {distance: distance, heading: car.heading}));
                 if (car.distance <= distanceTo(car.start, car.cpos)) {
                     car.reached = true;
                     car.cpos = car.dest;
                 }
+                if (car.reached && car.crash) {
+                    console.log(car.label + " lat:" + getLatitude(car.cpos) + " lng:" + getLongitude(car.cpos) + " crash:" + car.crash);
+                    //TODO rest call
+                } else {
+                    console.log(car.label + " lat:" + getLatitude(car.cpos) + " lng:" + getLongitude(car.cpos));
+                    //TODO rest call
+                }
             }
         },
         checkReached: function () {
-            for (var i = 0; i < this.simulationCars.length; i++) {
+            for (let i = 0; i < this.simulationCars.length; i++) {
 
-                if (this.simulationCars[i].reached == false) {
+                if (this.simulationCars[i].reached === false) {
                     return false;
                 }
             }
@@ -221,9 +244,9 @@ export default {
                 this.started = true;
             } else {
                 if (this.running) {
-
+                    this.onStop()
                 } else {
-                    for (var i = 0; i < this.simulationCars.length; i++) {
+                    for (let i = 0; i < this.simulationCars.length; i++) {
                         this.simulateStepForCar(this.simulationCars[i]);
                     }
                     this.markCurrentLocations();
@@ -234,23 +257,49 @@ export default {
             }
         },
         onStart: function () {
-
+            this.running = true;
+            this.started = true;
+            this.runSim();
         },
         onStop: function () {
-
+            this.running = false;
+            clearInterval(this.autoSimulation)
         },
         onReset: function() {
             this.running = false;
             this.createSimulationCars();
             this.started = true;
             this.ended = false;
+        },
+        runSim () {
+            if (this.ended) {
+                this.onStop();
+                return;
+            }
+            if (!this.started) {
+                this.ended = false;
+                this.createSimulationCars();
+                this.started = true;
+            } else {
+                this.autoSimulation = setInterval(() => {
+                    for (let i = 0; i < this.simulationCars.length; i++) {
+                        this.simulateStepForCar(this.simulationCars[i]);
+                    }
+                    this.markCurrentLocations();
+                    if (this.checkReached()) {
+                        this.ended = true;
+                        this.onStop()
+                    }
+                }, 60000 / this.simSpeed)
+            }
+
         }
 
 
     },
     mounted:function() {
         this.createSimulationCars();
-    },
+    }
 }
 
 </script>
