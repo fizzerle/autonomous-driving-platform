@@ -57,12 +57,18 @@
                             </v-btn>
                         </template>
                         <v-card>
-                            <v-card-text>Start: {{car.start}}<br>End: {{car.end}}<br>Speed: {{car.speed}}<br><template v-if="car.crash">Crashes at destination</template></v-card-text>                        </v-card>
+                            <v-card-text>Start: {{car.start}}<br>
+                                End: {{car.end}}<br>
+                                Speed: {{car.speed}}<br>
+                                OEM: {{car.oem}}<br>
+                                Chassis number: {{car.chassis}}<br>
+                                <template v-if="car.crash">Crashes at destination</template></v-card-text>
+                        </v-card>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-form v-model="valid">
                     <v-container>
-                        <v-layout>
+                        <v-layout row wrap>
                             <v-flex
                                     xs12
                                     md4
@@ -99,13 +105,51 @@
                             ></v-text-field>
                         </v-flex>
 
-                            <v-flex
-                                    xs12
-                                    md4
-                            >
-                                <input type="checkbox" id="crashCheckbox" v-model="crash">
-                                <label for="crashCheckbox">crashes</label>
-                            </v-flex>
+
+
+                        <v-flex
+                                xs12
+                                md4
+                        >
+                            <v-text-field
+                                    v-model="oem"
+                                    :rules="oemRule"
+                                    label="OEM"
+                                    required
+                            ></v-text-field>
+                        </v-flex>
+
+                        <v-flex
+                                xs12
+                                md4
+                        >
+                            <v-text-field
+                                    v-model="model"
+                                    :rules="modelRule"
+                                    label="Modeltype"
+                                    required
+                            ></v-text-field>
+                        </v-flex>
+
+                        <v-flex
+                                xs12
+                                md4
+                        >
+                            <v-text-field
+                                    v-model="chassis"
+                                    :rules="chassisRule"
+                                    label="Chassis Number"
+                                    required
+                            ></v-text-field>
+                        </v-flex>
+
+                        <v-flex
+                                xs12
+                                md4
+                        >
+                            <input type="checkbox" id="crashCheckbox" v-model="crash">
+                            <label for="crashCheckbox">crashes</label>
+                        </v-flex>
                         </v-layout>
                     </v-container>
                     <v-btn @click="addCar">submit</v-btn>
@@ -131,6 +175,9 @@ export default {
         crash:'',
         startCoord:'',
         endCoord:'',
+        oem:'',
+        chassis:'',
+        model:'',
         coordRules: [
             v => !!v || 'Coordinate is required',
             v => /^-?[0-9][0-9]?(\.[0-9]*)?, -?[0-9][0-9]?(\.[0-9]*)?$/.test(v) || 'Coordinates must be valid'
@@ -142,53 +189,87 @@ export default {
         crashRules: [
             v => /^[0-9]*$/.test(v) || 'Crash must be a number.'
         ],
+        oemRule: [
+            v => !!v || 'OEM is required.'
+        ],
+        chassisRule: [
+            v => !!v || 'Chassis number is required.'
+        ],
+        modelRule: [
+            v => !!v || 'Modeltype is required.'
+        ],
         cars: [
             {
                 name: "car1",
                 start: "40.731444, -73.996990",
                 end:  "40.803244, -73.944627",
                 speed: 40,
-                crash: false
+                crash: false,
+                oem: "Audi",
+                model: "A8",
+                chassis: "000"
             },
             {
                 name: "car2",
                 start: "40.731501, -73.996928",
                 end:  "40.803244, -73.944627",
                 speed: 40,
-                crash: false
+                crash: false,
+                oem: "BMW",
+                model: "i8 Coupe",
+                chassis: "001"
             },
             {
                 name: "car3",
                 start: "40.731472, -73.996947",
                 end:  "40.767396, -73.970741",
                 speed: 40,
-                crash: true
+                crash: true,
+                oem: "Opel",
+                model: "Astra",
+                chassis: "002"
             },
             {
                 name: "car4",
                 start: " 40.742530, -73.988865",
                 end:  "40.803244, -73.944627",
                 speed: 40,
-                crash: false
+                crash: false,
+                oem: "Audi",
+                model: "Q2",
+                chassis: "003"
             },
             {
                 name: "car5",
                 start: " 40.746545, -73.986014",
                 end:  "40.803244, -73.944627",
                 speed: 40,
-                crash: false
+                crash: false,
+                model: "r8",
+                oem: "Audi",
+                chassis: "004"
             },
             {
                 name: "car6",
                 start: " 40.709557, -73.297039",
                 end:  "40.719489, -73.267445",
                 speed: 10,
-                crash: false
+                crash: false,
+                model: "x7",
+                oem: "BMW",
+                chassis: "005"
             },
         ],
         selectedCar: null,
         simulationCars: [],
-        autoSimulation: null
+        autoSimulation: null,
+        crashTypes: [
+            "Crash with a cyclist",
+            "Collision with other car",
+            "Dodged an elephant and hit a street lamp",
+            "Hit by a bird",
+            "Tire blow-out"
+        ]
 
     }),
     methods: {
@@ -197,7 +278,7 @@ export default {
         },
         addCar: function () {
             if (this.valid) {
-                this.cars.push({name: "car"+ (this.cars.length+1), startCoord: this.start, endCoord: this.end, speed: this.speed, crash: this.crash});
+                this.cars.push({name: "car"+ (this.cars.length+1), startCoord: this.start, endCoord: this.end, speed: this.speed, crash: this.crash, oem: this.oem, chassis: this.chassis});
             }
         },
         createSimulationCars: function () {
@@ -210,7 +291,6 @@ export default {
                 let currentposition = start;
                 let heading = headingTo(start,destination);
                 let distance = distanceTo(start,destination);
-                let crash = car.crash;
                 this.simulationCars.push({
                     label: car.name.substring(3),
                     start: start,
@@ -220,7 +300,11 @@ export default {
                     heading: heading,
                     distance: distance,
                     reached: false,
-                    crash: crash
+                    crash: car.crash,
+                    oem: car.oem,
+                    model: car.model,
+                    chassis: car.chassis,
+                    passengers: Math.floor(Math.random() * 5) + 1
                 });
             }
             this.markCurrentLocations();
@@ -248,11 +332,34 @@ export default {
                     car.reached = true;
                     car.cpos = car.dest;
                 }
+                let eventData = {
+                    oem: car.oem,
+                    chassis: car.chassis,
+                    model: car.model,
+                    passengers: car.passengers,
+                    location: {
+                        lat: getLatitude(car.cpos),
+                        lng: getLongitude(car.cpos)
+                    },
+                    speed: car.speed,
+                };
+
+                let sensorFront = this.getRandomSensorData();
+                let sensorBack = this.getRandomSensorData();
+                if (sensorFront !== 0) {
+                    eventData.spaceAhead = sensorFront;
+                }
+                if (sensorBack !== 0) {
+                    eventData.spaceBack = sensorBack;
+                }
+
                 if (car.reached && car.crash) {
-                    console.log(car.label + " lat:" + getLatitude(car.cpos) + " lng:" + getLongitude(car.cpos) + " crash:" + car.crash);
+                    eventData.crash = this.crashTypes[Math.floor(Math.random()*this.crashTypes.length)];
+                    console.log(JSON.stringify(eventData));
+
                     //TODO rest call
                 } else {
-                    console.log(car.label + " lat:" + getLatitude(car.cpos) + " lng:" + getLongitude(car.cpos));
+                    console.log(JSON.stringify(eventData));
                     //TODO rest call
                 }
             }
@@ -321,6 +428,9 @@ export default {
                 }, 60000 / this.simSpeed)
             }
 
+        },
+        getRandomSensorData: function () {
+            return Math.floor(Math.round(Math.random()-0.3) * (Math.random() * 10) + 1)
         }
 
 
