@@ -152,11 +152,39 @@ export default {
             },
             {
                 name: "car2",
-                start: "40.803244, -73.944627",
-                end:  "40.731444, -73.996990",
-                speed: 50,
+                start: "40.731501, -73.996928",
+                end:  "40.803244, -73.944627",
+                speed: 40,
+                crash: false
+            },
+            {
+                name: "car3",
+                start: "40.731472, -73.996947",
+                end:  "40.767396, -73.970741",
+                speed: 40,
                 crash: true
-            }
+            },
+            {
+                name: "car4",
+                start: " 40.742530, -73.988865",
+                end:  "40.803244, -73.944627",
+                speed: 40,
+                crash: false
+            },
+            {
+                name: "car5",
+                start: " 40.746545, -73.986014",
+                end:  "40.803244, -73.944627",
+                speed: 40,
+                crash: false
+            },
+            {
+                name: "car6",
+                start: " 40.709557, -73.297039",
+                end:  "40.719489, -73.267445",
+                speed: 10,
+                crash: false
+            },
         ],
         selectedCar: null,
         simulationCars: [],
