@@ -55,5 +55,24 @@ public class EventStorageController {
         return repository.findById(eventId).orElse(null);
     }
 
+    @GetMapping("/allByChassis/")
+    public List<Event> getAllByChassisnumber(@RequestBody String chassisNumber) {
+        return repository.findAllByChassisnumber(chassisNumber);
+    }
+
+    @GetMapping("/latestByChassis/")
+    public Event getLatestByChassisnumber(@RequestBody String chassisNumber) {
+        List<Event> events = repository.findAllByChassisnumber(chassisNumber);
+        if (events.isEmpty()) return null;
+
+        Event latest = events.get(0);
+        for (Event event: events) {
+            if (event.getTimestamp().after(latest.getTimestamp())) {
+                latest = event;
+            }
+        }
+        return latest;
+    }
+
 
 }
