@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tuwien.dse.eventstorageservice.dto.CarDataDto;
 import tuwien.dse.eventstorageservice.model.Event;
 import tuwien.dse.eventstorageservice.persistence.EventRepository;
@@ -51,18 +48,18 @@ public class EventStorageController {
     }
 
     @GetMapping("/{eventId}")
-    public Event get(@RequestBody String eventId) {
+    public Event get(@PathVariable String eventId) {
         return repository.findById(eventId).orElse(null);
     }
 
-    @GetMapping("/allByChassis/")
-    public List<Event> getAllByChassisnumber(@RequestBody String chassisNumber) {
-        return repository.findAllByChassisnumber(chassisNumber);
+    @GetMapping("/events/{chassisnumber}")
+    public List<Event> getAllByChassisnumber(@PathVariable String chassisnumber) {
+        return repository.findAllByChassisnumber(chassisnumber);
     }
 
-    @GetMapping("/latestByChassis/")
-    public Event getLatestByChassisnumber(@RequestBody String chassisNumber) {
-        List<Event> events = repository.findAllByChassisnumber(chassisNumber);
+    @GetMapping("/latest/{chassisnumber}")
+    public Event getLatestByChassisnumber(@PathVariable String chassisnumber) {
+        List<Event> events = repository.findAllByChassisnumber(chassisnumber);
         if (events.isEmpty()) return null;
 
         Event latest = events.get(0);
