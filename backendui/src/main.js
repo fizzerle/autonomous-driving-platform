@@ -17,10 +17,17 @@ import i18n from '@/i18n'
 import router from '@/router'
 import store from '@/store'
 
+import VTooltip from 'v-tooltip'
+import Vuetify from 'vuetify'
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import * as VueGoogleMaps from 'vue2-google-maps'
+
+
 // Sync store with router
 sync(store, router)
 
 Vue.config.productionTip = false
+Vue.use(VTooltip)
 
 /* eslint-disable no-new */
 new Vue({
@@ -29,3 +36,14 @@ new Vue({
   store,
   render: h => h(App)
 }).$mount('#app')
+
+Vue.use(Vuetify, {
+  iconfont: 'md'
+})
+
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: 'AIzaSyD8-YcjQLE9ix9_nW5faST8jXrT_UREfzU',
+    libraries: 'places',
+  }
+})
