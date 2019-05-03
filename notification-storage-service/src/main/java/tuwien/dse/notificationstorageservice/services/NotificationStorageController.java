@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tuwien.dse.notificationstorageservice.dto.CrashDto;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import tuwien.dse.notificationstorageservice.dto.BlueLightOrgNotificationDto;
+import tuwien.dse.notificationstorageservice.dto.CarNotificationDto;
 import tuwien.dse.notificationstorageservice.dto.CrashEventDto;
+import tuwien.dse.notificationstorageservice.dto.Location;
 import tuwien.dse.notificationstorageservice.dto.OemNotificationDto;
 import tuwien.dse.notificationstorageservice.exception.CrashAlreadyInactiveException;
 import tuwien.dse.notificationstorageservice.exception.CrashNotFoundException;
@@ -57,30 +57,64 @@ public class NotificationStorageController {
     @GetMapping("/notificationstorage/stomp/active")
     public String stompCreateCrash() {
         LOGGER.info("crash reported");
-        CrashDto data = new CrashDto();
-        data.setLocation("40.751444, -73.956990");
-        data.setActive(true);
-        data.setChassis("B567GK");
-        data.setModel("A8");
-        data.setOem("Audi");
-        data.setOccupants(1);
-        data.setTimestamp(new Date());
-        stompService.yell(data);
+
+        BlueLightOrgNotificationDto bl = new BlueLightOrgNotificationDto();
+        bl.setChassisnumber("B567GK");
+        bl.setCrashId("1");
+        bl.setLocation(new Location(40.751444, -73.956990));
+        bl.setOem("Audi");
+        bl.setModeltype("A8");
+        bl.setPassengers(1);
+        bl.setTimestamp(new Date());
+        bl.setResolveTimestamp(null);
+
+        OemNotificationDto oem = new OemNotificationDto();
+        oem.setChassisnumber(bl.getChassisnumber());
+        oem.setLocation(bl.getLocation());
+        oem.setTimestamp(bl.getTimestamp());
+        oem.setDescription("Unicorn");
+        oem.setResolveTimestamp(null);
+
+        CarNotificationDto car = new CarNotificationDto();
+        car.setActive(true);
+        car.setLocation(bl.getLocation());
+
+        stompService.notifyBluelights(bl);
+        stompService.notifyCars(car);
+        stompService.notifyOem(bl.getOem(), oem);
+
         return "crash reported";
     }
 
     @GetMapping("/notificationstorage/stomp/inactive")
     public String stompResolveCrash() {
         LOGGER.info("crash resolved");
-        CrashDto data = new CrashDto();
-        data.setLocation("40.751444, -73.956990");
-        data.setActive(false);
-        data.setChassis("B567GK");
-        data.setModel("A8");
-        data.setOem("Audi");
-        data.setOccupants(1);
-        data.setTimestamp(new Date());
-        stompService.yell(data);
+
+        BlueLightOrgNotificationDto bl = new BlueLightOrgNotificationDto();
+        bl.setChassisnumber("B567GK");
+        bl.setCrashId("1");
+        bl.setLocation(new Location(40.751444, -73.956990));
+        bl.setOem("Audi");
+        bl.setModeltype("A8");
+        bl.setPassengers(1);
+        bl.setTimestamp(new Date());
+        bl.setResolveTimestamp(new Date());
+
+        OemNotificationDto oem = new OemNotificationDto();
+        oem.setChassisnumber(bl.getChassisnumber());
+        oem.setLocation(bl.getLocation());
+        oem.setTimestamp(bl.getTimestamp());
+        oem.setDescription("Unicorn");
+        oem.setResolveTimestamp(new Date());
+
+        CarNotificationDto car = new CarNotificationDto();
+        car.setActive(false);
+        car.setLocation(bl.getLocation());
+
+        stompService.notifyBluelights(bl);
+        stompService.notifyCars(car);
+        stompService.notifyOem(bl.getOem(), oem);
+
         return "crash resolved";
     }
 
@@ -113,9 +147,9 @@ public class NotificationStorageController {
     public CrashEvent setCrashToInactive(@PathVariable String crashId) throws CrashNotFoundException, CrashAlreadyInactiveException {
         CrashEvent event = crashRepository.findById(crashId).orElse(null);
         if (event == null) throw new CrashNotFoundException("crash with Id" + crashId + "not found");
-        if (event.getSetInactiveTimestamp() != null) throw new CrashAlreadyInactiveException("Crash with Id " + crashId + "is already inactive");
+        if (event.getResolveTimestamp() != null) throw new CrashAlreadyInactiveException("Crash with Id " + crashId + "is already inactive");
 
-        event.setSetInactiveTimestamp(new Date());
+        event.setResolveTimestamp(new Date());
         return crashRepository.save(event);
     }
 }

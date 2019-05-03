@@ -13,19 +13,19 @@ public class CrashEvent {
     private String eventId;
     private String chassisnumber;
     private Date crashTimestamp;
-    private Date setInactiveTimestamp;
+    private Date resolveTimestamp;
     private String description;
 
     public CrashEvent() {
 
     }
 
-    public CrashEvent(String crashId, String eventId, String chassisnumber, Date crashTimestamp, Date setInactiveTimestamp, String description) {
+    public CrashEvent(String crashId, String eventId, String chassisnumber, Date crashTimestamp, Date resolveTimestamp, String description) {
         this.crashId = crashId;
         this.eventId = eventId;
         this.chassisnumber = chassisnumber;
         this.crashTimestamp = crashTimestamp;
-        this.setInactiveTimestamp = setInactiveTimestamp;
+        this.resolveTimestamp = resolveTimestamp;
         this.description = description;
     }
 
@@ -57,16 +57,16 @@ public class CrashEvent {
         return crashTimestamp;
     }
 
-    public void setCrashTimestamp(Date chrashTimestamp) {
-        this.crashTimestamp = chrashTimestamp;
+    public void setCrashTimestamp(Date crashTimestamp) {
+        this.crashTimestamp = crashTimestamp;
     }
 
-    public Date getSetInactiveTimestamp() {
-        return setInactiveTimestamp;
+    public Date getResolveTimestamp() {
+        return resolveTimestamp;
     }
 
-    public void setSetInactiveTimestamp(Date setInactiveTimestamp) {
-        this.setInactiveTimestamp = setInactiveTimestamp;
+    public void setResolveTimestamp(Date resolveTimestamp) {
+        this.resolveTimestamp = resolveTimestamp;
     }
 
     public String getDescription() {

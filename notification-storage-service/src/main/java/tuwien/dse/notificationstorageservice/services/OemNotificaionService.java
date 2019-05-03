@@ -2,6 +2,7 @@ package tuwien.dse.notificationstorageservice.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tuwien.dse.notificationstorageservice.dto.Location;
 import tuwien.dse.notificationstorageservice.dto.OemNotificationDto;
 import tuwien.dse.notificationstorageservice.model.CrashEvent;
 import tuwien.dse.notificationstorageservice.persistence.CrashRepository;
@@ -21,7 +22,7 @@ public class OemNotificaionService {
 
         for (CrashEvent event: events) {
             //TODO: filter oem
-            notifications.add(new OemNotificationDto(event.getCrashTimestamp(), event.getDescription(), event.getChassisnumber()));
+            notifications.add(new OemNotificationDto(event.getCrashTimestamp(), event.getDescription(), event.getChassisnumber(), event.getResolveTimestamp(), new Location()));
         }
         return notifications;
     }

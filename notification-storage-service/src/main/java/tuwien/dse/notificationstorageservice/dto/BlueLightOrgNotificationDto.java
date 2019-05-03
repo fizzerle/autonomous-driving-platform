@@ -1,5 +1,7 @@
 package tuwien.dse.notificationstorageservice.dto;
 
+import java.util.Date;
+
 public class BlueLightOrgNotificationDto {
 
     private String crashId;
@@ -7,23 +9,23 @@ public class BlueLightOrgNotificationDto {
     private String chassisnumber;
     private String modeltype;
     private Location location;
+    private Date resolveTimestamp;
+    private Date timestamp;
     private int passengers;
 
     public BlueLightOrgNotificationDto() {
 
     }
 
-    public BlueLightOrgNotificationDto(String crashId, String oem, String chassisnumber, String modeltype, Location location, int passengers) {
+    public BlueLightOrgNotificationDto(String crashId, String oem, String chassisnumber, String modeltype, Location location, Date resolveTimestamp, Date timestamp, int passengers) {
         this.crashId = crashId;
         this.oem = oem;
         this.chassisnumber = chassisnumber;
         this.modeltype = modeltype;
         this.location = location;
+        this.resolveTimestamp = resolveTimestamp;
+        this.timestamp = timestamp;
         this.passengers = passengers;
-    }
-
-    public String getOem() {
-        return oem;
     }
 
     public String getCrashId() {
@@ -32,6 +34,10 @@ public class BlueLightOrgNotificationDto {
 
     public void setCrashId(String crashId) {
         this.crashId = crashId;
+    }
+
+    public String getOem() {
+        return oem;
     }
 
     public void setOem(String oem) {
@@ -60,6 +66,22 @@ public class BlueLightOrgNotificationDto {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public Date getResolveTimestamp() {
+        return resolveTimestamp;
+    }
+
+    public void setResolveTimestamp(Date resolveTimestamp) {
+        this.resolveTimestamp = resolveTimestamp;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
     public int getPassengers() {

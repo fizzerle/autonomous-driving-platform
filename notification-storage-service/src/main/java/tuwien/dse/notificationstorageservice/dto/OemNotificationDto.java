@@ -7,15 +7,19 @@ public class OemNotificationDto {
     private Date timestamp;
     private String description;
     private String chassisnumber;
+    private Date resolveTimestamp;
+    private Location location;
 
     public OemNotificationDto() {
 
     }
 
-    public OemNotificationDto(Date timestamp, String description, String chassisnumber) {
+    public OemNotificationDto(Date timestamp, String description, String chassisnumber, Date resolveTimestamp, Location location) {
         this.timestamp = timestamp;
         this.description = description;
         this.chassisnumber = chassisnumber;
+        this.resolveTimestamp = resolveTimestamp;
+        this.location = location;
     }
 
     public Date getTimestamp() {
@@ -40,5 +44,21 @@ public class OemNotificationDto {
 
     public void setChassisnumber(String chassisnumber) {
         this.chassisnumber = chassisnumber;
+    }
+
+    public Date getResolveTimestamp() {
+        return resolveTimestamp;
+    }
+
+    public void setResolveTimestamp(Date resolveTimestamp) {
+        this.resolveTimestamp = resolveTimestamp;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

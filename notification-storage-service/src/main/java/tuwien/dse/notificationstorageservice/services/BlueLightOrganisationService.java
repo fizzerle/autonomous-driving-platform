@@ -21,7 +21,16 @@ public class BlueLightOrganisationService {
 
         for(CrashEvent event: crashRepository.findAll()) {
             //TODO: get car and location information from Entity and Event service
-            accidents.add(new BlueLightOrgNotificationDto(event.getCrashId(),"DummyOem",event.getChassisnumber(),"DummyModel",new Location(0,0),-1));
+            accidents.add(new BlueLightOrgNotificationDto(
+                    event.getCrashId(),
+                    "Audi",
+                    event.getChassisnumber(),
+                    "A8",
+                    new Location(0,0),
+                    event.getResolveTimestamp(),
+                    event.getCrashTimestamp(),
+                    1
+            ));
         }
 
         return accidents;
@@ -31,9 +40,18 @@ public class BlueLightOrganisationService {
         List<BlueLightOrgNotificationDto> accidents = new ArrayList<>();
 
         for(CrashEvent event: crashRepository.findAll()) {
-            if (event.getSetInactiveTimestamp() == null) {
+            if (event.getResolveTimestamp() == null) {
                 //TODO: get car and location information from Entity and Event service
-                accidents.add(new BlueLightOrgNotificationDto(event.getCrashId(),"DummyOem", event.getChassisnumber(), "DummyModel", new Location(0, 0), -1));
+                accidents.add(new BlueLightOrgNotificationDto(
+                        event.getCrashId(),
+                        "Audi",
+                        event.getChassisnumber(),
+                        "A8",
+                        new Location(0,0),
+                        event.getResolveTimestamp(),
+                        event.getCrashTimestamp(),
+                        1
+                ));
             }
         }
 
