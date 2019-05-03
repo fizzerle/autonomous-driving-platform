@@ -160,7 +160,9 @@
 
 </template>
 <script>
-import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, getLongitude} from 'geolocation-utils'
+import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, getLongitude} from 'geolocation-utils';
+import SockJs from 'sockjs-client';
+import Stomp from 'stompjs';
 export default {
     data: () => ({
         started: false,
@@ -433,10 +435,33 @@ export default {
             return Math.floor(Math.round(Math.random()-0.3) * (Math.random() * 10) + 1)
         }
 
+        ,websocketsetup: function() {
+            fetch('/test/').then(resp => {
+                console.info("Received from fetch", resp);
+                console.info(resp.body.text());
+            }).catch(e => {
+                console.warn("Error on fetch", e);
+            });
+
+            console.info("Before SockJS");
+            let socket = new SockJs('/eventstorage/websocket');
+            console.info("Before Stomp");
+            let client = Stomp.over(socket);
+            console.info("Before Connect");
+            client.connect({}, function(frame) {
+                console.info("Before Subscribe");
+                client.subscribe('/event/audi', function(msg) {
+                    console.info("Socket received", msg);
+                });
+            });
+        }
+
 
     },
     mounted:function() {
         this.createSimulationCars();
+
+        //this.websocketsetup();
     }
 }
 

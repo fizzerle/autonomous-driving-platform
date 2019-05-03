@@ -22,4 +22,10 @@ public class NotificationStorageController {
         LOGGER.info("test called");
         return "test called";
     }
+
+    @GetMapping("/notificationstorage/test")
+    public String test2() {
+        LOGGER.info("notificationstorage test called");
+        return "notificationstorage test";
+    }
 }

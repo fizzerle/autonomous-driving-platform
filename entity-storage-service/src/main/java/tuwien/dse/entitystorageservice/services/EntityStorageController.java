@@ -29,6 +29,12 @@ public class EntityStorageController {
         return "test called";
     }
 
+    @GetMapping("/entitystorage/test")
+    public String test2() {
+        LOGGER.info("entitystorage test called");
+        return "entitystorage test";
+    }
+
 
     @GetMapping("/cars/{oem}")
     public List<Car> getAllOfOem(@PathVariable String oem) {

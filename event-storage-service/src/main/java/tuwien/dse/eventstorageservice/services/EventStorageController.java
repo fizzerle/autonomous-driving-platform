@@ -39,6 +39,12 @@ public class EventStorageController {
         return "test called";
     }
 
+    @GetMapping("/eventstorage/test")
+    public String test2() {
+        LOGGER.info("eventstorage test called");
+        return "eventstorage test";
+    }
+
     @PostMapping("/carData")
     public Event create(@RequestBody CarDataDto carDataDto) {
         Event event = new Event(carDataDto.getLocation(),carDataDto.getChassisNumber(), new Date(), carDataDto.getSpeed(), carDataDto.getSpaceAhead(), carDataDto.getSpaceBehind(), carDataDto.getCrashEvent());
