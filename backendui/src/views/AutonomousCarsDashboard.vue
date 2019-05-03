@@ -63,11 +63,14 @@ export default {
                 });
             }
         },
-        locationFromString: function(string) {
-            let help = string.split(', ');
+        locationFromString: function(loc) {
+            if (typeof(loc) === "object") {
+                return createLocation(loc.lat, loc.lng, 'LatLng');
+            }
+            let help = loc.split(', ');
             let lat = parseFloat(help[0]);
             let lng = parseFloat(help[1]);
-            return createLocation(lat,lng,'LatLng')
+            return createLocation(lat, lng, 'LatLng')
         },
 
         receivedCrashData: function(data) {
@@ -79,7 +82,7 @@ export default {
             if (crash.active) {
                 this.crashes.push(crash);
             } else {
-                let cr = this.crashes.filter(cr => cr.location === crash.location).pop();
+                let cr = this.crashes.filter(cr => cr.location.lat === crash.location.lat && cr.location.lng === crash.location.lng).pop();
                 if (cr !== undefined) {
                     this.crashes.splice(this.crashes.indexOf(cr), 1);
                 }
