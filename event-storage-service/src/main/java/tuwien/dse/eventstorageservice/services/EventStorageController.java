@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import tuwien.dse.eventstorageservice.dto.CarDataDto;
 import tuwien.dse.eventstorageservice.model.Event;
+import tuwien.dse.eventstorageservice.model.Location;
 import tuwien.dse.eventstorageservice.persistence.EventRepository;
 
 import java.util.Date;
@@ -23,6 +24,9 @@ public class EventStorageController {
 
     @Autowired
     private EventRepository repository;
+
+    @Autowired
+    private EventNotifyService stompService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventStorageController.class);
 
@@ -43,6 +47,22 @@ public class EventStorageController {
     public String test2() {
         LOGGER.info("eventstorage test called");
         return "eventstorage test";
+    }
+
+    @GetMapping("/eventstorage/stomp")
+    public String stompTest() {
+        LOGGER.info("stomptest test called");
+        CarDataDto data = new CarDataDto();
+        data.setOem("Audi");
+        data.setChassisNumber("B567GK");
+        data.setLocation(new Location(45, 48));
+        data.setModeltype("A8");
+        data.setPassengers(1);
+        data.setSpaceAhead(50);
+        data.setSpaceBehind(30);
+        data.setSpeed(30);
+        stompService.yell(data);
+        return "stomp request sent";
     }
 
     @PostMapping("/carData")

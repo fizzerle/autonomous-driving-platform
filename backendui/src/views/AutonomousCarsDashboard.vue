@@ -25,6 +25,7 @@
 </template>
 <script>
 import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, getLongitude} from 'geolocation-utils'
+import WebSocketClient from '../utils/WebSocketClient';
 export default {
     data: () => ({
         center: { lat: 40.756, lng: -73.978 },
@@ -36,11 +37,13 @@ export default {
             { active: false, oem: "BMW", model: "Z4", chassis: "ZZZDF73", occupants: 4, timestamp: "5.5.19 20:44", location: "40.731444, -73.896990" }
         ],
         list: [],
-        markers: []
+        markers: [],
+
+        wsClient: null
     }),
     methods: {
 
-        listAll: function() {
+        updateView: function() {
             this.list = [];
             this.crashes.forEach(cr => {
                 this.list.push({
@@ -65,12 +68,34 @@ export default {
             let lat = parseFloat(help[0]);
             let lng = parseFloat(help[1]);
             return createLocation(lat,lng,'LatLng')
-        }
+        },
 
+        receivedCrashData: function(data) {
+            let crash = JSON.parse(data.body);
+            crash.timestamp = new Date(crash.timestamp);
+            if (typeof(crash.location) === "string") {
+                // Convert to LatLng
+            }
+            if (crash.active) {
+                this.crashes.push(crash);
+            } else {
+                let cr = this.crashes.filter(cr => cr.location === crash.location).pop();
+                if (cr !== undefined) {
+                    this.crashes.splice(this.crashes.indexOf(cr), 1);
+                }
+            }
+            console.info("Received Socket Data", crash);
+            this.updateView();            
+        }
 
     },
     mounted:function() {
-        this.listAll();
+        this.updateView();
+        this.wsClient = new WebSocketClient();
+        this.wsClient.connectCar(this.receivedCrashData);
+    },
+    beforeDestroy: function() {
+        this.wsClient.close();
     }
 }
 

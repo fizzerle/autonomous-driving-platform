@@ -1,4 +1,4 @@
-package tuwien.dse.eventstorageservice.config;
+package tuwien.dse.notificationstorageservice.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -12,12 +12,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/event");
-        config.setApplicationDestinationPrefixes("/eventservice");
+        config.enableSimpleBroker("/crash");
+        config.setApplicationDestinationPrefixes("/notificationservice");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/eventstorage/websocket").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/notificationstorage/websocket").setAllowedOrigins("*").withSockJS();
     }
 }

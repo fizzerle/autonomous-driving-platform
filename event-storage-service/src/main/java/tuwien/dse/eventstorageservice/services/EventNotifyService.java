@@ -17,7 +17,7 @@ public class EventNotifyService {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
-            String topic = "/event/" + data.getOem();
+            String topic = "/event/" + data.getOem().toLowerCase();
             simp.convertAndSend(topic, json);
         } catch (JsonProcessingException e) {
             // Do nothing

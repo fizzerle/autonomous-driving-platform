@@ -77,6 +77,7 @@
 </template>
 <script>
 import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, getLongitude} from 'geolocation-utils'
+import WebSocketClient from '../utils/WebSocketClient';
 
 const FILTER_ALL = 0;
 const FILTER_ACTIVE = 1;
@@ -95,7 +96,9 @@ export default {
         list: [],
         filter: FILTER_ALL,
         markers: [],
-        selected: null
+        selected: null,
+
+        wsClient: null
     }),
     methods: {
 
@@ -131,6 +134,9 @@ export default {
                     });
                 }
             });
+            if (this.selected !== null && !this.selected.active) {
+                this.selected = null;
+            }
             this.filter = FILTER_ACTIVE;
             this.sortList();
             this.updateMarkers();
@@ -150,6 +156,9 @@ export default {
                     });
                 }
             });
+            if (this.selected !== null && this.selected.active) {
+                this.selected = null;
+            }
             this.filter = FILTER_INACTIVE;
             this.sortList();
             this.updateMarkers();
@@ -216,12 +225,35 @@ export default {
                 }
             });
             this.updateList();
-        }
+        },
 
+
+        receivedCrashData: function(data) {
+            let crash = JSON.parse(data.body);
+            crash.timestamp = new Date(crash.timestamp);
+            if (typeof(crash.location) === "string") {
+                // Convert to LatLng
+            }
+            if (crash.active) {
+                this.crashes.push(crash);
+            } else {
+                let cr = this.crashes.filter(cr => cr.chassis === crash.chassis && cr.location === crash.location).pop();
+                if (cr !== undefined) {
+                    cr.active = false;
+                }
+            }
+            this.updateList();
+            console.info("Received Socket Data", crash);
+        }
 
     },
     mounted:function() {
         this.listAll();
+        this.wsClient = new WebSocketClient();
+        this.wsClient.connectBluelight(this.receivedCrashData);
+    },
+    beforeDestroy: function() {
+        this.wsClient.close();
     }
 }
 
