@@ -6,10 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import tuwien.dse.eventstorageservice.dto.CarDto;
 import tuwien.dse.eventstorageservice.dto.CarEventDto;
 import tuwien.dse.eventstorageservice.model.Event;
 import tuwien.dse.eventstorageservice.model.Location;
 import tuwien.dse.eventstorageservice.persistence.EventRepository;
+import tuwien.dse.eventstorageservice.services.EntityStoreRestClient;
 import tuwien.dse.eventstorageservice.services.EventNotifyService;
 import tuwien.dse.eventstorageservice.services.NotificationStoreRestClient;
 
@@ -30,6 +32,9 @@ public class EventStorageController {
 
     @Autowired
     private NotificationStoreRestClient notificationStoreRestClient;
+
+    @Autowired
+    private EntityStoreRestClient entityStoreRestClient;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventStorageController.class);
 
@@ -63,7 +68,16 @@ public class EventStorageController {
 
     @PostMapping("/events")
     public void create(@RequestBody CarEventDto carEventDto) {
-        Event event = new Event(carEventDto.getLocation(), carEventDto.getChassisNumber(), new Date(), carEventDto.getSpeed(), carEventDto.getSpaceAhead(), carEventDto.getSpaceBehind(), carEventDto.getCrashEvent());
+        Event event = new Event(
+                carEventDto.getLocation(),
+                carEventDto.getChassisNumber(),
+                new Date(),
+                carEventDto.getSpeed(),
+                carEventDto.getSpaceAhead(),
+                carEventDto.getSpaceBehind(),
+                carEventDto.getCrashEvent(),
+                carEventDto.getPassengers()
+        );
         event = repository.save(event);
 
         stompService.yell(carEventDto);
@@ -78,12 +92,16 @@ public class EventStorageController {
     }
 
     @GetMapping("/events/{eventId}")
-    public Event get(@PathVariable String eventId) {
-        return repository.findById(eventId).orElse(null);
+    public CarEventDto get(@PathVariable String eventId) {
+        Event event = repository.findById(eventId).orElse(null);
+        if (event != null) {
+
+        }
+        return convertToCarEventDto(event);
     }
 
     @GetMapping("/events")
-    public List<Event> getEvents(@RequestParam(required = false) Optional<String> chassisnumber, @RequestParam(required = false) Optional<Integer> limit) {
+    public List<CarEventDto> getEvents(@RequestParam(required = false) Optional<String> oem, @RequestParam(required = false) Optional<String> chassisnumber, @RequestParam(required = false) Optional<Integer> limit) {
         List<Event> events;
         if (chassisnumber.isPresent()) {
             events = repository.findAllByChassisnumber(chassisnumber.get());
@@ -94,7 +112,33 @@ public class EventStorageController {
         if (limit.isPresent()) {
             events = events.stream().limit(limit.get()).collect(Collectors.toList());
         }
-        return events;
+        List<CarEventDto> result = events.stream().map(e -> convertToCarEventDto(e)).collect(Collectors.toList());
+        if (oem.isPresent()) {
+            result = result.stream().filter(e -> e.getOem().toLowerCase().equals(oem.get().toLowerCase())).collect(Collectors.toList());
+        }
+        return result;
+    }
+
+    private CarEventDto convertToCarEventDto(Event event) {
+        CarDto car;
+        try {
+            car = entityStoreRestClient.getCar(event.getChassisnumber());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return new CarEventDto(
+                car.getOem(),
+                event.getChassisnumber(),
+                car.getModelType(),
+                event.getPassengers(),
+                event.getLocation(),
+                event.getSpeed(),
+                event.getSpaceAhead(),
+                event.getSpaceBehind(),
+                event.getCrashEvent()
+        );
     }
 
 }

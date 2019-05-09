@@ -40,7 +40,7 @@ public class NotificationStorageController {
     @Autowired
     BlueLightOrganisationService blueLightOrganisationService;
 
-    @GetMapping("/test/")
+    @GetMapping("/test")
     public String test() {
         LOGGER.info("test called");
         return "test called";

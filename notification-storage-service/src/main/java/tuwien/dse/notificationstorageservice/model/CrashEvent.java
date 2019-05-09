@@ -20,8 +20,7 @@ public class CrashEvent {
 
     }
 
-    public CrashEvent(String crashId, String eventId, String chassisnumber, Date crashTimestamp, Date resolveTimestamp, String description) {
-        this.crashId = crashId;
+    public CrashEvent(String eventId, String chassisnumber, Date crashTimestamp, Date resolveTimestamp, String description) {
         this.eventId = eventId;
         this.chassisnumber = chassisnumber;
         this.crashTimestamp = crashTimestamp;

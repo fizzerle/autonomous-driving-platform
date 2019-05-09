@@ -9,42 +9,39 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
+import tuwien.dse.eventstorageservice.dto.CarDto;
 import tuwien.dse.eventstorageservice.dto.CrashEventDto;
 import tuwien.dse.eventstorageservice.model.Event;
 
 @Service
-public class NotificationStoreRestClient {
+public class EntityStoreRestClient {
 
-    private NotificationService notificationService;
+    private EntityService entityService;
 
-    public NotificationStoreRestClient() {
+    public EntityStoreRestClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:8083")
+                .baseUrl("http://localhost:8082")
                 .addConverterFactory(JacksonConverterFactory.create())
                 .client(httpClient.build())
                 .build();
-        this.notificationService = retrofit.create(NotificationService.class);
+        this.entityService = retrofit.create(EntityService.class);
     }
 
-    public void createCrashEvent(Event event) throws Exception {
-        CrashEventDto crash = new CrashEventDto(
-                event.getChassisnumber(),
-                event.getId(),
-                event.getTimestamp(),
-                event.getCrashEvent()
-        );
-        Call<Void> call = notificationService.createCrashEvent(crash);
+    public CarDto getCar(String chassis) throws Exception {
+        Call<CarDto> call = entityService.getCarData(chassis);
 
-        Response<Void> resp = call.execute();
+        Response<CarDto> resp = call.execute();
         if (!resp.isSuccessful()) {
             throw new Exception(resp.message());
         }
+        return resp.body();
     }
 
-    interface NotificationService {
+    interface EntityService {
 
-        @POST("/notifications")
-        Call<Void> createCrashEvent(@Body CrashEventDto crash);
+        @GET("/cars/{chassis}")
+        Call<CarDto> getCarData(@Path("chassis") String chassis);
     }
 }
