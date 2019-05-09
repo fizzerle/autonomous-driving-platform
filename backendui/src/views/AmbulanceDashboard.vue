@@ -26,7 +26,7 @@
                 <v-flex v-if="selected != null">
                     <material-card :color="selected.resolveTimestamp === null ? 'red' : 'blue'" 
                         :title="selected.oem + ' ' + selected.modeltype"
-                        :text="selected.timestamp">
+                        :text="crashTimestamps()">
                         <h4>Occupants: {{ selected.passengers }}</h4>
                         <h6>Chassis Number: {{ selected.chassisnumber }}</h6>
                         <v-btn v-if="selected.resolveTimestamp === null" class="mx-0 font-weight-light" color="success" @click="resolveCrash()">Resolve Crash</v-btn>
@@ -57,7 +57,7 @@
                             <v-icon v-if="cr.resolveTimestamp === null" slot="activator">mdi-alarm-light</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-title>
-                            {{ cr.timestamp }}
+                            {{ formatDateSmall(cr.timestamp) }}
                         </v-list-tile-title>
                         <v-list-tile-sub-title>
                             {{ cr.oem }} {{ cr.modeltype }}
@@ -77,6 +77,7 @@
 </template>
 <script>
 import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, getLongitude} from 'geolocation-utils'
+import * as moment from 'moment'
 import WebSocketClient from '../utils/WebSocketClient';
 
 const FILTER_ALL = 0;
@@ -199,6 +200,19 @@ export default {
             let lng = parseFloat(help[1]);
             return createLocation(lat, lng, 'LatLng')
         },
+        formatDateSmall: function(date) {
+            return moment(date).format('D.M h:mm');
+        },
+        formatDateFull: function(date) {
+            return moment(date).format('DD.MM.YYYY hh:mm:ss');
+        },
+        crashTimestamps: function() {
+            let start = this.formatDateFull(this.selected.timestamp);
+            if (this.selected.resolveTimestamp) {
+                return start + ' - ' + this.formatDateFull(this.selected.resolveTimestamp);
+            }
+            return start;
+        },
         select: function(item) {
             this.center = item.location;
             this.selected = item;
@@ -210,13 +224,14 @@ export default {
         getIcon: function(cr) {
             let red = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
             let blue = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+            let yellow = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
 
-            if (this.selected === null) {
+            if (this.selected && this.selected.crashId === cr.crashId) {
+                return yellow;
+            } else if (cr.resolveTimestamp) {
                 return blue;
-            } else if (this.selected.crashId === cr.crashId) {
-                return red;
             }
-            return blue;
+            return red;
         },
         resolveCrash: function() {
             if (!this.selected) {
