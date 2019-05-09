@@ -66,7 +66,7 @@ public class EventStorageController {
         return "stomp request sent";
     }
 
-    @PostMapping("/events")
+    @PostMapping("/eventstorage/events")
     public void create(@RequestBody CarEventDto carEventDto) {
         Event event = new Event(
                 carEventDto.getLocation(),
@@ -91,7 +91,7 @@ public class EventStorageController {
         }
     }
 
-    @GetMapping("/events/{eventId}")
+    @GetMapping("/eventstorage/events/{eventId}")
     public CarEventDto get(@PathVariable String eventId) {
         Event event = repository.findById(eventId).orElse(null);
         if (event != null) {
@@ -100,7 +100,7 @@ public class EventStorageController {
         return convertToCarEventDto(event);
     }
 
-    @GetMapping("/events")
+    @GetMapping("/eventstorage/events")
     public List<CarEventDto> getEvents(@RequestParam(required = false) Optional<String> oem, @RequestParam(required = false) Optional<String> chassisnumber, @RequestParam(required = false) Optional<Integer> limit) {
         List<Event> events;
         if (chassisnumber.isPresent()) {

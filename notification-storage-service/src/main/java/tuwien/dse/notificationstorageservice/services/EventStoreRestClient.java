@@ -36,7 +36,7 @@ public class EventStoreRestClient {
 
     interface EventStoreService {
 
-        @GET("/events/{id}")
+        @GET("/eventstorage/events/{id}")
         Call<CarEventDto> getCarData(@Path("id") String id);
     }
 }

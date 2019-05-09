@@ -23,7 +23,7 @@ public class EntityStorageController {
     @GetMapping("/test")
     public String test() {
         LOGGER.info("test called");
-        return "test called";
+        return "test called entityservice";
     }
 
     @GetMapping("/entitystorage/test")
@@ -33,7 +33,7 @@ public class EntityStorageController {
     }
 
 
-    @GetMapping("/cars")
+    @GetMapping("/entitystorage/cars")
     public List<Car> getAll(@RequestParam(required = false) Optional<String> oem) {
         if (oem.isPresent()) {
             return carRepository.findAllByOem(oem.get());
@@ -41,22 +41,22 @@ public class EntityStorageController {
         return carRepository.findAll();
     }
 
-    @PostMapping("/cars")
+    @PostMapping("/entitystorage/cars")
     public Car insertCar(@RequestBody Car car) {
         return carRepository.save(car);
     }
 
-    @GetMapping("/cars/{chassisnumber}")
+    @GetMapping("/entitystorage/cars/{chassisnumber}")
     public Car getCarByChassisnumber(@PathVariable String chassisnumber) {
         return carRepository.findByChassisnumber(chassisnumber);
     }
 
-    @DeleteMapping("/cars/{chassisnumber}")
+    @DeleteMapping("/entitystorage/cars/{chassisnumber}")
     public Long deleteCarByChassisnumber(@PathVariable String chassisnumber) {
         return carRepository.deleteCarByChassisnumber(chassisnumber);
     }
 
-    @GetMapping("/oem")
+    @GetMapping("/entitystorage/oem")
     public List<String> getOems() {
         return carRepository.findAll().stream().map(car -> car.getOem()).distinct().collect(Collectors.toList());
     }

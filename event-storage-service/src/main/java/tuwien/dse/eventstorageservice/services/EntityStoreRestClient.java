@@ -41,7 +41,7 @@ public class EntityStoreRestClient {
 
     interface EntityService {
 
-        @GET("/cars/{chassis}")
+        @GET("/entitystorage/cars/{chassis}")
         Call<CarDto> getCarData(@Path("chassis") String chassis);
     }
 }

@@ -29,13 +29,7 @@ import WebSocketClient from '../utils/WebSocketClient';
 export default {
     data: () => ({
         center: { lat: 40.756, lng: -73.978 },
-        crashes: [
-            { active: true, oem: "Audi", model: "A8", chassis: "B567GK", occupants: 4, timestamp: "1.5.19 20:44", location: "40.731444, -73.996990" },
-            { active: false, oem: "Fiat", model: "Punto", chassis: "ASDF1", occupants: 1, timestamp: "8.5.19 20:44", location: "40.721444, -73.986990" },
-            { active: false, oem: "Audi", model: "A6", chassis: "XXX7", occupants: 2, timestamp: "2.5.19 20:44", location: "40.791444, -73.986990" },
-            { active: true, oem: "Ford", model: "Fokus", chassis: "QWERT5", occupants: 3, timestamp: "3.5.19 20:44", location: "40.701444, -74.006990" },
-            { active: false, oem: "BMW", model: "Z4", chassis: "ZZZDF73", occupants: 4, timestamp: "5.5.19 20:44", location: "40.731444, -73.896990" }
-        ],
+        crashes: [],
         list: [],
         markers: [],
 
@@ -73,12 +67,23 @@ export default {
             return createLocation(lat, lng, 'LatLng')
         },
 
+        loadCrashData: function() {
+            fetch('/notificationstorage/notifications', {
+                headers: {
+                    'X-Client-Type': 'Car'
+                }
+            })
+            .then(resp => {
+                resp.json().then(data => {
+                    console.info("Received car crash events", data);
+                    this.$data = data;
+                    this.updateView();
+                });
+            });
+        },
+
         receivedCrashData: function(data) {
             let crash = JSON.parse(data.body);
-            crash.timestamp = new Date(crash.timestamp);
-            if (typeof(crash.location) === "string") {
-                // Convert to LatLng
-            }
             if (crash.active) {
                 this.crashes.push(crash);
             } else {
@@ -92,8 +97,8 @@ export default {
         }
 
     },
-    mounted:function() {
-        this.updateView();
+    mounted: function() {
+        this.loadCrashData();
         this.wsClient = new WebSocketClient();
         this.wsClient.connectCar(this.receivedCrashData);
     },

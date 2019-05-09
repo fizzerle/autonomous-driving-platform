@@ -17,6 +17,7 @@ import tuwien.dse.notificationstorageservice.exception.CrashAlreadyInactiveExcep
 import tuwien.dse.notificationstorageservice.exception.CrashNotFoundException;
 import tuwien.dse.notificationstorageservice.model.CrashEvent;
 import tuwien.dse.notificationstorageservice.persistence.CrashRepository;
+import tuwien.dse.notificationstorageservice.services.AutonomousCarService;
 import tuwien.dse.notificationstorageservice.services.BlueLightOrganisationService;
 import tuwien.dse.notificationstorageservice.services.CrashNotifyService;
 import tuwien.dse.notificationstorageservice.services.OemNotificaionService;
@@ -24,11 +25,15 @@ import tuwien.dse.notificationstorageservice.services.OemNotificaionService;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class NotificationStorageController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationStorageController.class);
+    private static final String CLIENT_TYPE_CAR = "Car";
+    private static final String CLIENT_TYPE_OEM = "OEM";
+    private static final String CLIENT_TYPE_BLUELIGHT = "Bluelight";
 
     @Autowired
     private CrashNotifyService stompService;
@@ -40,10 +45,13 @@ public class NotificationStorageController {
     @Autowired
     BlueLightOrganisationService blueLightOrganisationService;
 
+    @Autowired
+    private AutonomousCarService carService;
+
     @GetMapping("/test")
     public String test() {
         LOGGER.info("test called");
-        return "test called";
+        return "test called notificationservice";
     }
 
     @GetMapping("/notificationstorage/test")
@@ -116,19 +124,30 @@ public class NotificationStorageController {
         return "crash resolved";
     }
 
-    @GetMapping("/notifications")
-    public List<?> getNotificationsForOem(@RequestParam(required = false) Optional<String> oem,
-                                                           @RequestParam(defaultValue = "false") boolean active) {
-        if (oem.isPresent()) {
-            return oemNotificaionService.getOemNotifications(oem.get());
+    @GetMapping("/notificationstorage/notifications")
+    public List<?> getCrashEvents(@RequestHeader(value="X-Client-Type") String clientType,
+                                  @RequestParam(required = false) Optional<String> oem,
+                                  @RequestParam(defaultValue = "false") boolean active) {
+        if (CLIENT_TYPE_CAR.equals(clientType)) {
+            // Get all active crashes
+            return carService.getAllActiveCrashEvents();
+        } else if (CLIENT_TYPE_OEM.equals(clientType)) {
+            // Get all crashes by oem
+            if (oem.isPresent()) {
+                return oemNotificaionService.getOemNotifications(oem.get());
+            }
+            // Throw missing parameter exception
+            return null;
+        } else if (CLIENT_TYPE_BLUELIGHT.equals(clientType)) {
+            // Get all crashes
+            return blueLightOrganisationService.getAllAccidents();
+        } else {
+            // Throw missing header exception
+            return null;
         }
-        if (active) {
-            return blueLightOrganisationService.getAllActiveAccidents();
-        }
-        return blueLightOrganisationService.getAllAccidents();
     }
 
-    @PostMapping("/notifications")
+    @PostMapping("/notificationstorage/notifications")
     public void createCrashEvent(@RequestBody CrashEventDto crashEventDto) {
         CrashEvent event = new CrashEvent();
         event.setChassisnumber(crashEventDto.getChassisNumber());
@@ -140,7 +159,7 @@ public class NotificationStorageController {
         stompService.yell(event);
     }
 
-    @PatchMapping("/notifications/{crashId}")
+    @PatchMapping("/notificationstorage/notifications/{crashId}")
     public void resolveCrashEvent(@PathVariable String crashId) throws CrashNotFoundException, CrashAlreadyInactiveException {
         CrashEvent event = crashRepository.findById(crashId).orElse(null);
         if (event == null) throw new CrashNotFoundException("crash with Id" + crashId + "not found");

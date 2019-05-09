@@ -44,7 +44,7 @@ public class NotificationStoreRestClient {
 
     interface NotificationService {
 
-        @POST("/notifications")
+        @POST("/notificationstorage/notifications")
         Call<Void> createCrashEvent(@Body CrashEventDto crash);
     }
 }
