@@ -20,6 +20,15 @@ public class TestDataInserter {
                 return;
             }
 
+            // Simulation Cars
+            repo.save(new Car("000", "Audi", "A8"));
+            repo.save(new Car("001", "BMW", "i8 Coupe"));
+            repo.save(new Car("002", "Opel", "Astra"));
+            repo.save(new Car("003", "Audi", "Q2"));
+            repo.save(new Car("004", "Audi", "r8"));
+            repo.save(new Car("005", "BMW", "x7"));
+
+            // Other test data
             repo.save(new Car("ABCD0", "Audi", "A8"));
             repo.save(new Car("ABCD1", "Audi", "A6"));
             repo.save(new Car("ABCD2", "Audi", "A5"));

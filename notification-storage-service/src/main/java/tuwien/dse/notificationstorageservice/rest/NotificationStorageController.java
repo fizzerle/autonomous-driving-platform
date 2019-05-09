@@ -149,6 +149,7 @@ public class NotificationStorageController {
 
     @PostMapping("/notificationstorage/notifications")
     public void createCrashEvent(@RequestBody CrashEventDto crashEventDto) {
+        LOGGER.info("Creating new Crash with chassis {}", crashEventDto.getChassisNumber());
         CrashEvent event = new CrashEvent();
         event.setChassisnumber(crashEventDto.getChassisNumber());
         event.setCrashTimestamp(crashEventDto.getTimestamp());
@@ -161,6 +162,7 @@ public class NotificationStorageController {
 
     @PatchMapping("/notificationstorage/notifications/{crashId}")
     public void resolveCrashEvent(@PathVariable String crashId) throws CrashNotFoundException, CrashAlreadyInactiveException {
+        LOGGER.info("Resolving Crash with id {}", crashId);
         CrashEvent event = crashRepository.findById(crashId).orElse(null);
         if (event == null) throw new CrashNotFoundException("crash with Id" + crashId + "not found");
         if (event.getResolveTimestamp() != null) throw new CrashAlreadyInactiveException("Crash with Id " + crashId + "is already inactive");

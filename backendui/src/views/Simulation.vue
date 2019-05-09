@@ -61,7 +61,7 @@
                                 End: {{car.end}}<br>
                                 Speed: {{car.speed}}<br>
                                 OEM: {{car.oem}}<br>
-                                Chassis number: {{car.chassis}}<br>
+                                Chassis number: {{car.chassisNumber}}<br>
                                 <template v-if="car.crash">Crashes at destination</template></v-card-text>
                         </v-card>
                     </v-expansion-panel-content>
@@ -124,7 +124,7 @@
                                 md4
                         >
                             <v-text-field
-                                    v-model="model"
+                                    v-model="modeltype"
                                     :rules="modelRule"
                                     label="Modeltype"
                                     required
@@ -136,7 +136,7 @@
                                 md4
                         >
                             <v-text-field
-                                    v-model="chassis"
+                                    v-model="chassisNumber"
                                     :rules="chassisRule"
                                     label="Chassis Number"
                                     required
@@ -171,15 +171,15 @@ export default {
         valid: false,
         center: { lat: 40.756, lng: -73.978 },
         markers: [],
-        simStepSize: 1,
+        simStepSize: 0.1,
         simSpeed: 120,
         speed:'',
         crash:'',
         startCoord:'',
         endCoord:'',
         oem:'',
-        chassis:'',
-        model:'',
+        chassisNumber:'',
+        modeltype:'',
         coordRules: [
             v => !!v || 'Coordinate is required',
             v => /^-?[0-9][0-9]?(\.[0-9]*)?, -?[0-9][0-9]?(\.[0-9]*)?$/.test(v) || 'Coordinates must be valid'
@@ -208,8 +208,8 @@ export default {
                 speed: 40,
                 crash: false,
                 oem: "Audi",
-                model: "A8",
-                chassis: "000"
+                modeltype: "A8",
+                chassisNumber: "000"
             },
             {
                 name: "car2",
@@ -218,8 +218,8 @@ export default {
                 speed: 40,
                 crash: false,
                 oem: "BMW",
-                model: "i8 Coupe",
-                chassis: "001"
+                modeltype: "i8 Coupe",
+                chassisNumber: "001"
             },
             {
                 name: "car3",
@@ -228,8 +228,8 @@ export default {
                 speed: 40,
                 crash: true,
                 oem: "Opel",
-                model: "Astra",
-                chassis: "002"
+                modeltype: "Astra",
+                chassisNumber: "002"
             },
             {
                 name: "car4",
@@ -238,8 +238,8 @@ export default {
                 speed: 40,
                 crash: false,
                 oem: "Audi",
-                model: "Q2",
-                chassis: "003"
+                modeltype: "Q2",
+                chassisNumber: "003"
             },
             {
                 name: "car5",
@@ -247,9 +247,9 @@ export default {
                 end:  "40.803244, -73.944627",
                 speed: 40,
                 crash: false,
-                model: "r8",
+                modeltype: "r8",
                 oem: "Audi",
-                chassis: "004"
+                chassisNumber: "004"
             },
             {
                 name: "car6",
@@ -257,9 +257,9 @@ export default {
                 end:  "40.719489, -73.267445",
                 speed: 10,
                 crash: false,
-                model: "x7",
+                modeltype: "x7",
                 oem: "BMW",
-                chassis: "005"
+                chassisNumber: "005"
             },
         ],
         selectedCar: null,
@@ -280,7 +280,7 @@ export default {
         },
         addCar: function () {
             if (this.valid) {
-                this.cars.push({name: "car"+ (this.cars.length+1), startCoord: this.start, endCoord: this.end, speed: this.speed, crash: this.crash, oem: this.oem, chassis: this.chassis});
+                this.cars.push({name: "car"+ (this.cars.length+1), startCoord: this.start, endCoord: this.end, speed: this.speed, crash: this.crash, oem: this.oem, chassisNumber: this.chassisNumber});
             }
         },
         createSimulationCars: function () {
@@ -304,8 +304,8 @@ export default {
                     reached: false,
                     crash: car.crash,
                     oem: car.oem,
-                    model: car.model,
-                    chassis: car.chassis,
+                    modeltype: car.modeltype,
+                    chassisNumber: car.chassisNumber,
                     passengers: Math.floor(Math.random() * 5) + 1
                 });
             }
@@ -336,8 +336,8 @@ export default {
                 }
                 let eventData = {
                     oem: car.oem,
-                    chassis: car.chassis,
-                    model: car.model,
+                    chassisNumber: car.chassisNumber,
+                    modeltype: car.modeltype,
                     passengers: car.passengers,
                     location: {
                         lat: getLatitude(car.cpos),
@@ -356,14 +356,9 @@ export default {
                 }
 
                 if (car.reached && car.crash) {
-                    eventData.crash = this.crashTypes[Math.floor(Math.random()*this.crashTypes.length)];
-                    console.log(JSON.stringify(eventData));
-
-                    //TODO rest call
-                } else {
-                    console.log(JSON.stringify(eventData));
-                    //TODO rest call
+                    eventData.crashEvent = this.crashTypes[Math.floor(Math.random()*this.crashTypes.length)];
                 }
+                this.sendEventData(eventData);
             }
         },
         checkReached: function () {
@@ -433,6 +428,16 @@ export default {
         },
         getRandomSensorData: function () {
             return Math.floor(Math.round(Math.random()-0.3) * (Math.random() * 10) + 1)
+        },
+
+        sendEventData: function(event) {
+            fetch('/eventstorage/events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(event)
+            });
         }
 
     },

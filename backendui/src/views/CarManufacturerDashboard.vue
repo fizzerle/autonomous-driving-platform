@@ -9,9 +9,10 @@
       wrap
     >
       <v-flex xs12>
-        <v-combobox
-          v-model="select"
-          :items="itemsCombo"
+        <v-select
+          v-model="selectedOem"
+          :items="oems"
+          @change="oemChanged"
           chips
           label="Please Select a Car Manufacturer"
         >
@@ -30,7 +31,7 @@
               {{ data.item }}
             </v-chip>
           </template>
-        </v-combobox>
+        </v-select>
       </v-flex>
       <v-flex
         md6
@@ -128,15 +129,19 @@
 </template>
 
 <script>
+import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, getLongitude} from 'geolocation-utils'
+import WebSocketClient from '../utils/WebSocketClient';
+import * as moment from 'moment'
+import { setTimeout } from 'timers';
+
 export default {
   data: () => ({
-    select: 'Audi',
-    itemsCombo: [
-      'Audi',
-      'BMW',
-      'Lamborghini',
-      'Lotus'
-    ],
+    selectedOem: null,
+    oems: [],
+
+    wsClientCrash: null,
+    wsClientEvent: null,
+
     headers: [
       {
         sortable: false,
@@ -264,7 +269,55 @@ export default {
         speed: '120 km/h'
       }
     ]
-  })
+  }),
+  methods: {
+
+    oemChanged: function() {
+      if (this.wsClientCrash) {
+        this.wsClientCrash.close();
+      }
+      if (this.wsClientEvent) {
+        this.wsClientEvent.close();
+      }
+      this.wsClientCrash = new WebSocketClient();
+      this.wsClientCrash.connectOemCrash(this.selectedOem, this.receivedCrashData);
+      this.wsClientEvent = new WebSocketClient();
+      this.wsClientEvent.connectOemEvent(this.selectedOem, this.receivedEventData);
+
+
+    },
+
+    loadOems: function() {
+      fetch('/entitystorage/oem')
+      .then(resp => {
+          resp.json().then(data => {
+                console.info("Received oems events", data);
+                this.oems = data;
+          });
+      });
+    },
+    receivedCrashData: function(data) {
+        let crash = JSON.parse(data.body);
+        console.info('Received crash update', crash);
+        // TODO            
+    },
+    receivedEventData: function(data) {
+        let event = JSON.parse(data.body);
+        console.info('Received event update', event);
+        // TODO
+    }
+  },
+  mounted: function() {
+      this.loadOems();
+  },
+  beforeDestroy: function() {
+      if (this.wsClientCrash) {
+        this.wsClientCrash.close();
+      }
+      if (this.wsClientEvent) {
+        this.wsClientEvent.close();
+      }
+  }
 }
 </script>
 <style>

@@ -68,6 +68,7 @@ public class EventStorageController {
 
     @PostMapping("/eventstorage/events")
     public void create(@RequestBody CarEventDto carEventDto) {
+        LOGGER.info("Update from car with chassis {}", carEventDto.getChassisNumber());
         Event event = new Event(
                 carEventDto.getLocation(),
                 carEventDto.getChassisNumber(),
