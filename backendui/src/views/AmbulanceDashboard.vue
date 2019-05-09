@@ -86,13 +86,7 @@ const FILTER_INACTIVE = 2;
 export default {
     data: () => ({
         center: { lat: 40.756, lng: -73.978 },
-        crashes: [
-            { resolveTimestamp: null, oem: "Audi", modeltype: "A8", chassisnumber: "B567GK", passengers: 4, timestamp: "1.5.19 20:44", location: "40.731444, -73.996990", crashId: "C" },
-            { resolveTimestamp: new Date(), oem: "Fiat", modeltype: "Punto", chassisnumber: "ASDF1", passengers: 1, timestamp: "8.5.19 20:44", location: "40.721444, -73.986990", crashId: "A" },
-            { resolveTimestamp: new Date(), oem: "Audi", modeltype: "A6", chassisnumber: "XXX7", passengers: 2, timestamp: "2.5.19 20:44", location: "40.791444, -73.986990", crashId: "3" },
-            { resolveTimestamp: null, oem: "Ford", modeltype: "Fokus", chassisnumber: "QWERT5", passengers: 3, timestamp: "3.5.19 20:44", location: "40.701444, -74.006990", crashId: "8" },
-            { resolveTimestamp: new Date(), oem: "BMW", modeltype: "Z4", chassisnumber: "ZZZDF73", passengers: 4, timestamp: "5.5.19 20:44", location: "40.731444, -73.896990", crashId: "5" }
-        ],
+        crashes: [],
         list: [],
         filter: FILTER_ALL,
         markers: [],
@@ -225,15 +219,42 @@ export default {
             return blue;
         },
         resolveCrash: function() {
+            if (!this.selected) {
+                return;
+            }
+
+            fetch('/notificationstorage/notifications/' + this.selected.crashId, {
+                method: 'PATCH'
+            })
+            .then(resp => {
+                this.loadCrashData();
+                this.selected.resolveTimestamp = new Date();
+            });
+            /* // OLD:
             this.crashes.forEach(cr => {
                 if (cr.crashId === this.selected.crashId){
                     cr.resolveTimestamp = new Date();
                     // TODO: Send Request to resolve selected crash
                 }
             });
-            this.updateList();
+            this.updateList(); */
         },
 
+        loadCrashData: function() {
+            const v = this;
+            fetch('/notificationstorage/notifications', {
+                headers: {
+                    'X-Client-Type': 'Bluelight'
+                }
+            })
+            .then(resp => {
+                resp.json().then(data => {
+                    console.info("Received bluelight crash events", data);
+                    this.crashes = data;
+                    this.updateList();
+                });
+            });
+        },
 
         receivedCrashData: function(data) {
             let crash = JSON.parse(data.body);
@@ -255,7 +276,7 @@ export default {
 
     },
     mounted:function() {
-        this.listAll();
+        this.loadCrashData();
         this.wsClient = new WebSocketClient();
         this.wsClient.connectBluelight(this.receivedCrashData);
     },
