@@ -29,68 +29,71 @@ import WebSocketClient from '../utils/WebSocketClient';
 export default {
     data: () => ({
         center: { lat: 40.756, lng: -73.978 },
-        crashes: [
-            { active: true, oem: "Audi", model: "A8", chassis: "B567GK", occupants: 4, timestamp: "1.5.19 20:44", location: "40.731444, -73.996990" },
-            { active: false, oem: "Fiat", model: "Punto", chassis: "ASDF1", occupants: 1, timestamp: "8.5.19 20:44", location: "40.721444, -73.986990" },
-            { active: false, oem: "Audi", model: "A6", chassis: "XXX7", occupants: 2, timestamp: "2.5.19 20:44", location: "40.791444, -73.986990" },
-            { active: true, oem: "Ford", model: "Fokus", chassis: "QWERT5", occupants: 3, timestamp: "3.5.19 20:44", location: "40.701444, -74.006990" },
-            { active: false, oem: "BMW", model: "Z4", chassis: "ZZZDF73", occupants: 4, timestamp: "5.5.19 20:44", location: "40.731444, -73.896990" }
-        ],
-        list: [],
+        crashes: [],
         markers: [],
 
         wsClient: null
     }),
     methods: {
 
-        updateView: function() {
-            this.list = [];
-            this.crashes.forEach(cr => {
-                this.list.push({
-                    location: this.locationFromString(cr.location)
-                });
-            });
-            this.updateMarkers();
-        },
+        
         updateMarkers: function() {
             this.markers = [];
-            for (const cr of this.list) {
+            let count = 0;
+            this.crashes.forEach(cr => {
+                count++;
                 this.markers.push({
                     crash: cr,
                     icon: {
                         url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
                     }
                 });
-            }
+            });
+            console.info("Updated " + count + " markers");
         },
-        locationFromString: function(string) {
-            let help = string.split(', ');
+        locationFromString: function(loc) {
+            if (typeof(loc) === "object") {
+                return createLocation(loc.lat, loc.lng, 'LatLng');
+            }
+            let help = loc.split(', ');
             let lat = parseFloat(help[0]);
             let lng = parseFloat(help[1]);
-            return createLocation(lat,lng,'LatLng')
+            return createLocation(lat, lng, 'LatLng')
+        },
+
+        loadCrashData: function() {
+            const v = this;
+            fetch('/notificationstorage/notifications', {
+                headers: {
+                    'X-Client-Type': 'Car'
+                }
+            })
+            .then(resp => {
+                resp.json().then(data => {
+                    console.info("Received car crash events", data);
+                    this.crashes = data;
+                    this.updateMarkers();
+                });
+            });
         },
 
         receivedCrashData: function(data) {
             let crash = JSON.parse(data.body);
-            crash.timestamp = new Date(crash.timestamp);
-            if (typeof(crash.location) === "string") {
-                // Convert to LatLng
-            }
             if (crash.active) {
                 this.crashes.push(crash);
             } else {
-                let cr = this.crashes.filter(cr => cr.location === crash.location).pop();
+                let cr = this.crashes.filter(cr => cr.location.lat === crash.location.lat && cr.location.lng === crash.location.lng).pop();
                 if (cr !== undefined) {
                     this.crashes.splice(this.crashes.indexOf(cr), 1);
                 }
             }
             console.info("Received Socket Data", crash);
-            this.updateView();            
+            this.updateMarkers();            
         }
 
     },
-    mounted:function() {
-        this.updateView();
+    mounted: function() {
+        this.loadCrashData();
         this.wsClient = new WebSocketClient();
         this.wsClient.connectCar(this.receivedCrashData);
     },

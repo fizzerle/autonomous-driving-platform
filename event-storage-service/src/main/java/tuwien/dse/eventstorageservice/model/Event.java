@@ -18,12 +18,13 @@ public class Event {
     private int speed;
     private double spaceAhead;
     private double spaceBehind;
+    private int passengers;
 
     public Event() {
 
     }
 
-    public Event(Location location, String chassisnumber, Date timestamp, int speed, double spaceAhead, double spaceBehind,String crashEvent) {
+    public Event(Location location, String chassisnumber, Date timestamp, int speed, double spaceAhead, double spaceBehind,String crashEvent, int passengers) {
         this.location = location;
         this.chassisnumber = chassisnumber;
         this.timestamp = timestamp;
@@ -31,6 +32,7 @@ public class Event {
         this.spaceAhead = spaceAhead;
         this.spaceBehind = spaceBehind;
         this.crashEvent = crashEvent;
+        this.passengers = passengers;
     }
 
     public String getId() {
@@ -95,5 +97,13 @@ public class Event {
 
     public void setSpaceBehind(double spaceBehind) {
         this.spaceBehind = spaceBehind;
+    }
+
+    public int getPassengers() {
+        return passengers;
+    }
+
+    public void setPassengers(int passengers) {
+        this.passengers = passengers;
     }
 }

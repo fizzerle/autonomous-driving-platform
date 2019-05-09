@@ -24,12 +24,12 @@
                 </v-flex>
 
                 <v-flex v-if="selected != null">
-                    <material-card :color="selected.active ? 'red' : 'blue'" 
-                        :title="selected.oem + ' ' + selected.model"
-                        :text="selected.timestamp">
-                        <h4>Occupants: {{ selected.occupants }}</h4>
-                        <h6>Chassis Number: {{ selected.chassis }}</h6>
-                        <v-btn v-if="selected.active" class="mx-0 font-weight-light" color="success" @click="resolveCrash()">Resolve Crash</v-btn>
+                    <material-card :color="selected.resolveTimestamp === null ? 'red' : 'blue'" 
+                        :title="selected.oem + ' ' + selected.modeltype"
+                        :text="crashTimestamps()">
+                        <h4>Occupants: {{ selected.passengers }}</h4>
+                        <h6>Chassis Number: {{ selected.chassisnumber }}</h6>
+                        <v-btn v-if="selected.resolveTimestamp === null" class="mx-0 font-weight-light" color="success" @click="resolveCrash()">Resolve Crash</v-btn>
                     </material-card>
                 </v-flex>
             </v-flex>
@@ -54,13 +54,13 @@
                     <v-list three-line>
                         <v-list-tile v-for="(cr, i) in list" :key="i" @click="select(cr)">
                         <v-list-tile-action>
-                            <v-icon v-if="cr.active" slot="activator">mdi-alarm-light</v-icon>
+                            <v-icon v-if="cr.resolveTimestamp === null" slot="activator">mdi-alarm-light</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-title>
-                            {{ cr.timestamp }}
+                            {{ formatDateSmall(cr.timestamp) }}
                         </v-list-tile-title>
                         <v-list-tile-sub-title>
-                            {{ cr.oem }} {{ cr.model }}
+                            {{ cr.oem }} {{ cr.modeltype }}
                         </v-list-tile-sub-title>
                         </v-list-tile>
                         <v-divider/>
@@ -77,6 +77,7 @@
 </template>
 <script>
 import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, getLongitude} from 'geolocation-utils'
+import * as moment from 'moment'
 import WebSocketClient from '../utils/WebSocketClient';
 
 const FILTER_ALL = 0;
@@ -86,13 +87,7 @@ const FILTER_INACTIVE = 2;
 export default {
     data: () => ({
         center: { lat: 40.756, lng: -73.978 },
-        crashes: [
-            { active: true, oem: "Audi", model: "A8", chassis: "B567GK", occupants: 4, timestamp: "1.5.19 20:44", location: "40.731444, -73.996990" },
-            { active: false, oem: "Fiat", model: "Punto", chassis: "ASDF1", occupants: 1, timestamp: "8.5.19 20:44", location: "40.721444, -73.986990" },
-            { active: false, oem: "Audi", model: "A6", chassis: "XXX7", occupants: 2, timestamp: "2.5.19 20:44", location: "40.791444, -73.986990" },
-            { active: true, oem: "Ford", model: "Fokus", chassis: "QWERT5", occupants: 3, timestamp: "3.5.19 20:44", location: "40.701444, -74.006990" },
-            { active: false, oem: "BMW", model: "Z4", chassis: "ZZZDF73", occupants: 4, timestamp: "5.5.19 20:44", location: "40.731444, -73.896990" }
-        ],
+        crashes: [],
         list: [],
         filter: FILTER_ALL,
         markers: [],
@@ -106,11 +101,12 @@ export default {
             this.list = [];
             this.crashes.forEach(cr => {
                 this.list.push({
-                    active: cr.active,
+                    crashId: cr.crashId,
+                    resolveTimestamp: cr.resolveTimestamp,
                     oem: cr.oem,
-                    model: cr.model,
-                    chassis: cr.chassis,
-                    occupants: cr.occupants,
+                    modeltype: cr.modeltype,
+                    chassisnumber: cr.chassisnumber,
+                    passengers: cr.passengers,
                     timestamp: cr.timestamp,
                     location: this.locationFromString(cr.location)
                 });
@@ -122,19 +118,20 @@ export default {
         listActive: function() {
             this.list = [];
             this.crashes.forEach(cr => {
-                if (cr.active) {
+                if (cr.resolveTimestamp === null) {
                     this.list.push({
-                        active: true,
+                        crashId: cr.crashId,
+                        resolveTimestamp: null,
                         oem: cr.oem,
-                        model: cr.model,
-                        chassis: cr.chassis,
-                        occupants: cr.occupants,
+                        modeltype: cr.modeltype,
+                        chassisnumber: cr.chassisnumber,
+                        passengers: cr.passengers,
                         timestamp: cr.timestamp,
                         location: this.locationFromString(cr.location)
                     });
                 }
             });
-            if (this.selected !== null && !this.selected.active) {
+            if (this.selected !== null && this.selected.resolveTimestamp !== null) {
                 this.selected = null;
             }
             this.filter = FILTER_ACTIVE;
@@ -144,19 +141,20 @@ export default {
         listInactive: function() {
             this.list = [];
             this.crashes.forEach(cr => {
-                if (!cr.active) {
+                if (cr.resolveTimestamp !== null) {
                     this.list.push({
-                        active: false,
+                        crashId: cr.crashId,
+                        resolveTimestamp: cr.resolveTimestamp,
                         oem: cr.oem,
-                        model: cr.model,
-                        chassis: cr.chassis,
-                        occupants: cr.occupants,
+                        modeltype: cr.modeltype,
+                        chassisnumber: cr.chassisnumber,
+                        passengers: cr.passengers,
                         timestamp: cr.timestamp,
                         location: this.locationFromString(cr.location)
                     });
                 }
             });
-            if (this.selected !== null && this.selected.active) {
+            if (this.selected !== null && this.selected.resolveTimestamp === null) {
                 this.selected = null;
             }
             this.filter = FILTER_INACTIVE;
@@ -193,11 +191,27 @@ export default {
                 this.listInactive();
             }
         },
-        locationFromString: function(string) {
-            let help = string.split(', ');
+        locationFromString: function(loc) {
+            if (typeof(loc) === "object") {
+                return createLocation(loc.lat, loc.lng, 'LatLng');
+            }
+            let help = loc.split(', ');
             let lat = parseFloat(help[0]);
             let lng = parseFloat(help[1]);
-            return createLocation(lat,lng,'LatLng')
+            return createLocation(lat, lng, 'LatLng')
+        },
+        formatDateSmall: function(date) {
+            return moment(date).format('D.M h:mm');
+        },
+        formatDateFull: function(date) {
+            return moment(date).format('DD.MM.YYYY hh:mm:ss');
+        },
+        crashTimestamps: function() {
+            let start = this.formatDateFull(this.selected.timestamp);
+            if (this.selected.resolveTimestamp) {
+                return start + ' - ' + this.formatDateFull(this.selected.resolveTimestamp);
+            }
+            return start;
         },
         select: function(item) {
             this.center = item.location;
@@ -210,36 +224,65 @@ export default {
         getIcon: function(cr) {
             let red = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
             let blue = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+            let yellow = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
 
-            if (this.selected === null) {
+            if (this.selected && this.selected.crashId === cr.crashId) {
+                return yellow;
+            } else if (cr.resolveTimestamp) {
                 return blue;
-            } else if (this.selected.chassis === cr.chassis && this.selected.timestamp === cr.timestamp) {
-                return red;
             }
-            return blue;
+            return red;
         },
         resolveCrash: function() {
+            if (!this.selected) {
+                return;
+            }
+
+            fetch('/notificationstorage/notifications/' + this.selected.crashId, {
+                method: 'PATCH'
+            })
+            .then(resp => {
+                this.loadCrashData();
+                this.selected.resolveTimestamp = new Date();
+            });
+            /* // OLD:
             this.crashes.forEach(cr => {
-                if (cr.chassis === this.selected.chassis && cr.timestamp === this.selected.timestamp) {
-                    cr.active = false;
+                if (cr.crashId === this.selected.crashId){
+                    cr.resolveTimestamp = new Date();
+                    // TODO: Send Request to resolve selected crash
                 }
             });
-            this.updateList();
+            this.updateList(); */
         },
 
+        loadCrashData: function() {
+            const v = this;
+            fetch('/notificationstorage/notifications', {
+                headers: {
+                    'X-Client-Type': 'Bluelight'
+                }
+            })
+            .then(resp => {
+                resp.json().then(data => {
+                    console.info("Received bluelight crash events", data);
+                    this.crashes = data;
+                    this.updateList();
+                });
+            });
+        },
 
         receivedCrashData: function(data) {
             let crash = JSON.parse(data.body);
             crash.timestamp = new Date(crash.timestamp);
-            if (typeof(crash.location) === "string") {
-                // Convert to LatLng
-            }
-            if (crash.active) {
+            if (crash.resolveTimestamp === null) {
                 this.crashes.push(crash);
             } else {
-                let cr = this.crashes.filter(cr => cr.chassis === crash.chassis && cr.location === crash.location).pop();
+                let cr = this.crashes.filter(cr => cr.crashId === crash.crashId).pop();
+                console.info("found crash with id", cr);
                 if (cr !== undefined) {
-                    cr.active = false;
+                    this.crashes.splice(this.crashes.indexOf(cr), 1);
+                    this.crashes.push(crash);
+                    console.info("updated crash", crash);
                 }
             }
             this.updateList();
@@ -248,7 +291,7 @@ export default {
 
     },
     mounted:function() {
-        this.listAll();
+        this.loadCrashData();
         this.wsClient = new WebSocketClient();
         this.wsClient.connectBluelight(this.receivedCrashData);
     },

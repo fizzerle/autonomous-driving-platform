@@ -5,25 +5,61 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
-import tuwien.dse.notificationstorageservice.dto.CrashDto;
+import tuwien.dse.notificationstorageservice.dto.BlueLightOrgNotificationDto;
+import tuwien.dse.notificationstorageservice.dto.CarEventDto;
+import tuwien.dse.notificationstorageservice.dto.CarNotificationDto;
+import tuwien.dse.notificationstorageservice.dto.OemNotificationDto;
+import tuwien.dse.notificationstorageservice.model.CrashEvent;
+
 
 @Service
 public class CrashNotifyService {
 
     @Autowired
+    private EventStoreRestClient eventStoreRestClient;
+
+    @Autowired
     private SimpMessageSendingOperations simp;
 
-    public void yell(CrashDto data) {
-        notifyBluelights(data);
-        notifyOem(data);
+    public void yell(CrashEvent crashEvent) {
+        CarEventDto event;
 
-        CrashDto carDto = new CrashDto();
-        carDto.setLocation(data.getLocation());
-        carDto.setActive(data.isActive());
+        try {
+            event = eventStoreRestClient.getCarEvent(crashEvent.getEventId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        CarNotificationDto carDto = new CarNotificationDto(
+                event.getLocation(),
+                crashEvent.getResolveTimestamp() == null
+        );
+        BlueLightOrgNotificationDto bluelightDto = new BlueLightOrgNotificationDto(
+                crashEvent.getCrashId(),
+                event.getOem(),
+                crashEvent.getChassisnumber(),
+                event.getModeltype(),
+                event.getLocation(),
+                crashEvent.getResolveTimestamp(),
+                crashEvent.getCrashTimestamp(),
+                event.getPassengers()
+        );
+        OemNotificationDto oemDto = new OemNotificationDto(
+                crashEvent.getCrashTimestamp(),
+                crashEvent.getDescription(),
+                crashEvent.getChassisnumber(),
+                crashEvent.getResolveTimestamp(),
+                event.getLocation()
+        );
+
         notifyCars(carDto);
+        notifyBluelights(bluelightDto);
+        notifyOem(event.getOem(), oemDto);
     }
 
-    public void notifyCars(CrashDto data) {
+
+    public void notifyCars(CarNotificationDto data) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
@@ -34,7 +70,7 @@ public class CrashNotifyService {
         }
     }
 
-    public void notifyBluelights(CrashDto data) {
+    public void notifyBluelights(BlueLightOrgNotificationDto data) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
@@ -45,11 +81,11 @@ public class CrashNotifyService {
         }
     }
 
-    public void notifyOem(CrashDto data) {
+    public void notifyOem(String oem, OemNotificationDto data) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
-            String topic = "/crash/audi";
+            String topic = "/crash/" + oem.toLowerCase();
             simp.convertAndSend(topic, json);
         } catch (JsonProcessingException e) {
             // Do nothing

@@ -1,4 +1,4 @@
-package tuwien.dse.entitystorageservice.services;
+package tuwien.dse.entitystorageservice.rest;
 
 
 import org.slf4j.Logger;
@@ -9,6 +9,8 @@ import tuwien.dse.entitystorageservice.model.Car;
 import tuwien.dse.entitystorageservice.persistence.CarRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class EntityStorageController {
@@ -18,15 +20,10 @@ public class EntityStorageController {
     @Autowired
     CarRepository carRepository;
 
-    @GetMapping("/cars/")
-    public List<Car> findAll() {
-        return carRepository.findAll();
-    }
-
-    @GetMapping("/test/")
+    @GetMapping("/test")
     public String test() {
         LOGGER.info("test called");
-        return "test called";
+        return "test called entityservice";
     }
 
     @GetMapping("/entitystorage/test")
@@ -36,23 +33,31 @@ public class EntityStorageController {
     }
 
 
-    @GetMapping("/cars/{oem}")
-    public List<Car> getAllOfOem(@PathVariable String oem) {
-        return carRepository.findAllByOem(oem);
+    @GetMapping("/entitystorage/cars")
+    public List<Car> getAll(@RequestParam(required = false) Optional<String> oem) {
+        if (oem.isPresent()) {
+            return carRepository.findAllByOem(oem.get());
+        }
+        return carRepository.findAll();
     }
 
-    @PostMapping("/saveCar/")
+    @PostMapping("/entitystorage/cars")
     public Car insertCar(@RequestBody Car car) {
         return carRepository.save(car);
     }
 
-    @GetMapping("/car/{chassisnumber}")
+    @GetMapping("/entitystorage/cars/{chassisnumber}")
     public Car getCarByChassisnumber(@PathVariable String chassisnumber) {
         return carRepository.findByChassisnumber(chassisnumber);
     }
 
-    @DeleteMapping("/car/{chassisnumber}")
+    @DeleteMapping("/entitystorage/cars/{chassisnumber}")
     public Long deleteCarByChassisnumber(@PathVariable String chassisnumber) {
         return carRepository.deleteCarByChassisnumber(chassisnumber);
+    }
+
+    @GetMapping("/entitystorage/oem")
+    public List<String> getOems() {
+        return carRepository.findAll().stream().map(car -> car.getOem()).distinct().collect(Collectors.toList());
     }
 }
