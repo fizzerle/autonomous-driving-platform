@@ -1,4 +1,4 @@
-package tuwien.dse.notificationstorageservice.services;
+package tuwien.dse.notificationstorageservice.rest;
 
 
 import org.slf4j.Logger;
@@ -17,9 +17,13 @@ import tuwien.dse.notificationstorageservice.exception.CrashAlreadyInactiveExcep
 import tuwien.dse.notificationstorageservice.exception.CrashNotFoundException;
 import tuwien.dse.notificationstorageservice.model.CrashEvent;
 import tuwien.dse.notificationstorageservice.persistence.CrashRepository;
+import tuwien.dse.notificationstorageservice.services.BlueLightOrganisationService;
+import tuwien.dse.notificationstorageservice.services.CrashNotifyService;
+import tuwien.dse.notificationstorageservice.services.OemNotificaionService;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class NotificationStorageController {
@@ -35,12 +39,6 @@ public class NotificationStorageController {
     OemNotificaionService oemNotificaionService;
     @Autowired
     BlueLightOrganisationService blueLightOrganisationService;
-
-    @GetMapping("/")
-    public List<CrashEvent> findAll() {
-        LOGGER.info("Event find all");
-        return crashRepository.findAll();
-    }
 
     @GetMapping("/test/")
     public String test() {
@@ -118,38 +116,38 @@ public class NotificationStorageController {
         return "crash resolved";
     }
 
-    @GetMapping("/oemNotifications/{oem}")
-    public List<OemNotificationDto> getNotificationsForOem(@PathVariable String oem) {
-        return oemNotificaionService.getOemNotifications(oem);
-    }
-
-    @GetMapping("/bluelight/active/")
-    public List<BlueLightOrgNotificationDto> getAllActiveAccidents() {
-        return blueLightOrganisationService.getAllActiveAccidents();
-    }
-
-    @GetMapping("/bluelight/all/")
-    public List<BlueLightOrgNotificationDto> getAllAccidents() {
+    @GetMapping("/notifications")
+    public List<?> getNotificationsForOem(@RequestParam(required = false) Optional<String> oem,
+                                                           @RequestParam(defaultValue = "false") boolean active) {
+        if (oem.isPresent()) {
+            return oemNotificaionService.getOemNotifications(oem.get());
+        }
+        if (active) {
+            return blueLightOrganisationService.getAllActiveAccidents();
+        }
         return blueLightOrganisationService.getAllAccidents();
     }
 
-    @PostMapping("/crashEvent/")
-    public CrashEvent createCrashEvent(@RequestBody CrashEventDto crashEventDto) {
+    @PostMapping("/notifications")
+    public void createCrashEvent(@RequestBody CrashEventDto crashEventDto) {
         CrashEvent event = new CrashEvent();
         event.setChassisnumber(crashEventDto.getChassisNumber());
         event.setCrashTimestamp(crashEventDto.getTimestamp());
         event.setDescription(crashEventDto.getDescription());
         event.setEventId(crashEventDto.getEventId());
-        return crashRepository.save(event);
+
+        event = crashRepository.save(event);
+        stompService.yell(event);
     }
 
-    @PostMapping("/setInactive/{crashId}")
-    public CrashEvent setCrashToInactive(@PathVariable String crashId) throws CrashNotFoundException, CrashAlreadyInactiveException {
+    @PatchMapping("/notifications/{crashId}")
+    public void resolveCrashEvent(@PathVariable String crashId) throws CrashNotFoundException, CrashAlreadyInactiveException {
         CrashEvent event = crashRepository.findById(crashId).orElse(null);
         if (event == null) throw new CrashNotFoundException("crash with Id" + crashId + "not found");
         if (event.getResolveTimestamp() != null) throw new CrashAlreadyInactiveException("Crash with Id " + crashId + "is already inactive");
 
         event.setResolveTimestamp(new Date());
-        return crashRepository.save(event);
+        event = crashRepository.save(event);
+        stompService.yell(event);
     }
 }

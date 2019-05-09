@@ -1,8 +1,6 @@
-package tuwien.dse.eventstorageservice.dto;
+package tuwien.dse.notificationstorageservice.dto;
 
-import tuwien.dse.eventstorageservice.model.Location;
-
-public class CarDataDto {
+public class CarEventDto {
 
     private String oem;
     private String chassisNumber;
@@ -14,10 +12,10 @@ public class CarDataDto {
     private double spaceBehind;
     private String crashEvent;
 
-    public CarDataDto() {
+    public CarEventDto() {
     }
 
-    public CarDataDto(String oem, String chassisNumber, String modeltype, int passengers, Location location, int speed, double spaceAhead, double spaceBehind, String crashEvent) {
+    public CarEventDto(String oem, String chassisNumber, String modeltype, int passengers, Location location, int speed, double spaceAhead, double spaceBehind, String crashEvent) {
         this.oem = oem;
         this.chassisNumber = chassisNumber;
         this.modeltype = modeltype;

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
-import tuwien.dse.eventstorageservice.dto.CarDataDto;
+import tuwien.dse.eventstorageservice.dto.CarEventDto;
 
 @Service
 public class EventNotifyService {
@@ -13,7 +13,7 @@ public class EventNotifyService {
     @Autowired
     private SimpMessageSendingOperations simp;
 
-    public void yell(CarDataDto data) {
+    public void yell(CarEventDto data) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
