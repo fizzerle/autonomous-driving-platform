@@ -30,32 +30,26 @@ export default {
     data: () => ({
         center: { lat: 40.756, lng: -73.978 },
         crashes: [],
-        list: [],
         markers: [],
 
         wsClient: null
     }),
     methods: {
 
-        updateView: function() {
-            this.list = [];
-            this.crashes.forEach(cr => {
-                this.list.push({
-                    location: this.locationFromString(cr.location)
-                });
-            });
-            this.updateMarkers();
-        },
+        
         updateMarkers: function() {
             this.markers = [];
-            for (const cr of this.list) {
+            let count = 0;
+            this.crashes.forEach(cr => {
+                count++;
                 this.markers.push({
                     crash: cr,
                     icon: {
                         url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
                     }
                 });
-            }
+            });
+            console.info("Updated " + count + " markers");
         },
         locationFromString: function(loc) {
             if (typeof(loc) === "object") {
@@ -68,6 +62,7 @@ export default {
         },
 
         loadCrashData: function() {
+            const v = this;
             fetch('/notificationstorage/notifications', {
                 headers: {
                     'X-Client-Type': 'Car'
@@ -76,8 +71,8 @@ export default {
             .then(resp => {
                 resp.json().then(data => {
                     console.info("Received car crash events", data);
-                    this.$data = data;
-                    this.updateView();
+                    this.crashes = data;
+                    this.updateMarkers();
                 });
             });
         },
@@ -93,7 +88,7 @@ export default {
                 }
             }
             console.info("Received Socket Data", crash);
-            this.updateView();            
+            this.updateMarkers();            
         }
 
     },
