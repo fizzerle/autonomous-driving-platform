@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface EventRepository extends MongoRepository<Event,String> {
 
     List<Event> findAll();
-    List<Event> findAllByChassisnumber(String chassisnumber);
+    //List<Event> findAllOrderByTimestampDesc();
     List<Event> findAllByChassisnumberOrderByTimestampDesc(String chassisnumber);
     Optional<Event> findById(String id);
 }

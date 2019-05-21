@@ -105,9 +105,9 @@ public class EventStorageController {
     public List<CarEventDto> getEvents(@RequestParam(required = false) Optional<String> oem, @RequestParam(required = false) Optional<String> chassisnumber, @RequestParam(required = false) Optional<Integer> limit) {
         List<Event> events;
         if (chassisnumber.isPresent()) {
-            events = repository.findAllByChassisnumber(chassisnumber.get());
+            events = repository.findAllByChassisnumberOrderByTimestampDesc(chassisnumber.get());
         } else {
-            events = repository.findAll();
+            events = repository.findAll();//OrOrderByTimestampDesc();
         }
 
         if (limit.isPresent()) {
