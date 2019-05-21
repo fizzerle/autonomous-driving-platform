@@ -127,6 +127,9 @@ export default {
             this.markers = [];
             let count = 0;
             this.crashes.forEach(cr => {
+                if (!this.isInRadiusOf3Km(cr.location)) {
+                    return;
+                }
                 count++;
                 this.markers.push({
                     location: cr.location,
@@ -154,6 +157,15 @@ export default {
             let lat = parseFloat(help[0]);
             let lng = parseFloat(help[1]);
             return createLocation(lat, lng, 'LatLng')
+        },
+        isInRadiusOf3Km(location) {
+            //headingDistanceTo
+            if (this.myPosition === null) {
+                return false;
+            }
+            let distance = distanceTo(this.myPosition, location);
+            console.info('Position distance: ', distance);
+            return distance < 3000;
         },
 
         loadCrashData: function() {
@@ -215,6 +227,7 @@ export default {
                             let loc = event.location;
                             console.info('My position should be: ', loc);
                             this.myPosition = loc;
+                            this.center = loc;
                             this.updateMarkers();
                         }
                     }
