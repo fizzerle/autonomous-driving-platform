@@ -69,6 +69,15 @@
                 </material-card>
                 
             </v-flex>
+
+            <v-flex md4 v-if="spaceAhead">
+                <material-card>
+                    <h6>Space Ahead: {{ spaceAhead }}</h6>
+                    <h6>Space Behind: {{ spaceBehind }}</h6>
+                    <h6>Speed: {{ speed }}</h6>
+                    <h6>Passengers: {{ passengers }}</h6>
+                </material-card>
+            </v-flex>
         </v-layout>
     </v-container>
 
@@ -84,6 +93,11 @@ export default {
         selectedCar: null,
         cars: [],
         myPosition: null,
+
+        spaceAhead: null,
+        spaceBehind: null,
+        speed: null,
+        passengers: null,
 
         center: { lat: 40.756, lng: -73.978 },
         crashes: [],
@@ -227,6 +241,10 @@ export default {
                             let loc = event.location;
                             console.info('My position should be: ', loc);
                             this.myPosition = loc;
+                            this.spaceAhead = event.spaceAhead;
+                            this.spaceBehind = event.spaceBehind;
+                            this.speed = event.speed;
+                            this.passengers = event.passengers;
                             this.center = loc;
                             this.updateMarkers();
                         }
