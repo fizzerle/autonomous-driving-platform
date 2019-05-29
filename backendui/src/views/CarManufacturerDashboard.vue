@@ -16,7 +16,7 @@
           chips
           label="Please Select a Car Manufacturer"
         >
-          <template v-slot:selection="data">
+          <!--<template v-slot:selection="data">
             <v-chip
               :key="JSON.stringify(data.item)"
               :selected="data.selected"
@@ -30,20 +30,20 @@
               </v-avatar>
               {{ data.item }}
             </v-chip>
-          </template>
+          </template>-->
         </v-select>
       </v-flex>
       <v-flex
         md6
       >
         <material-card
-          :text="'This is the list of cars for car manufacturer '+ select"
-          :title="'List of Cars for '+ select"
+          :text="'This is the list of cars for car manufacturer '+ selectedOem"
+          :title="'List of Cars for '+ selectedOem"
           color="green"
         >
           <v-data-table
             :headers="headers"
-            :items="items"
+            :items="cars"
           >
             <template
               slot="headerCell"
@@ -58,10 +58,10 @@
               slot="items"
               slot-scope="{ item }"
             >
-              <td>{{ item.id }}</td>
-              <td>{{ item.type }}</td>
-              <td>{{ item.people }}</td>
-              <td class="text-xs-right">{{ item.speed }}</td>
+              <td>{{ item.chassisnumber }}</td>
+              <td>{{ item.modelType }}</td>
+              <td>{{ item.passengers }}</td>
+              <td>{{ item.speed }}</td>
             </template>
           </v-data-table>
         </material-card>
@@ -70,8 +70,8 @@
         md6
       >
         <material-card
-          :text="'List of Crash Events for '+ select"
-          :title="'This is the list of Crash Events for '+ select"
+          :text="'List of Crash Events for '+ selectedOem"
+          :title="'This is the list of Crash Events for '+ selectedOem"
           color="red"
         >
           <v-data-table
@@ -103,7 +103,7 @@
         md12
       >
         <material-card
-          :title="'Map for the manufacturer '+ select"
+          :title="'Map for the manufacturer '+ selectedOem"
           color="blue"
         >
         <div>
@@ -133,11 +133,13 @@ import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, get
 import WebSocketClient from '../utils/WebSocketClient';
 import * as moment from 'moment'
 import { setTimeout } from 'timers';
+import { constants } from 'crypto';
 
 export default {
   data: () => ({
     selectedOem: null,
     oems: [],
+    cars:[],
 
     wsClientCrash: null,
     wsClientEvent: null,
@@ -146,17 +148,17 @@ export default {
       {
         sortable: false,
         text: 'Fahrgestellnummer',
-        value: 'id'
+        value: 'chassisnumber'
       },
       {
         sortable: false,
         text: 'Modelltyp',
-        value: 'type'
+        value: 'modelType'
       },
       {
         sortable: false,
         text: 'Insassen',
-        value: 'people'
+        value: 'passengers'
       },
       {
         sortable: false,
@@ -283,8 +285,7 @@ export default {
       this.wsClientCrash.connectOemCrash(this.selectedOem, this.receivedCrashData);
       this.wsClientEvent = new WebSocketClient();
       this.wsClientEvent.connectOemEvent(this.selectedOem, this.receivedEventData);
-
-
+      this.loadCarsOfOem(this.selectedOem)
     },
 
     loadOems: function() {
@@ -294,6 +295,32 @@ export default {
                 console.info("Received oems events", data);
                 this.oems = data;
           });
+      });
+    },
+    loadCarsOfOem: function(oem) {
+        fetch('entitystorage/cars?oem=' + oem)
+        .then(resp => {
+          resp.json().then(data => {
+                console.info("Received cars", data);
+                this.cars = data;
+                this.loadActualEventsForCars();
+          });
+      });
+      
+    },
+    loadActualEventsForCars: function(car) {
+      console.log(JSON.stringify(this.cars));
+      this.cars.forEach(car => {
+        console.log(JSON.stringify(car));
+        fetch('eventstorage/events?chassisnumber=' + car.chassisnumber + '&limit=1')
+        .then(resp => {
+            resp.json().then(data => {
+                  console.info("Received car event", JSON.stringify(data[0]));
+                  car.speed = data[0].speed + ' km/h';
+                  car.passengers = data[0].passengers;
+                  
+            });
+        });
       });
     },
     receivedCrashData: function(data) {
