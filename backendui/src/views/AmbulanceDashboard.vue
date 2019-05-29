@@ -1,4 +1,5 @@
 <template>
+
     <v-container fill-height fluid grid-list-xl>
         <v-layout justify-center wrap>
             
@@ -71,6 +72,31 @@
                 </material-card>
             </v-flex>
 
+            <v-snackbar
+              color="error"
+              :bottom="true"
+              :top="false"
+              :left="false"
+              :right="true"
+              v-model="snackbar"
+              @click="select(notificationCrash)"
+              dark
+            >
+              <v-icon
+                color="white"
+                class="mr-3"
+              >
+                mdi-bell-plus
+              </v-icon>
+              <div v-if="notificationCrash">{{ notificationCrash.oem + " " + notificationCrash.modeltype }} (Occupants: {{notificationCrash.passengers}})</div>
+              <v-icon
+                size="16"
+                @click="snackbar = false;"
+              >
+                mdi-close-circle
+              </v-icon>
+            </v-snackbar>
+
         </v-layout>
     </v-container>
 
@@ -85,13 +111,15 @@ const FILTER_ACTIVE = 1;
 const FILTER_INACTIVE = 2;
 
 export default {
-    data: () => ({
+    data: () => ({        
         center: { lat: 40.756, lng: -73.978 },
         crashes: [],
         list: [],
         filter: FILTER_ALL,
         markers: [],
         selected: null,
+        snackbar: null,
+        notificationCrash: null,
 
         wsClient: null
     }),
@@ -271,11 +299,22 @@ export default {
             });
         },
 
+        snack: function(crash) {
+            console.log('Show snackbar babe', crash);
+            this.snackbar = true;
+            this.notificationCrash = crash;
+        },
+
+        testMeth: function() {
+            console.info('TEST ASSDF');
+        },
+
         receivedCrashData: function(data) {
             let crash = JSON.parse(data.body);
             crash.timestamp = new Date(crash.timestamp);
             if (crash.resolveTimestamp === null) {
                 this.crashes.push(crash);
+                this.snack(crash);
             } else {
                 let cr = this.crashes.filter(cr => cr.crashId === crash.crashId).pop();
                 console.info("found crash with id", cr);
