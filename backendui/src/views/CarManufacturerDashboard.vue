@@ -118,6 +118,7 @@
                           :position="car.location"
                           :label="car.chassisnumber"
                           @click="center=car.location"
+                          :icon="getIcon(car)"
                   ></gmap-marker>
               </gmap-map>
             </div>
@@ -248,6 +249,7 @@ export default {
                   Vue.set(car, 'speed', data[0].speed + ' km/h');
                   Vue.set(car, 'passengers', data[0].passengers);
                   Vue.set(car, 'location', data[0].location);
+                  Vue.set(car, 'crashEvent', event.crashEvent);
             });
         });
       });
@@ -280,6 +282,7 @@ export default {
             }
           )
         }
+        Vue.set(updateCar, 'crashEvent', event.crashEvent);
         Vue.set(updateCar, 'speed', event.speed + ' km/h');
         Vue.set(updateCar, 'passengers', event.passengers);
         Vue.set(updateCar, 'location', event.location);
@@ -290,6 +293,15 @@ export default {
       }
       return moment(date).format('D.M h:mm a');
     },
+    getIcon: function(car) {
+      let red = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+      let blue = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+
+      if (car.crashEvent != null) {
+        return red;
+      }
+      return blue;
+    }
   },
   
   mounted: function() {
