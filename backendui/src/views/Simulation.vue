@@ -343,7 +343,7 @@ export default {
                         lat: getLatitude(car.cpos),
                         lng: getLongitude(car.cpos)
                     },
-                    speed: car.speed,
+                    speed: car.vel,
                 };
 
                 let sensorFront = this.getRandomSensorData();

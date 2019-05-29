@@ -109,16 +109,19 @@
         <div>
           <div class="mapouter">
             <div class="gmap_canvas">
-              <iframe
-                id="gmap_canvas"
-                width="100%"
-                height="100%"
-                src="https://maps.google.com/maps?q=google&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                frameborder="0"
-                scrolling="no"
-                marginheight="0"
-                marginwidth="0"
-              />
+              <gmap-map
+                      :center="center"
+                      :zoom="12"
+                      style="width:100%;  height: 100%;"
+              >
+                  <gmap-marker
+                          :key="index"
+                          v-for="(car, index) in cars"
+                          :position="car.location"
+                          :label="car.chassisnumber"
+                          @click="center=car.location"
+                  ></gmap-marker>
+              </gmap-map>
             </div>
           </div>
         </div>
@@ -134,12 +137,14 @@ import WebSocketClient from '../utils/WebSocketClient';
 import * as moment from 'moment'
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
+import Vue from 'vue'
 
 export default {
   data: () => ({
     selectedOem: null,
     oems: [],
     cars:[],
+    center: { lat: 40.756, lng: -73.978 },
 
     wsClientCrash: null,
     wsClientEvent: null,
@@ -173,102 +178,6 @@ export default {
         type: 'B',
         people: '6',
         speed: '75 km/h'
-      },
-      {
-        id: '2',
-        type: 'A',
-        people: '2',
-        speed: '25 km/h'
-      },
-      {
-        id: '3',
-        type: 'D',
-        people: '1',
-        speed: '120 km/h'
-      },
-      {
-        id: '4',
-        type: 'A',
-        people: '2',
-        speed: '25 km/h'
-      },
-      {
-        id: '5',
-        type: 'D',
-        people: '1',
-        speed: '120 km/h'
-      },
-      {
-        id: '6',
-        type: 'A',
-        people: '2',
-        speed: '25 km/h'
-      },
-      {
-        id: '7',
-        type: 'D',
-        people: '1',
-        speed: '120 km/h'
-      },
-      {
-        id: '8',
-        type: 'A',
-        people: '2',
-        speed: '25 km/h'
-      },
-      {
-        id: '9',
-        type: 'D',
-        people: '1',
-        speed: '120 km/h'
-      },
-      {
-        id: '10',
-        type: 'A',
-        people: '2',
-        speed: '25 km/h'
-      },
-      {
-        id: '11',
-        type: 'D',
-        people: '1',
-        speed: '120 km/h'
-      },
-      {
-        id: '12',
-        type: 'A',
-        people: '2',
-        speed: '25 km/h'
-      },
-      {
-        id: '13',
-        type: 'D',
-        people: '1',
-        speed: '120 km/h'
-      },
-      {
-        id: '14',
-        type: 'A',
-        people: '2',
-        speed: '25 km/h'
-      },
-      {
-        id: '15',
-        type: 'D',
-        people: '1',
-        speed: '120 km/h'
-      },
-      {
-        id: '16',
-        type: 'A',
-        people: '2',
-        speed: '25 km/h'
-      },
-      {
-        id: '17',
-        type: 'D',
-        people: '1',
-        speed: '120 km/h'
       }
     ]
   }),
@@ -316,9 +225,9 @@ export default {
         .then(resp => {
             resp.json().then(data => {
                   console.info("Received car event", JSON.stringify(data[0]));
-                  car.speed = data[0].speed + ' km/h';
-                  car.passengers = data[0].passengers;
-                  
+                  Vue.set(car, 'speed', data[0].speed + ' km/h');
+                  Vue.set(car, 'passengers', data[0].passengers);
+                  Vue.set(car, 'location', data[0].location);
             });
         });
       });
@@ -326,12 +235,30 @@ export default {
     receivedCrashData: function(data) {
         let crash = JSON.parse(data.body);
         console.info('Received crash update', crash);
+         
+
+
         // TODO            
     },
     receivedEventData: function(data) {
         let event = JSON.parse(data.body);
         console.info('Received event update', event);
         // TODO
+        let updateCar = this.cars.find(function(element) {
+          return element.chassisnumber == event.chassisNumber;
+        });
+        if (updateCar == null) {
+          this.cars.push(
+            {
+              chassisnumber: event.chassisNumber,
+              modelType: event.modelType,
+              oem: event.oem
+            }
+          )
+        }
+        Vue.set(updateCar, 'speed', event.speed + ' km/h');
+        Vue.set(updateCar, 'passengers', event.passengers);
+        Vue.set(updateCar, 'location', event.location);
     }
   },
   mounted: function() {
