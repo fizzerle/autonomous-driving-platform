@@ -46,6 +46,7 @@ public class CrashNotifyService {
                 event.getPassengers()
         );
         OemNotificationDto oemDto = new OemNotificationDto(
+                crashEvent.getCrashId(),
                 crashEvent.getCrashTimestamp(),
                 crashEvent.getDescription(),
                 crashEvent.getChassisnumber(),

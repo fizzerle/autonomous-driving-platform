@@ -60,8 +60,6 @@
             >
               <td>{{ item.chassisnumber }}</td>
               <td>{{ item.modelType }}</td>
-              <td>{{ item.passengers }}</td>
-              <td>{{ item.speed }}</td>
             </template>
           </v-data-table>
         </material-card>
@@ -75,8 +73,8 @@
           color="red"
         >
           <v-data-table
-            :headers="headers"
-            :items="items"
+            :headers="oemHeaders"
+            :items="crashes"
           >
             <template
               slot="headerCell"
@@ -91,10 +89,10 @@
               slot="items"
               slot-scope="{ item }"
             >
-              <td>{{ item.id }}</td>
-              <td>{{ item.type }}</td>
-              <td>{{ item.people }}</td>
-              <td class="text-xs-right">{{ item.speed }}</td>
+              <td>{{ item.chassisnumber }}</td>
+              <td>{{ formatDateSmall(item.timestamp) }}</td>
+              <td>{{ item.description }}</td>
+              <td>{{ formatDateSmall(item.resolveTimestamp) }}</td>
             </template>
           </v-data-table>
         </material-card>
@@ -144,6 +142,7 @@ export default {
     selectedOem: null,
     oems: [],
     cars:[],
+    crashes:[],
     center: { lat: 40.756, lng: -73.978 },
 
     wsClientCrash: null,
@@ -159,17 +158,28 @@ export default {
         sortable: false,
         text: 'Modelltyp',
         value: 'modelType'
+      }
+    ],
+    oemHeaders: [
+      {
+        sortable: false,
+        text: 'Fahrgestellnummer',
+        value: 'chassisnumber'
       },
       {
         sortable: false,
-        text: 'Insassen',
-        value: 'passengers'
+        text: 'Datum',
+        value: 'timestamp'
       },
       {
         sortable: false,
-        text: 'Geschwindigkeit',
-        value: 'speed',
-        align: 'right'
+        text: 'Beschreibung',
+        value: 'description',
+      }, 
+      {
+        sortable: false,
+        text: 'Behoben',
+        value: 'resolveTimestamp'
       }
     ],
     items: [
@@ -194,7 +204,8 @@ export default {
       this.wsClientCrash.connectOemCrash(this.selectedOem, this.receivedCrashData);
       this.wsClientEvent = new WebSocketClient();
       this.wsClientEvent.connectOemEvent(this.selectedOem, this.receivedEventData);
-      this.loadCarsOfOem(this.selectedOem)
+      this.loadCarsOfOem(this.selectedOem);
+      this.loadNotificationsOfOem(this.selectedOem);
     },
 
     loadOems: function() {
@@ -210,21 +221,30 @@ export default {
         fetch('entitystorage/cars?oem=' + oem)
         .then(resp => {
           resp.json().then(data => {
-                console.info("Received cars", data);
                 this.cars = data;
                 this.loadActualEventsForCars();
           });
       });
       
     },
+    loadNotificationsOfOem: function(oem) {
+      fetch('/notificationstorage/notifications?oem=' + oem, {
+                headers: {
+                    'X-Client-Type': 'OEM'
+                }
+            })
+            .then(resp => {
+                resp.json().then(data => {
+                    console.info("Received bluelight crash events", data);
+                    this.crashes = data;
+                });
+            });
+    },
     loadActualEventsForCars: function(car) {
-      console.log(JSON.stringify(this.cars));
       this.cars.forEach(car => {
-        console.log(JSON.stringify(car));
         fetch('eventstorage/events?chassisnumber=' + car.chassisnumber + '&limit=1')
         .then(resp => {
             resp.json().then(data => {
-                  console.info("Received car event", JSON.stringify(data[0]));
                   Vue.set(car, 'speed', data[0].speed + ' km/h');
                   Vue.set(car, 'passengers', data[0].passengers);
                   Vue.set(car, 'location', data[0].location);
@@ -235,15 +255,19 @@ export default {
     receivedCrashData: function(data) {
         let crash = JSON.parse(data.body);
         console.info('Received crash update', crash);
-         
-
-
-        // TODO            
+        let updateCrash = this.crashes.find(function(element) {
+          return element.crashId == crash.crashId;
+        })
+        console.log("MATCH:",JSON.stringify(updateCrash))
+        if (updateCrash == null) {
+          this.crashes.push(crash)
+        } else {
+          Vue.set(updateCrash, 'resolveTimestamp', crash.resolveTimestamp)
+        }
     },
     receivedEventData: function(data) {
         let event = JSON.parse(data.body);
         console.info('Received event update', event);
-        // TODO
         let updateCar = this.cars.find(function(element) {
           return element.chassisnumber == event.chassisNumber;
         });
@@ -259,8 +283,15 @@ export default {
         Vue.set(updateCar, 'speed', event.speed + ' km/h');
         Vue.set(updateCar, 'passengers', event.passengers);
         Vue.set(updateCar, 'location', event.location);
-    }
+    },
+    formatDateSmall: function(date) {
+      if (date == null) {
+        return "Not Resolved!"
+      }
+      return moment(date).format('D.M h:mm a');
+    },
   },
+  
   mounted: function() {
       this.loadOems();
   },

@@ -229,10 +229,10 @@ export default {
             return createLocation(lat, lng, 'LatLng')
         },
         formatDateSmall: function(date) {
-            return moment(date).format('D.M h:mm');
+            return moment(date).format('D.M h:mm a');
         },
         formatDateFull: function(date) {
-            return moment(date).format('DD.MM.YYYY hh:mm:ss');
+            return moment(date).format('DD.MM.YYYY hh:mm:ss a');
         },
         crashTimestamps: function() {
             let start = this.formatDateFull(this.selected.timestamp);

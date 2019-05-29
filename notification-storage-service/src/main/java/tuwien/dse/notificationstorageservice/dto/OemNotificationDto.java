@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class OemNotificationDto {
 
+    private String crashId;
     private Date timestamp;
     private String description;
     private String chassisnumber;
@@ -14,12 +15,21 @@ public class OemNotificationDto {
 
     }
 
-    public OemNotificationDto(Date timestamp, String description, String chassisnumber, Date resolveTimestamp, Location location) {
+    public OemNotificationDto(String crashId, Date timestamp, String description, String chassisnumber, Date resolveTimestamp, Location location) {
+        this.crashId = crashId;
         this.timestamp = timestamp;
         this.description = description;
         this.chassisnumber = chassisnumber;
         this.resolveTimestamp = resolveTimestamp;
         this.location = location;
+    }
+
+    public String getCrashId() {
+        return crashId;
+    }
+
+    public void setCrashId(String crashId) {
+        this.crashId = crashId;
     }
 
     public Date getTimestamp() {

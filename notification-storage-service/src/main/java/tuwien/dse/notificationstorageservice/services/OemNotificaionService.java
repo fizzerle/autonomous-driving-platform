@@ -44,6 +44,7 @@ public class OemNotificaionService {
 
     private OemNotificationDto getOemNotificationDto(CrashEvent crashEvent, CarEventDto carEvent) {
         return new OemNotificationDto(
+                crashEvent.getCrashId(),
                 crashEvent.getCrashTimestamp(),
                 crashEvent.getDescription(),
                 crashEvent.getChassisnumber(),
