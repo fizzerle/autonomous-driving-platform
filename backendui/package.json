@@ -9,6 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@melmacaluso/vue-modal": "^2.1.0",
     "chartist": "0.11.0",
     "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0",
@@ -27,6 +28,7 @@
     "vue-chartist": "^2.1.2",
     "vue-meta": "^1.5.2",
     "vue2-google-maps": "^0.10.6",
+    "vuedals": "^1.7.0",
     "vuetify": "^1.2.5"
   },
   "devDependencies": {

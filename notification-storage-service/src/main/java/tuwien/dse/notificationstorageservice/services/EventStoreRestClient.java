@@ -8,7 +8,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import tuwien.dse.notificationstorageservice.dto.CarEventDto;
+import tuwien.dse.notificationstorageservice.dto.Location;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 public class EventStoreRestClient {
@@ -34,9 +40,27 @@ public class EventStoreRestClient {
         return resp.body();
     }
 
+    public List<String> getAffectedCars(Location location) {
+        Call<List<String>> call = eventStoreService.getAffectedCars(location.getLat(), location.getLng());
+        Response<List<String>> resp = null;
+        try {
+            resp = call.execute();
+            if (!resp.isSuccessful()) {
+                throw new Exception(resp.message());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new LinkedList<>();
+        }
+        return resp.body();
+    }
+
     interface EventStoreService {
 
         @GET("/eventstorage/events/{id}")
         Call<CarEventDto> getCarData(@Path("id") String id);
+
+        @GET("/eventstorage/events/radius")
+        Call<List<String>> getAffectedCars(@Query("lat") double lat, @Query("lng") double lng);
     }
 }

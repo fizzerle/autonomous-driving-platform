@@ -92,6 +92,12 @@ public class NotificationStorageController {
         return "crash reported";
     }
 
+    @DeleteMapping("/notificationstorage/clean")
+    public String clean() {
+        crashRepository.deleteAll();
+        return "deleted all notifications";
+    }
+
     @GetMapping("/notificationstorage/stomp/inactive")
     public String stompResolveCrash() {
         LOGGER.info("crash resolved");

@@ -280,7 +280,7 @@ export default {
         },
         addCar: function () {
             if (this.valid) {
-                this.cars.push({name: "car"+ (this.cars.length+1), startCoord: this.start, endCoord: this.end, speed: this.speed, crash: this.crash, oem: this.oem, chassisNumber: this.chassisNumber});
+                this.cars.push({name: "car"+ (this.cars.length+1), startCoord: this.start, endCoord: this.end, speed: this.speed, crash: this.crash, oem: this.oem, chassisNumber: this.chassisNumber, modelType: this.modeltype});
             }
         },
         createSimulationCars: function () {

@@ -78,6 +78,31 @@
                     <h6>Passengers: {{ passengers }}</h6>
                 </material-card>
             </v-flex>
+
+
+            <v-snackbar
+              color="error"
+              :bottom="true"
+              :top="false"
+              :left="false"
+              :right="true"
+              v-model="snackbar"
+              dark
+            >
+              <v-icon
+                color="white"
+                class="mr-3"
+              >
+                mdi-bell-plus
+              </v-icon>
+              <div v-if="notificationCrash">Crash in {{ getDistanceToCrash() }}m </div>
+              <v-icon
+                size="16"
+                @click="snackbar = false;"
+              >
+                mdi-close-circle
+              </v-icon>
+            </v-snackbar>
         </v-layout>
     </v-container>
 
@@ -102,6 +127,8 @@ export default {
         center: { lat: 40.756, lng: -73.978 },
         crashes: [],
         markers: [],
+        snackbar: null,
+        notificationCrash: null,
 
         wsClient: null,
         positionUpdateInterval: null
@@ -134,7 +161,18 @@ export default {
             console.info("Car Changed: ", this.selectedCar);
             //this.stopPositionUpdate();
             //this.startPositionUpdate();
+            if (this.wsClient !== null) {
+                this.wsClient.close();
+            }
+            this.wsClient = new WebSocketClient();
+            this.wsClient.connectCar(this.selectedCar, this.receivedCrashData);
 
+        },
+
+        snack: function(crash) {
+            console.log('Show snackbar babe', crash);
+            this.snackbar = true;
+            this.notificationCrash = crash;
         },
         
         updateMarkers: function() {
@@ -181,6 +219,13 @@ export default {
             console.info('Position distance: ', distance);
             return distance < 3000;
         },
+        getDistanceToCrash() {
+            if (this.myPosition === null || this.notificationCrash === null) {
+                return 0;
+            }
+            let distance = distanceTo(this.myPosition, this.notificationCrash.location);
+            return Math.round(distance);
+        },
 
         loadCrashData: function() {
             const v = this;
@@ -202,6 +247,7 @@ export default {
             let crash = JSON.parse(data.body);
             if (crash.active) {
                 this.crashes.push(crash);
+                this.snack(crash);
             } else {
                 let cr = this.crashes.filter(cr => cr.location.lat === crash.location.lat && cr.location.lng === crash.location.lng).pop();
                 if (cr !== undefined) {
@@ -232,14 +278,14 @@ export default {
             }
             fetch('/eventstorage/events?limit=1&chassisnumber=' + chassis)
             .then(resp => {
-                console.info("Received eventupdates", resp);
+                //console.info("Received eventupdates", resp);
                 resp.json().then(data => {
                     if (data.length > 0) {
                         let event = data[0];
-                        console.info('Received event from car', event);
+                        //console.info('Received event from car', event);
                         if (event.chassisNumber === this.selectedCar) {
                             let loc = event.location;
-                            console.info('My position should be: ', loc);
+                            //console.info('My position should be: ', loc);
                             this.myPosition = loc;
                             this.spaceAhead = event.spaceAhead;
                             this.spaceBehind = event.spaceBehind;
@@ -258,8 +304,6 @@ export default {
         this.loadCrashData();
         this.loadOems();
         this.startPositionUpdate();
-        this.wsClient = new WebSocketClient();
-        this.wsClient.connectCar(this.receivedCrashData);
     },
     beforeDestroy: function() {
         this.wsClient.close();

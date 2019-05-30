@@ -35,12 +35,13 @@ export default class WebSocketClient {
         });
     }
 
-    connectCar(crashHandler) {
+    connectCar(chasis, crashHandler) {
         this.socket = new SockJS('/notificationstorage/websocket');
         this.client = Stomp.over(this.socket);
         const that = this;
+        const path = '/crash/car/' + chasis.toLocaleLowerCase();
         this.client.connect({}, function(frame) {
-            that.subscribe('/crash/car', crashHandler);
+            that.subscribe(path, crashHandler);
         });
     }
 
