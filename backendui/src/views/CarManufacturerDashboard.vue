@@ -16,22 +16,63 @@
           chips
           label="Please Select a Car Manufacturer"
         >
-          <!--<template v-slot:selection="data">
-            <v-chip
-              :key="JSON.stringify(data.item)"
-              :selected="data.selected"
-              :disabled="data.disabled"
-              class="v-chip--select-multi"
-              @click.stop="data.parent.selectedIndex = data.index"
-              @input="data.parent.selectItem(data.item)"
-            >
-              <v-avatar class="accent white--text">
-                {{ data.item.slice(0, 1).toUpperCase() }}
-              </v-avatar>
-              {{ data.item }}
-            </v-chip>
-          </template>-->
         </v-select>
+        <Modal
+          btnText="Create Car"
+          >
+            <v-form v-model="valid">
+                    <v-container>
+                        <v-layout row wrap>
+                          <v-flex
+                                xs12
+                                md4
+                          >
+                            <v-text-field
+                                    id="oemField"
+                                    v-model="newOem"
+                                    :rules="oemRule"
+                                    label="OEM"
+                                    required
+                            ></v-text-field>
+                          </v-flex>
+
+                            <v-flex
+                                xs12
+                                md4
+                            >
+                              <v-text-field
+                                    id="modelTypeField"
+                                    v-model="newModelType"
+                                    :rules="modelRule"
+                                    label="Modeltype"
+                                    required
+                              ></v-text-field>
+                           </v-flex>
+
+                          <v-flex
+                                  xs12
+                                  md4
+                          >
+                              <v-text-field
+                                      id="chassisNumberField"
+                                      v-model="newChassisnumber"
+                                      :rules="chassisRule"
+                                      label="Chassis Number"
+                                      required
+                              ></v-text-field>
+                          </v-flex>
+
+                          <v-flex
+                                  xs12
+                                  md4
+                          >
+                              <v-btn @click="addCar">submit</v-btn>
+                          </v-flex>
+                        </v-layout>
+                    </v-container>
+                    
+                </v-form>
+        </Modal>
       </v-flex>
       <v-flex
         md6
@@ -104,27 +145,27 @@
           :title="'Map for the manufacturer '+ selectedOem"
           color="blue"
         >
-        <div>
-          <div class="mapouter">
-            <div class="gmap_canvas">
-              <gmap-map
-                      :center="center"
-                      :zoom="12"
-                      style="width:100%;  height: 100%;"
-              >
-                  <gmap-marker
-                          :key="index"
-                          v-for="(car, index) in cars"
-                          :position="car.location"
-                          :label="car.chassisnumber"
-                          @click="center=car.location"
-                          :icon="getIcon(car)"
-                  ></gmap-marker>
-              </gmap-map>
+          <div>
+            <div class="mapouter">
+              <div class="gmap_canvas">
+                <gmap-map
+                        :center="center"
+                        :zoom="12"
+                        style="width:100%;  height: 100%;"
+                >
+                    <gmap-marker
+                            :key="index"
+                            v-for="(car, index) in cars"
+                            :position="car.location"
+                            :label="car.chassisnumber"
+                            @click="center=car.location"
+                            :icon="getIcon(car)"
+                    ></gmap-marker>
+                </gmap-map>
+              </div>
             </div>
           </div>
-        </div>
-                </material-card>
+      </material-card>
       </v-flex>
     </v-layout>
   </v-container>
@@ -146,9 +187,24 @@ export default {
     crashes:[],
     center: { lat: 40.756, lng: -73.978 },
 
+    newOem: "",
+    newChassisnumber:"",
+    newModelType:"",
+    newCar: null,
+    valid: false,
+
+
     wsClientCrash: null,
     wsClientEvent: null,
-
+    oemRule: [
+        v => !!v || 'OEM is required.'
+    ],
+    chassisRule: [
+        v => !!v || 'Chassis number is required.'
+    ],
+    modelRule: [
+        v => !!v || 'Modeltype is required.'
+    ],
     headers: [
       {
         sortable: false,
@@ -246,8 +302,6 @@ export default {
         fetch('eventstorage/events?chassisnumber=' + car.chassisnumber + '&limit=1')
         .then(resp => {
             resp.json().then(data => {
-                  Vue.set(car, 'speed', data[0].speed + ' km/h');
-                  Vue.set(car, 'passengers', data[0].passengers);
                   Vue.set(car, 'location', data[0].location);
                   Vue.set(car, 'crashEvent', event.crashEvent);
             });
@@ -283,8 +337,6 @@ export default {
           )
         }
         Vue.set(updateCar, 'crashEvent', event.crashEvent);
-        Vue.set(updateCar, 'speed', event.speed + ' km/h');
-        Vue.set(updateCar, 'passengers', event.passengers);
         Vue.set(updateCar, 'location', event.location);
     },
     formatDateSmall: function(date) {
@@ -301,6 +353,34 @@ export default {
         return red;
       }
       return blue;
+    },
+    addCar: function () {
+      if (this.valid) {
+        this.newCar = {oem: this.newOem, chassisnumber: this.newChassisnumber, modelType: this.newModelType}
+        fetch('entitystorage/cars', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(this.newCar)
+        })
+        .then(resp => {
+            resp.json().then(data => {
+              if(resp.ok) {
+                alert("Created car");
+                console.log(JSON.stringify(data));
+                this.loadOems();
+                if (this.selectedOem == this.newCar.oem) {
+                  this.loadCarsOfOem(this.selectedOem);
+                }
+              } else {
+                console.log(JSON.stringify(data));
+                alert(data.status + ": " + data.message);
+              }
+            });            
+        });
+        
+      }
     }
   },
   
@@ -316,10 +396,23 @@ export default {
       }
   }
 }
+
+
+
 </script>
 <style>
 .gmap_canvas {
   height:40em;
   width: auto;
+}
+
+#oemField {
+  color: white !important
+}
+#chassisNumberField {
+  color: white !important
+}
+#modelTypeField {
+  color: white !important
 }
 </style>
