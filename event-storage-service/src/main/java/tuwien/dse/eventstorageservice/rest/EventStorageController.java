@@ -69,6 +69,12 @@ public class EventStorageController {
         return "stomp request sent";
     }
 
+    @GetMapping("/eventstorage/clean")
+    public String clean() {
+        repository.deleteAll();
+        return "deleted all events";
+    }
+
     @PostMapping("/eventstorage/events")
     public void create(@RequestBody CarEventDto carEventDto) {
         LOGGER.info("Update from car with chassis {}", carEventDto.getChassisNumber());

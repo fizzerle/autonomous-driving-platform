@@ -11,6 +11,8 @@ import tuwien.dse.notificationstorageservice.dto.CarNotificationDto;
 import tuwien.dse.notificationstorageservice.dto.OemNotificationDto;
 import tuwien.dse.notificationstorageservice.model.CrashEvent;
 
+import java.util.List;
+
 
 @Service
 public class CrashNotifyService {
@@ -62,10 +64,13 @@ public class CrashNotifyService {
 
     public void notifyCars(CarNotificationDto data) {
         try {
+            List<String> affectedCars = eventStoreRestClient.getAffectedCars(data.getLocation());
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
-            String topic = "/crash/car";
-            simp.convertAndSend(topic, json);
+            for (String chassis: affectedCars) {
+                String topic = "/crash/car/" + chassis;
+                simp.convertAndSend(topic, json);
+            }
         } catch (JsonProcessingException e) {
             // Do nothing
         }
