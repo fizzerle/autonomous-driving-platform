@@ -1,0 +1,23 @@
+image: docker:stable
+
+services:
+  - docker:dind
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+stages:
+  - build
+
+maven-build:
+  image: maven:3.6.1-ibmjava-8-alpine
+  stage: build
+  script: "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
+           -Ddockerfile.username=gitlab-ci-token \
+           -Ddockerfile.password=$CI_BUILD_TOKEN -DskipTests -B"
+  artifacts:
+    paths:
+      - dse-gateway/target/*.jar
+      - dse-entitystore/target/*.jar
+      - dse-eventstore/target/*.jar
+      - dse-notificationstore/target/*.jar
+      - dse-ui/build/
