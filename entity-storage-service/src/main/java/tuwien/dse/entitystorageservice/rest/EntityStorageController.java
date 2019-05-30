@@ -1,10 +1,13 @@
 package tuwien.dse.entitystorageservice.rest;
 
 
+import com.sun.xml.internal.ws.client.sei.ResponseBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tuwien.dse.entitystorageservice.exception.CarAlreadyExistsException;
 import tuwien.dse.entitystorageservice.model.Car;
 import tuwien.dse.entitystorageservice.persistence.CarRepository;
 
@@ -42,7 +45,12 @@ public class EntityStorageController {
     }
 
     @PostMapping("/entitystorage/cars")
-    public Car insertCar(@RequestBody Car car) {
+    public Car insertCar(@RequestBody Car car) throws CarAlreadyExistsException {
+        if (carRepository.findByChassisnumber(car.getChassisnumber()) != null) {
+            String err = "Car with chassisnumber " + car.getChassisnumber() + " already exists!";
+            LOGGER.error(err);
+            throw new CarAlreadyExistsException(err);
+        }
         return carRepository.save(car);
     }
 
