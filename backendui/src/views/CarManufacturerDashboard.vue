@@ -167,6 +167,30 @@
           </div>
       </material-card>
       </v-flex>
+
+      <v-snackbar
+              color="error"
+              :bottom="true"
+              :top="false"
+              :left="false"
+              :right="true"
+              v-model="snackbar"
+              dark
+            >
+              <v-icon
+                color="white"
+                class="mr-3"
+              >
+                mdi-bell-plus
+              </v-icon>
+              <div v-if="notificationCrash">{{ notificationCrash.oem + " " + notificationCrash.modelType + ": " + notificationCrash.description}}</div>
+              <v-icon
+                size="16"
+                @click="snackbar = false;"
+              >
+                mdi-close-circle
+              </v-icon>
+            </v-snackbar>
     </v-layout>
   </v-container>
 </template>
@@ -193,6 +217,8 @@ export default {
     newCar: null,
     valid: false,
 
+    snackbar: null,
+    notificationCrash: null,
 
     wsClientCrash: null,
     wsClientEvent: null,
@@ -317,6 +343,7 @@ export default {
         console.log("MATCH:",JSON.stringify(updateCrash))
         if (updateCrash == null) {
           this.crashes.push(crash)
+          this.snack(crash);
         } else {
           Vue.set(updateCrash, 'resolveTimestamp', crash.resolveTimestamp)
         }
@@ -354,6 +381,23 @@ export default {
       }
       return blue;
     },
+
+    snack: function(crash) {
+        fetch('/entitystorage/cars/' + crash.chassisnumber).then(resp => {
+            resp.json().then(car => {
+              this.snackbar = true;
+              this.notificationCrash = {
+                  oem: car.oem,
+                  chassisnumber: car.chassisnumber,
+                  modelType: car.modelType,
+                  description: crash.description,
+                  location: crash.location
+              };
+              console.log('Show snackbar babe', this.notificationCrash);
+            });
+        });        
+    },
+
     addCar: function () {
       if (this.valid) {
         this.newCar = {oem: this.newOem, chassisnumber: this.newChassisnumber, modelType: this.newModelType}
