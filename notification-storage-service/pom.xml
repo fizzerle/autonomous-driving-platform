@@ -16,6 +16,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <docker.registry>e1426972</docker.registry>
     </properties>
 
     <dependencies>
@@ -94,7 +95,7 @@
                 </dependencies>
                 <version>1.4.0</version>
                 <configuration>
-                    <repository>e1426972/${project.artifactId}</repository>
+                    <repository>${docker.registry}/${project.artifactId}</repository>
                     <tag>latest</tag>
                     <buildArgs>
                         <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
