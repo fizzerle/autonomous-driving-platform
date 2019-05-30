@@ -4,6 +4,9 @@ package tuwien.dse.eventstorageservice.rest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import tuwien.dse.eventstorageservice.dto.CarDto;
@@ -120,6 +123,17 @@ public class EventStorageController {
         return result;
     }
 
+    @GetMapping("/eventstorage/events/radius")
+    public List<String> getCarsIn3kmRadius(@RequestParam double lng, @RequestParam double lat) {
+        return repository.findByLocationNearOrderByTimestampDesc(
+                new Point(lng, lat),
+                new Distance(3, Metrics.KILOMETERS)
+        ).stream()
+                .map(e -> e.getChassisnumber())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
     private CarEventDto convertToCarEventDto(Event event) {
         CarDto car;
         try {
@@ -134,7 +148,7 @@ public class EventStorageController {
                 event.getChassisnumber(),
                 car.getModelType(),
                 event.getPassengers(),
-                event.getLocation(),
+                new Location(event.getLocation().getY(), event.getLocation().getX()),
                 event.getSpeed(),
                 event.getSpaceAhead(),
                 event.getSpaceBehind(),

@@ -32,7 +32,7 @@ public class TestDataInserter {
             repo.save(new Event(new Location(11, 10), "ABCD1", new Date(2), 50, 10, 10, null, 1));
 
             repo.save(new Event(new Location(12, 10), "ABCD2", new Date(0), 50, 10, 10, null, 2));
-            repo.save(new Event(new Location(12, 10), "ABCD2", new Date(1), 50, 10, 10, null, 2));
+            repo.save(new Event(new Location(12, 10), "ABCD2", new Date(1), 60, 5, 20, null, 2));
 
             repo.save(new Event(new Location(13, 10), "ABCD3", new Date(0), 50, 10, 10, null, 2));
             repo.save(new Event(new Location(13, 10), "ABCD3", new Date(1), 50, 10, 10, null, 2));
