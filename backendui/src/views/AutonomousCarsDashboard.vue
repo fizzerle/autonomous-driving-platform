@@ -134,6 +134,11 @@ export default {
             console.info("Car Changed: ", this.selectedCar);
             //this.stopPositionUpdate();
             //this.startPositionUpdate();
+            if (this.wsClient !== null) {
+                this.wsClient.close();
+            }
+            this.wsClient = new WebSocketClient();
+            this.wsClient.connectCar(this.selectedCar, this.receivedCrashData);
 
         },
         
@@ -232,14 +237,14 @@ export default {
             }
             fetch('/eventstorage/events?limit=1&chassisnumber=' + chassis)
             .then(resp => {
-                console.info("Received eventupdates", resp);
+                //console.info("Received eventupdates", resp);
                 resp.json().then(data => {
                     if (data.length > 0) {
                         let event = data[0];
-                        console.info('Received event from car', event);
+                        //console.info('Received event from car', event);
                         if (event.chassisNumber === this.selectedCar) {
                             let loc = event.location;
-                            console.info('My position should be: ', loc);
+                            //console.info('My position should be: ', loc);
                             this.myPosition = loc;
                             this.spaceAhead = event.spaceAhead;
                             this.spaceBehind = event.spaceBehind;
@@ -258,8 +263,6 @@ export default {
         this.loadCrashData();
         this.loadOems();
         this.startPositionUpdate();
-        this.wsClient = new WebSocketClient();
-        this.wsClient.connectCar(this.receivedCrashData);
     },
     beforeDestroy: function() {
         this.wsClient.close();

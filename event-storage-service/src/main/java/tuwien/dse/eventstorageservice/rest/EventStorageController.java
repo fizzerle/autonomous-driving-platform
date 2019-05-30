@@ -69,7 +69,7 @@ public class EventStorageController {
         return "stomp request sent";
     }
 
-    @GetMapping("/eventstorage/clean")
+    @DeleteMapping("/eventstorage/clean")
     public String clean() {
         repository.deleteAll();
         return "deleted all events";

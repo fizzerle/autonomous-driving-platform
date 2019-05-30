@@ -92,7 +92,7 @@ public class NotificationStorageController {
         return "crash reported";
     }
 
-    @GetMapping("/notificationstorage/clean")
+    @DeleteMapping("/notificationstorage/clean")
     public String clean() {
         crashRepository.deleteAll();
         return "deleted all notifications";
