@@ -20,5 +20,6 @@ kubernetes-deploy:
   image: google/cloud-sdk
   stage: deploy
   script:
-    - "kubectl --help"
+    - kubectl version
     - cd kubernetes
+    - ./execute-all.sh
