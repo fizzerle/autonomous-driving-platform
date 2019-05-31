@@ -22,4 +22,4 @@ kubernetes-deploy:
   script:
     - kubectl version
     - cd kubernetes
-    - ./execute-all.sh
+    - kubectl apply -f mongo-secret.yaml
