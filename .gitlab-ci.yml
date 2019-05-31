@@ -22,4 +22,3 @@ kubernetes-deploy:
   script:
     - kubectl version
     - cd kubernetes
-    - ./execute-all.sh
