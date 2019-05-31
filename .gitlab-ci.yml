@@ -23,7 +23,7 @@ backend-maven-build:
       - dse-notificationstore/target/*.jar
       - dse-ui/build/
 
-kubernetes-deploy:
+backend-maven-deploy:
   image: lachlanevenson/k8s-kubectl:latest
   stage: review
   script:
