@@ -7,8 +7,9 @@ variables:
   DOCKER_DRIVER: overlay2
 stages:
   - build
+  - deploy
 
-maven-build:
+backend-maven-build:
   image: maven:3.6.1-ibmjava-8-alpine
   stage: build
   script: "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
@@ -21,3 +22,11 @@ maven-build:
       - dse-eventstore/target/*.jar
       - dse-notificationstore/target/*.jar
       - dse-ui/build/
+
+kubernetes-deploy:
+  image: lachlanevenson/k8s-kubectl:latest
+  stage: review
+  script:
+    - kubectl version
+    - cd kubernetes
+    - ./execute-all.sh
