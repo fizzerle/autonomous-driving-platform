@@ -17,7 +17,7 @@ stages:
 #           -Ddockerfile.password=$CI_BUILD_TOKEN -DskipTests -B"
 
 kubernetes-deploy:
-  image: google/cloud-sdk
+  image: lachlanevenson/k8s-kubectl:latest
   stage: deploy
   script:
     - kubectl version
