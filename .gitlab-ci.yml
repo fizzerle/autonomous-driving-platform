@@ -21,4 +21,5 @@ kubernetes-deploy:
   stage: deploy
   script:
     - kubectl config set-cluster e2e --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM"
+    - kubectl apply -f mongo-secret.yaml
     
