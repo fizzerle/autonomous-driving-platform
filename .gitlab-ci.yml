@@ -24,6 +24,7 @@ kubernetes-deploy:
     - gcloud auth activate-service-account --key-file key.json
     - gcloud config set compute/zone europe-west1-b
     - gcloud config set project dse19-group-11
+    - gcloud services enable container.googleapis.com
     - gcloud config set container/use_client_certificate True
     - gcloud container clusters get-credentials dse-deploy-cluster --project dse19-group-11
     - kubectl delete secret registry.gitlab.com
