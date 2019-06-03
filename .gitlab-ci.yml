@@ -26,7 +26,7 @@ kubernetes-deploy:
     - gcloud config set project dse19-group-11
     - gcloud services enable container.googleapis.com
     - gcloud config set container/use_client_certificate True
-    - gcloud container clusters get-credentials dse19-group-11 --project dse-deploy-cluster
+    - gcloud container clusters get-credentials dse-deploy-cluster
     - kubectl delete secret registry.gitlab.com
     - kubectl create secret docker-registry registry.gitlab.com --docker-server=https://registry.gitlab.com --docker-username=gitlab-ci-token --docker-password=$CI_BUILD_TOKEN --docker-email=thomas.schallert94@gmail.com
     - kubectl apply -f deployment.yml --namespace=production
