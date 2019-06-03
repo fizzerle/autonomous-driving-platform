@@ -6,15 +6,15 @@ variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_DRIVER: overlay2
 stages:
-#  - build
+  - build
   - deploy
 
-#backend-maven-build:
-#  image: maven:3.6.1-ibmjava-8-alpine
-#  stage: build
-#  script: "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
-#           -Ddockerfile.username=gitlab-ci-token \
-#           -Ddockerfile.password=$CI_BUILD_TOKEN -DskipTests -B"
+backend-maven-build:
+  image: maven:3.6.1-ibmjava-8-alpine
+  stage: build
+  script: "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
+           -Ddockerfile.username=gitlab-ci-token \
+           -Ddockerfile.password=$CI_BUILD_TOKEN -DskipTests -B"
 
 kubernetes-deploy:
   image: google/cloud-sdk
