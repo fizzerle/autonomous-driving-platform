@@ -22,7 +22,7 @@ kubernetes-deploy:
   script:
     - echo "$GOOGLE_KEY5" > key.json
     - gcloud auth activate-service-account --key-file key.json
-    - gcloud config set compute/zone europe-west1-b
+    - gcloud config set compute/zone europe-west3-c
     - gcloud config set project dse19-group-11
     - gcloud container clusters get-credentials standard-cluster-1
     - kubectl delete secret registry.gitlab.com
