@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: notification-storage
-          image: e1426972/notificationstorageservice:latest
+          image: registry.gitlab.com/fizzerle/dse-2019-ss/notificationstorageservice:latest
           imagePullPolicy: Always
           ports:
           - containerPort: 8080
@@ -36,6 +36,8 @@ spec:
                 secretKeyRef:
                   name: mongodb
                   key: database-password
+      imagePullSecrets:
+        - name: registry.gitlab.com
 ---
 apiVersion: v1
 kind: Service

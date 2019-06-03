@@ -14,10 +14,12 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: e1426972/apigateway:latest
+          image: registry.gitlab.com/fizzerle/dse-2019-ss/apigateway:latest
           imagePullPolicy: Always
           ports:
           - containerPort: 8080
+      imagePullSecrets:
+        - name: registry.gitlab.com
 ---
 apiVersion: v1
 kind: Service
