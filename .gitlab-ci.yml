@@ -20,7 +20,7 @@ kubernetes-deploy:
   image: google/cloud-sdk
   stage: deploy
   script:
-    - echo "$GOOGLE_KEY" > key.json
+    - echo "$GOOGLE_KEY5" > key.json
     - gcloud auth activate-service-account --key-file key.json
     - gcloud config set compute/zone europe-west1-b
     - gcloud config set project dse19-group-11
