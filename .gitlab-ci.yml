@@ -5,6 +5,11 @@ services:
 variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_DRIVER: overlay2
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+cache:
+  paths:
+    - .m2/repository
+
 stages:
   - build
   - deploy
@@ -14,7 +19,10 @@ backend-maven-build:
   stage: build
   script: "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
            -Ddockerfile.username=gitlab-ci-token \
-           -Ddockerfile.password=$CI_BUILD_TOKEN -DskipTests -B"
+           -Ddockerfile.password=$CI_BUILD_TOKEN \
+           -DskipTests \ 
+           -B \ 
+           --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
 
 kubernetes-deploy:
   image: google/cloud-sdk
