@@ -20,6 +20,15 @@ kubernetes-deploy:
   image: google/cloud-sdk
   stage: deploy
   script:
-    - kubectl config set-cluster e2e --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM"
+    - echo "$GOOGLE_KEY" > key.json
+    - gcloud auth activate-service-account --key-file key.json
+    - gcloud config set compute/zone europe-west1-b
+    - gcloud config set project dse19-group-11
+    - gcloud config set container/use_client_certificate True
+    - gcloud container clusters get-credentials dse-deploy-cluster
+    - kubectl delete secret registry.gitlab.com
+    - kubectl create secret docker-registry registry.gitlab.com --docker-server=https://registry.gitlab.com --docker-username=gitlab-ci-token --docker-password=$CI_BUILD_TOKEN --docker-email=thomas.schallert94@gmail.com
+    - kubectl apply -f deployment.yml --namespace=production
     - cd kubernetes/
     - kubectl apply -f mongo-secret.yaml
+    
