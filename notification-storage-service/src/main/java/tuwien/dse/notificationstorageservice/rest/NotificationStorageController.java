@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@RestController
+@RestController("test")
 public class NotificationStorageController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationStorageController.class);

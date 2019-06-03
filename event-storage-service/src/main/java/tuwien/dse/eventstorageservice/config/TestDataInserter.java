@@ -11,12 +11,10 @@ import tuwien.dse.eventstorageservice.persistence.EventRepository;
 
 import java.util.Date;
 
-@Configuration
 public class TestDataInserter {
 
     private static final Logger log = LoggerFactory.getLogger(TestDataInserter.class);
 
-    @Bean
     public CommandLineRunner insertTestData(EventRepository repo) {
         return args -> {
             if (repo.findAll().size() > 0) {

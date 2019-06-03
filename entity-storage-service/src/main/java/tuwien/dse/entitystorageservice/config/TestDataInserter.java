@@ -8,12 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import tuwien.dse.entitystorageservice.model.Car;
 import tuwien.dse.entitystorageservice.persistence.CarRepository;
 
-@Configuration
 public class TestDataInserter {
 
     private static final Logger log = LoggerFactory.getLogger(TestDataInserter.class);
 
-    @Bean
     public CommandLineRunner insertTestData(CarRepository repo) {
         return args -> {
             if (repo.findAll().size() > 0) {
