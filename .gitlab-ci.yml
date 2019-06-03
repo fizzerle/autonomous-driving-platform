@@ -25,7 +25,7 @@ kubernetes-deploy:
     - gcloud config set compute/zone europe-west1-b
     - gcloud config set project dse19-group-11
     - gcloud config set container/use_client_certificate True
-    - gcloud container clusters get-credentials dse-deploy-cluster
+    - gcloud container clusters get-credentials dse-deploy-cluster --project dse19-group-11
     - kubectl delete secret registry.gitlab.com
     - kubectl create secret docker-registry registry.gitlab.com --docker-server=https://registry.gitlab.com --docker-username=gitlab-ci-token --docker-password=$CI_BUILD_TOKEN --docker-email=thomas.schallert94@gmail.com
     - kubectl apply -f deployment.yml --namespace=production
