@@ -17,9 +17,10 @@ stages:
 #           -Ddockerfile.password=$CI_BUILD_TOKEN -DskipTests -B"
 
 kubernetes-deploy:
-  image: lachlanevenson/k8s-kubectl:latest
+  image: google/cloud-sdk
   stage: deploy
   script:
-    - kubectl version
-    - cd kubernetes
-    - ./execute-all.sh
+    - kubectl config set-cluster e2e --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM"
+    - cd kubernetes/
+    - kubectl apply -f mongo-secret.yaml
+    
