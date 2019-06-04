@@ -60,4 +60,10 @@ kubernetes-deploy:
   only:
     changes:
       - kubernetes/*
+      - entity-storage-service/*
+      - event-storage-service/*
+      - notification-storage-service/*
+      - swaggergateway/*
+      - apigateway/*
+      - backendui/*
     
