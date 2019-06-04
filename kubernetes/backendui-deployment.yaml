@@ -27,11 +27,11 @@ metadata:
   name: backendui
 spec:
   ports:
-    - port: 80
+    - port: 81
       targetPort: 8080
       protocol: TCP
       name: http
   selector:
     app: backendui
-  type: NodePort
-  
+  type: LoadBalancer
+  loadBalancerIP: 35.246.153.101
