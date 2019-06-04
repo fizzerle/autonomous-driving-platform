@@ -25,11 +25,11 @@ backend-maven-build:
            --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
   only:
     changes:
-      - entity-storage-service/*
-      - event-storage-service/*
-      - notification-storage-service/*
-      - swaggergateway/*
-      - apigateway/*
+      - entity-storage-service/**
+      - event-storage-service/**
+      - notification-storage-service/**
+      - swaggergateway/**
+      - apigateway/**
 
            
 frontend-build:
