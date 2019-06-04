@@ -23,6 +23,13 @@ backend-maven-build:
            -DskipTests \ 
            -B \ 
            --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+  only:
+    changes:
+      - entity-storage-service/*
+      - event-storage-service/*
+      - notification-storage-service/*
+      - swaggergateway/*
+      - apigateway/*
 
            
 frontend-build:
@@ -32,6 +39,9 @@ frontend-build:
         - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN https://registry.gitlab.com
         - docker build -t registry.gitlab.com/fizzerle/dse-2019-ss/backendui .
         - docker push registry.gitlab.com/fizzerle/dse-2019-ss/backendui:latest
+    only:
+        changes:
+          - backendui/*
         
 
 kubernetes-deploy:
@@ -47,4 +57,7 @@ kubernetes-deploy:
     - kubectl create secret docker-registry registry.gitlab.com --docker-server=https://registry.gitlab.com --docker-username=fizzerle --docker-password=$GITLAB_REPO_TOKEN --docker-email=thomas.schallert94@gmail.com
     - cd kubernetes/
     - ./execute-all.sh
+  only:
+    changes:
+      - backendui/*
     
