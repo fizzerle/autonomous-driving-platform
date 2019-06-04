@@ -23,6 +23,7 @@ backend-maven-build:
            -DskipTests \ 
            -B \ 
            --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+
            
 frontend-build:
     stage: build
