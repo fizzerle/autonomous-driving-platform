@@ -23,6 +23,15 @@ backend-maven-build:
            -DskipTests \ 
            -B \ 
            --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+           
+frontend-build:
+    stage: build
+    script:
+        - cd backendui/
+        - docker login --username=gitlab-ci-token --password=$CI_BUILD_TOKEN https://registry.gitlab.com
+        - docker build -t registry.gitlab.com/fizzerle/dse-2019-ss/backendui .
+        - docker push registry.gitlab.com/fizzerle/dse-2019-ss/backendui:latest
+        
 
 kubernetes-deploy:
   image: google/cloud-sdk
