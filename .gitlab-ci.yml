@@ -14,65 +14,16 @@ stages:
   - build
   - deploy
 
-entitystorage-build:
+backend-maven-build:
   image: maven:3.6.1-ibmjava-8-alpine
   stage: build
-  script: 
-    - cd entity-storage-service/
-    - "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
-           -Ddockerfile.username=gitlab-ci-token \
-           -Ddockerfile.password=$CI_BUILD_TOKEN \
-           -DskipTests \ 
-           -B \ 
-           --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
-           
-event-build:
-  image: maven:3.6.1-ibmjava-8-alpine
-  stage: build
-  script: 
-    - cd event-storage-service/
-    - "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
-           -Ddockerfile.username=gitlab-ci-token \
-           -Ddockerfile.password=$CI_BUILD_TOKEN \
-           -DskipTests \ 
-           -B \ 
-           --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
-           
-notification-build:
-  image: maven:3.6.1-ibmjava-8-alpine
-  stage: build
-  script: 
-    - cd notification-storage-service/
-    - "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
+  script: "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
            -Ddockerfile.username=gitlab-ci-token \
            -Ddockerfile.password=$CI_BUILD_TOKEN \
            -DskipTests \ 
            -B \ 
            --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
 
-swaggergateway-build:
-  image: maven:3.6.1-ibmjava-8-alpine
-  stage: build
-  script: 
-    - cd swaggergateway/
-    - "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
-           -Ddockerfile.username=gitlab-ci-token \
-           -Ddockerfile.password=$CI_BUILD_TOKEN \
-           -DskipTests \ 
-           -B \ 
-           --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
-
-apigateway-build:
-  image: maven:3.6.1-ibmjava-8-alpine
-  stage: build
-  script: 
-    - cd apigateway/
-    - "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
-           -Ddockerfile.username=gitlab-ci-token \
-           -Ddockerfile.password=$CI_BUILD_TOKEN \
-           -DskipTests \ 
-           -B \ 
-           --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
            
 frontend-build:
     stage: build
