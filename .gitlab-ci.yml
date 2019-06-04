@@ -25,11 +25,11 @@ backend-maven-build:
            --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
   only:
     changes:
-      - apigateway/**
-      - entity-storage-service/**
-      - event-storage-service/**
-      - notification-storage-service/**
-      - swaggergateway/**
+      - apigateway/**/*
+      - entity-storage-service/**/*
+      - event-storage-service/**/*
+      - notification-storage-service/**/*
+      - swaggergateway/**/*
 
            
 frontend-build:
@@ -41,7 +41,7 @@ frontend-build:
         - docker push registry.gitlab.com/fizzerle/dse-2019-ss/backendui:latest
     only:
         changes:
-          - backendui/*
+          - backendui/**/*
         
 
 kubernetes-deploy:
@@ -59,11 +59,11 @@ kubernetes-deploy:
     - ./execute-all.sh
   only:
     changes:
-      - kubernetes/*
-      - entity-storage-service/*
-      - event-storage-service/*
-      - notification-storage-service/*
-      - swaggergateway/*
-      - apigateway/*
-      - backendui/*
+      - kubernetes/**/*
+      - entity-storage-service/**/*
+      - event-storage-service/**/*
+      - notification-storage-service/**/*
+      - swaggergateway/**/*
+      - apigateway/**/*
+      - backendui/**/*
     
