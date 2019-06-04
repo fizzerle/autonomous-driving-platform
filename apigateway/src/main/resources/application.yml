@@ -10,19 +10,19 @@ spring:
                 predicates:
                 -   Path=/eventstorage/**
                 filters:
-                -   RewritePath=/eventstorage/(?<path>.*), /$\{path}
+                -   RewritePath=/(?<path>.*), /$\{path}
             -   id: entity-storage
                 uri: lb://entity-storage
                 predicates:
                     -   Path=/entitystorage/**
                 filters:
-                    -   RewritePath=/entitystorage/(?<path>.*), /$\{path}
+                    -   RewritePath=/(?<path>.*), /$\{path}
             -   id: notification-storage
                 uri: lb://notification-storage
                 predicates:
                     -   Path=/notificationstorage/**
                 filters:
-                    -   RewritePath=/notificationstorage/(?<path>.*), /$\{path}
+                    -   RewritePath=/(?<path>.*), /$\{path}
 
 logging:
     pattern:
