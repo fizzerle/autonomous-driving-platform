@@ -10,5 +10,5 @@ spec:
         paths:
         - path: /backendui
           backend:
-            serviceName: backendui-service
+            serviceName: backendui
             servicePort: 80
