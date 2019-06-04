@@ -34,3 +34,4 @@ spec:
   selector:
     app: backendui
   type: NodePort
+  
