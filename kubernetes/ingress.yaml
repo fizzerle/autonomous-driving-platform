@@ -4,6 +4,7 @@ metadata:
   name: gateway-ingress
   annotations:
     kubernetes.io/ingress.global-static-ip-name: backendui-ip
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
     - http:
