@@ -31,7 +31,7 @@
                                     id="oemField"
                                     v-model="newOem"
                                     :rules="oemRule"
-                                    label="OEMssssssssssssssssssssssss"
+                                    label="OEM"
                                     required
                             ></v-text-field>
                           </v-flex>
@@ -78,7 +78,7 @@
         md6
       >
         <material-card
-          :text="'This is the list of cars for car manufacturer '+ selectedOem"
+          :text="'This is the list of cars for car manufacturersssssssssssss '+ selectedOem"
           :title="'List of Cars for '+ selectedOem"
           color="green"
         >
