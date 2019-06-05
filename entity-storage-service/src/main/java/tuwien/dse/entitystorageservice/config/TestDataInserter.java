@@ -2,17 +2,20 @@ package tuwien.dse.entitystorageservice.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tuwien.dse.entitystorageservice.model.Car;
 import tuwien.dse.entitystorageservice.persistence.CarRepository;
 
+@Configuration
 public class TestDataInserter {
 
     private static final Logger log = LoggerFactory.getLogger(TestDataInserter.class);
 
-    public CommandLineRunner insertTestData(CarRepository repo) {
+    @Bean
+    public CommandLineRunner insertTestData(@Autowired CarRepository repo) {
         return args -> {
             if (repo.findAll().size() > 0) {
                 return;
@@ -27,7 +30,7 @@ public class TestDataInserter {
             repo.save(new Car("005", "BMW", "x7"));
 
             // Other test data
-            repo.save(new Car("ABCD0", "Audi", "A8"));
+            /*repo.save(new Car("ABCD0", "Audi", "A8"));
             repo.save(new Car("ABCD1", "Audi", "A6"));
             repo.save(new Car("ABCD2", "Audi", "A5"));
             repo.save(new Car("ABCD3", "BMW", "z3"));
@@ -36,7 +39,7 @@ public class TestDataInserter {
             repo.save(new Car("ABCD6", "VW", "K1"));
             repo.save(new Car("ABCD7", "VW", "Golf"));
             repo.save(new Car("ABCD8", "Fiat", "Punto"));
-            repo.save(new Car("ABCD9", "Fiat", "Punto"));
+            repo.save(new Car("ABCD9", "Fiat", "Punto"));*/
 
             log.info("Inserted Test Data");
         };

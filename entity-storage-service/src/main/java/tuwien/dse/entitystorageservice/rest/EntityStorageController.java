@@ -35,7 +35,7 @@ public class EntityStorageController {
     }
 
 
-    @GetMapping("/entitystorage/cars")
+    @GetMapping("/cars")
     public List<Car> getAll(@RequestParam(required = false) Optional<String> oem) {
         if (oem.isPresent()) {
             return carRepository.findAllByOem(oem.get());
@@ -43,7 +43,7 @@ public class EntityStorageController {
         return carRepository.findAll();
     }
 
-    @PostMapping("/entitystorage/cars")
+    @PostMapping("/cars")
     public Car insertCar(@RequestBody Car car) throws CarAlreadyExistsException {
         if (carRepository.findByChassisnumber(car.getChassisnumber()) != null) {
             String err = "Car with chassisnumber " + car.getChassisnumber() + " already exists!";
@@ -53,17 +53,17 @@ public class EntityStorageController {
         return carRepository.save(car);
     }
 
-    @GetMapping("/entitystorage/cars/{chassisnumber}")
+    @GetMapping("/cars/{chassisnumber}")
     public Car getCarByChassisnumber(@PathVariable String chassisnumber) {
         return carRepository.findByChassisnumber(chassisnumber);
     }
 
-    @DeleteMapping("/entitystorage/cars/{chassisnumber}")
+    @DeleteMapping("/cars/{chassisnumber}")
     public Long deleteCarByChassisnumber(@PathVariable String chassisnumber) {
         return carRepository.deleteCarByChassisnumber(chassisnumber);
     }
 
-    @GetMapping("/entitystorage/oem")
+    @GetMapping("/oem")
     public List<String> getOems() {
         return carRepository.findAll().stream().map(car -> car.getOem()).distinct().collect(Collectors.toList());
     }

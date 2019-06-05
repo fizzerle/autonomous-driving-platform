@@ -75,7 +75,7 @@ public class EventStorageController {
         return "deleted all events";
     }
 
-    @PostMapping("/eventstorage/events")
+    @PostMapping("/events")
     public void create(@RequestBody CarEventDto carEventDto) {
         LOGGER.info("Update from car with chassis {}", carEventDto.getChassisNumber());
         Event event = new Event(
@@ -101,7 +101,7 @@ public class EventStorageController {
         }
     }
 
-    @GetMapping("/eventstorage/events/{eventId}")
+    @GetMapping("/events/{eventId}")
     public CarEventDto get(@PathVariable String eventId) {
         Event event = repository.findById(eventId).orElse(null);
         if (event != null) {
@@ -110,7 +110,7 @@ public class EventStorageController {
         return convertToCarEventDto(event);
     }
 
-    @GetMapping("/eventstorage/events")
+    @GetMapping("/events")
     public List<CarEventDto> getEvents(@RequestParam(required = false) Optional<String> oem, @RequestParam(required = false) Optional<String> chassisnumber, @RequestParam(required = false) Optional<Integer> limit) {
         List<Event> events;
         if (chassisnumber.isPresent()) {
@@ -129,7 +129,7 @@ public class EventStorageController {
         return result;
     }
 
-    @GetMapping("/eventstorage/events/radius")
+    @GetMapping("/events/radius")
     public List<String> getCarsIn3kmRadius(@RequestParam double lng, @RequestParam double lat) {
         return repository.findByLocationNearOrderByTimestampDesc(
                 new Point(lng, lat),
