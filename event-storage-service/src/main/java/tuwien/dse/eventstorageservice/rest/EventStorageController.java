@@ -122,7 +122,7 @@ public class EventStorageController {
         if (limit.isPresent()) {
             events = events.stream().limit(limit.get()).collect(Collectors.toList());
         }
-        List<CarEventDto> result = events.stream().map(e -> convertToCarEventDto(e)).collect(Collectors.toList());
+        List<CarEventDto> result = events.stream().map(e -> convertToCarEventDto(e)).collect(Collectors.toList()); // TODO: Filter null values
         if (oem.isPresent()) {
             result = result.stream().filter(e -> e.getOem().toLowerCase().equals(oem.get().toLowerCase())).collect(Collectors.toList());
         }

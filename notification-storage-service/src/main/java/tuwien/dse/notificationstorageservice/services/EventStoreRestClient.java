@@ -24,7 +24,7 @@ public class EventStoreRestClient {
     public EventStoreRestClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:8081")
+                .baseUrl("http://event-storage")
                 .addConverterFactory(JacksonConverterFactory.create())
                 .client(httpClient.build())
                 .build();
