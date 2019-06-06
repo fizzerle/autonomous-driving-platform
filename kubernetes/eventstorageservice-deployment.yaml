@@ -47,11 +47,9 @@ metadata:
     app: event-storage
 spec:
   ports:
-    - port: 81
+    - port: 80
       targetPort: 8080
       protocol: TCP
       name: http
   selector:
     app: event-storage
-  type: LoadBalancer
-  loadBalancerIP: 35.246.153.101
