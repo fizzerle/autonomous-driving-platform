@@ -25,6 +25,11 @@ public class BlueLightOrganisationService {
     @Autowired
     private EventStoreRestClient eventStoreRestClient;
 
+    /**
+     * Method which returns Dtos with crash-information seen by bluelightorgs for each crash.
+     *
+     * @return List of crashes
+     */
     public List<BlueLightOrgNotificationDto> getAllAccidents() {
         List<BlueLightOrgNotificationDto> accidents = new ArrayList<>();
 
@@ -35,9 +40,17 @@ public class BlueLightOrganisationService {
         return accidents.stream().filter(c -> c != null).collect(Collectors.toList());
     }
 
+    /**
+     * Method to create a BlueLightOrgNotificationDto for a crash.
+     * EventStoreRestClient is used to get the crashLocation and carinformation.
+     *
+     * @param crashEvent the crashInformation.
+     * @return subset of information seen by blue-light-organisations.
+     */
     private BlueLightOrgNotificationDto getBlueLightOrgNotificationDto(CrashEvent crashEvent) {
         CarEventDto event;
 
+        /* get additional event information */
         try {
             event = eventStoreRestClient.getCarEvent(crashEvent.getEventId());
         } catch (Exception e) {

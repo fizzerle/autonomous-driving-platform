@@ -151,6 +151,17 @@ public class NotificationStorageController {
         return "crash resolved";
     }
 
+    /**
+     * Rest-Endpoint to get crashEvents.
+     * The type of DTO returned is dependent on the clienttype. There are DTOs for each of: Oem, Car, BlueLightOrg.
+     * OEMs musst pass their oem as argument, because they can only see crashes of their cars. A authentication for this
+     * was not required for this exercise.
+     *
+     * @param clientType Type of the client (Oem | Car | BlueLight)
+     * @param oem        oem argument specifing the oem for Oem clients
+     * @return List of crashevents including information specific to the ClientType.
+     * @throws BadRequestException If the client-type-header was missing/unknown or a OEM did not pass the oem-param
+     */
     @GetMapping("/notificationstorage/notifications")
     public List<?> getCrashEvents(@RequestHeader(value="X-Client-Type") String clientType,
                                   @RequestParam(required = false) Optional<String> oem) throws BadRequestException {
@@ -171,6 +182,12 @@ public class NotificationStorageController {
         }
     }
 
+    /**
+     * Rest-endpoint to save a crashevent in the database.
+     * With the stompService the UI-Components for oems, bluelightorg and cars are notified about the new crash.ö
+     *
+     * @param crashEventDto Information about the crash.
+     */
     @PostMapping("/notificationstorage/notifications")
     public void createCrashEvent(@RequestBody CrashEventDto crashEventDto) {
         LOGGER.info("Creating new Crash with chassis {}", crashEventDto.getChassisNumber());
@@ -181,18 +198,34 @@ public class NotificationStorageController {
         event.setEventId(crashEventDto.getEventId());
 
         event = crashRepository.save(event);
+        /* inform frontend components */
         stompService.yell(event);
     }
 
+    /**
+     * Rest-endpoint to resolve active crashevents.
+     * With the stompService the UI-Compenents for oems, bluelightorg and cars are notified that the crash was resolved.
+     *
+     * @param crashId Id of the active crash.
+     * @throws CrashNotFoundException If no crash with the given Id could be found.
+     * @throws CrashAlreadyInactiveException If the crash has already been resolved.
+     */
     @PatchMapping("/notificationstorage/notifications/{crashId}")
     public void resolveCrashEvent(@PathVariable String crashId) throws CrashNotFoundException, CrashAlreadyInactiveException {
         LOGGER.info("Resolving Crash with id {}", crashId);
         CrashEvent event = crashRepository.findById(crashId).orElse(null);
+
+        /* check if crash was found */
         if (event == null) throw new CrashNotFoundException("crash with Id" + crashId + "not found");
+
+        /* check if the crash is active */
         if (event.getResolveTimestamp() != null) throw new CrashAlreadyInactiveException("Crash with Id " + crashId + "is already inactive");
 
+        /* resolve crash */
         event.setResolveTimestamp(new Date());
         event = crashRepository.save(event);
+
+        /* inform frontend components */
         stompService.yell(event);
     }
 }
