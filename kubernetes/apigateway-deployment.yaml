@@ -33,5 +33,3 @@ spec:
       name: http
   selector:
     app: api-gateway
-  type: LoadBalancer
-  loadBalancerIP: 35.246.153.101
