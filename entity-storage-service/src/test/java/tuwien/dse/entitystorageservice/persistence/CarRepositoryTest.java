@@ -93,6 +93,7 @@ public class CarRepositoryTest {
     }
 
     private void insertCarTestData() {
+        carRepo.deleteAll();
         carRepo.save(new Car("000", "Audi", "A8"));
         carRepo.save(new Car("001", "BMW", "i8 Coupe"));
         carRepo.save(new Car("002", "Opel", "Astra"));
