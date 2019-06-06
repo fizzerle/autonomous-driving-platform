@@ -47,6 +47,8 @@ frontend-build:
 kubernetes-deploy:
   image: google/cloud-sdk
   stage: deploy
+  tags:
+    - ipax
   script:
     - echo "$GOOGLE_KEY5" > key.json
     - gcloud auth activate-service-account --key-file key.json
