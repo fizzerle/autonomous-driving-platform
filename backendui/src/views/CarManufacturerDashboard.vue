@@ -79,7 +79,7 @@
       >
         <material-card
           :text="'This is the list of cars for car manufacturer '+ selectedOem"
-          :title="'List of Cars forssssssssssssssssss '+ selectedOem"
+          :title="'List of Cars for '+ selectedOem"
           color="green"
         >
           <v-data-table
