@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import tuwien.dse.eventstorageservice.dto.CarDto;
 import tuwien.dse.eventstorageservice.dto.CarEventDto;
+import tuwien.dse.eventstorageservice.exception.EventNotFoundException;
 import tuwien.dse.eventstorageservice.model.Event;
 import tuwien.dse.eventstorageservice.model.Location;
 import tuwien.dse.eventstorageservice.persistence.EventRepository;
@@ -18,6 +19,7 @@ import tuwien.dse.eventstorageservice.services.EntityStoreRestClient;
 import tuwien.dse.eventstorageservice.services.EventNotifyService;
 import tuwien.dse.eventstorageservice.services.NotificationStoreRestClient;
 
+import java.beans.Transient;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -27,19 +29,32 @@ import java.util.stream.Collectors;
 @RestController
 public class EventStorageController {
 
-    @Autowired
     private EventRepository repository;
-
-    @Autowired
     private EventNotifyService stompService;
-
-    @Autowired
     private NotificationStoreRestClient notificationStoreRestClient;
-
-    @Autowired
     private EntityStoreRestClient entityStoreRestClient;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventStorageController.class);
+
+    @Autowired
+    public void setRepository(EventRepository repository) {
+        this.repository = repository;
+    }
+
+    @Autowired
+    public void setStompService(EventNotifyService stompService) {
+        this.stompService = stompService;
+    }
+
+    @Autowired
+    public void setNotificationStoreRestClient(NotificationStoreRestClient notificationStoreRestClient) {
+        this.notificationStoreRestClient = notificationStoreRestClient;
+    }
+
+    @Autowired
+    public void setEntityStoreRestClient(EntityStoreRestClient entityStoreRestClient) {
+        this.entityStoreRestClient = entityStoreRestClient;
+    }
 
     @GetMapping("/test/")
     public String test() {
@@ -102,12 +117,12 @@ public class EventStorageController {
     }
 
     @GetMapping("/eventstorage/events/{eventId}")
-    public CarEventDto get(@PathVariable String eventId) {
+    public CarEventDto get(@PathVariable String eventId) throws EventNotFoundException {
         Event event = repository.findById(eventId).orElse(null);
         if (event != null) {
-
+            return convertToCarEventDto(event);
         }
-        return convertToCarEventDto(event);
+        throw new EventNotFoundException("Event with Id " + eventId + "not found");
     }
 
     @GetMapping("/eventstorage/events")
