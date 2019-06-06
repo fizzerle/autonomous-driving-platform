@@ -31,18 +31,6 @@ public class BlueLightOrganisationService {
         return accidents;
     }
 
-    public List<BlueLightOrgNotificationDto> getAllActiveAccidents() {
-        List<BlueLightOrgNotificationDto> accidents = new ArrayList<>();
-
-        for(CrashEvent event: crashRepository.findAll()) {
-            if (event.getResolveTimestamp() == null) {
-                accidents.add(getBlueLightOrgNotificationDto(event));
-            }
-        }
-
-        return accidents;
-    }
-
     private BlueLightOrgNotificationDto getBlueLightOrgNotificationDto(CrashEvent crashEvent) {
         CarEventDto event;
 

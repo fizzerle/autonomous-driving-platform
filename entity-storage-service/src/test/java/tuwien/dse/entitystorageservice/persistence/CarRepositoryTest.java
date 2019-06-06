@@ -86,7 +86,7 @@ public class CarRepositoryTest {
     }
 
     @After
-    public void tearDown() {
+    public void cleanup() {
         carRepo.deleteAll();
     }
 

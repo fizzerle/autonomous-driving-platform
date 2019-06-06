@@ -65,7 +65,7 @@ public class EntityStorageControllerTest {
 
 
     @After
-    public void teardown() {
+    public void cleanup() {
         carRepo.deleteAll();
     }
 

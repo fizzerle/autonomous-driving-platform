@@ -1,5 +1,6 @@
 package tuwien.dse.notificationstorageservice.persistence;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,11 @@ public class CrashRepositoryTest {
     public void testFindAll_ShouldReturnAllCrashes() {
         List<CrashEvent> crashes = crashRepo.findAll();
         Assert.assertEquals(2, crashes.size());
+    }
+
+    @After
+    public void cleanup() {
+        crashRepo.deleteAll();
     }
 
 }

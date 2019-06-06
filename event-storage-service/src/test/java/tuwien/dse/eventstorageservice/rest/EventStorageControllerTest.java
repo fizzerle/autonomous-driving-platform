@@ -237,7 +237,7 @@ public class EventStorageControllerTest {
 
 
     @After
-    public void teardown() {
+    public void cleanup() {
         eventRepo.deleteAll();
     }
 

@@ -101,7 +101,7 @@ public class EventRepositoryTest {
 
 
     @After
-    public void tearDown() {
+    public void cleanup() {
         eventRepo.deleteAll();
     }
 

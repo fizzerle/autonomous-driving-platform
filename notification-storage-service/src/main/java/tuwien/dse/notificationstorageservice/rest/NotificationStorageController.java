@@ -13,6 +13,7 @@ import tuwien.dse.notificationstorageservice.dto.CarNotificationDto;
 import tuwien.dse.notificationstorageservice.dto.CrashEventDto;
 import tuwien.dse.notificationstorageservice.dto.Location;
 import tuwien.dse.notificationstorageservice.dto.OemNotificationDto;
+import tuwien.dse.notificationstorageservice.exception.BadRequestException;
 import tuwien.dse.notificationstorageservice.exception.CrashAlreadyInactiveException;
 import tuwien.dse.notificationstorageservice.exception.CrashNotFoundException;
 import tuwien.dse.notificationstorageservice.model.CrashEvent;
@@ -35,18 +36,38 @@ public class NotificationStorageController {
     private static final String CLIENT_TYPE_OEM = "OEM";
     private static final String CLIENT_TYPE_BLUELIGHT = "Bluelight";
 
-    @Autowired
+
     private CrashNotifyService stompService;
 
-    @Autowired
-    CrashRepository crashRepository;
-    @Autowired
-    OemNotificaionService oemNotificaionService;
-    @Autowired
-    BlueLightOrganisationService blueLightOrganisationService;
+    private CrashRepository crashRepository;
+    private OemNotificaionService oemNotificaionService;
+    private BlueLightOrganisationService blueLightOrganisationService;
+    private AutonomousCarService carService;
 
     @Autowired
-    private AutonomousCarService carService;
+    public void setStompService(CrashNotifyService stompService) {
+        this.stompService = stompService;
+    }
+
+    @Autowired
+    public void setCrashRepository(CrashRepository crashRepository) {
+        this.crashRepository = crashRepository;
+    }
+
+    @Autowired
+    public void setOemNotificaionService(OemNotificaionService oemNotificaionService) {
+        this.oemNotificaionService = oemNotificaionService;
+    }
+
+    @Autowired
+    public void setBlueLightOrganisationService(BlueLightOrganisationService blueLightOrganisationService) {
+        this.blueLightOrganisationService = blueLightOrganisationService;
+    }
+
+    @Autowired
+    public void setCarService(AutonomousCarService carService) {
+        this.carService = carService;
+    }
 
     @GetMapping("/test")
     public String test() {
@@ -132,8 +153,7 @@ public class NotificationStorageController {
 
     @GetMapping("/notificationstorage/notifications")
     public List<?> getCrashEvents(@RequestHeader(value="X-Client-Type") String clientType,
-                                  @RequestParam(required = false) Optional<String> oem,
-                                  @RequestParam(defaultValue = "false") boolean active) {
+                                  @RequestParam(required = false) Optional<String> oem) throws BadRequestException {
         if (CLIENT_TYPE_CAR.equals(clientType)) {
             // Get all active crashes
             return carService.getAllActiveCrashEvents();
@@ -142,14 +162,12 @@ public class NotificationStorageController {
             if (oem.isPresent()) {
                 return oemNotificaionService.getOemNotifications(oem.get());
             }
-            // Throw missing parameter exception
-            return null;
+            throw new BadRequestException("Missing parameter \"oem\"!");
         } else if (CLIENT_TYPE_BLUELIGHT.equals(clientType)) {
             // Get all crashes
             return blueLightOrganisationService.getAllAccidents();
         } else {
-            // Throw missing header exception
-            return null;
+            throw new BadRequestException("Missing header \"X-Client-Type\"");
         }
     }
 
