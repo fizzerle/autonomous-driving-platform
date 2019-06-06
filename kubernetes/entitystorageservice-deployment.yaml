@@ -58,5 +58,3 @@ spec:
       name: http
   selector:
     app: entity-storage
-  type: LoadBalancer
-  loadBalancerIP: 35.246.153.101
