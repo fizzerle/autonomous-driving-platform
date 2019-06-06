@@ -130,7 +130,7 @@ public class NotificationStorageController {
         return "crash resolved";
     }
 
-    @GetMapping("/notifications")
+    @GetMapping("/notificationstorage/notifications")
     public List<?> getCrashEvents(@RequestHeader(value="X-Client-Type") String clientType,
                                   @RequestParam(required = false) Optional<String> oem,
                                   @RequestParam(defaultValue = "false") boolean active) {
@@ -153,7 +153,7 @@ public class NotificationStorageController {
         }
     }
 
-    @PostMapping("/notifications")
+    @PostMapping("/notificationstorage/notifications")
     public void createCrashEvent(@RequestBody CrashEventDto crashEventDto) {
         LOGGER.info("Creating new Crash with chassis {}", crashEventDto.getChassisNumber());
         CrashEvent event = new CrashEvent();
@@ -166,7 +166,7 @@ public class NotificationStorageController {
         stompService.yell(event);
     }
 
-    @PatchMapping("/notifications/{crashId}")
+    @PatchMapping("/notificationstorage/notifications/{crashId}")
     public void resolveCrashEvent(@PathVariable String crashId) throws CrashNotFoundException, CrashAlreadyInactiveException {
         LOGGER.info("Resolving Crash with id {}", crashId);
         CrashEvent event = crashRepository.findById(crashId).orElse(null);
