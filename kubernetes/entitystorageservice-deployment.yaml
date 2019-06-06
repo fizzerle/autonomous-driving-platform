@@ -26,6 +26,11 @@ spec:
                 configMapKeyRef:
                   name: mongodb
                   key: database-name
+            - name: MONGO_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb
+                  key: database-host
             - name: MONGO_USERNAME
               valueFrom:
                 secretKeyRef:
