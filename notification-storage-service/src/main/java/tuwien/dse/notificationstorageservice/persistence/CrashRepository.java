@@ -8,5 +8,4 @@ import java.util.List;
 public interface CrashRepository extends MongoRepository<CrashEvent,String> {
 
     List<CrashEvent> findAll();
-    CrashEvent findByCrashId();
 }

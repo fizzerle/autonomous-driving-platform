@@ -1,6 +1,5 @@
 package tuwien.dse.entitystorageservice.persistence;
 
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import tuwien.dse.entitystorageservice.model.Car;
-import tuwien.dse.entitystorageservice.persistence.CarRepository;
 
 import java.util.List;
 
@@ -110,7 +108,4 @@ public class CarRepositoryTest {
         }
         return false;
     }
-
-
-
 }
