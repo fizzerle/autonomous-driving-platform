@@ -1,5 +1,7 @@
 package tuwien.dse.notificationstorageservice.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tuwien.dse.notificationstorageservice.dto.BlueLightOrgNotificationDto;
@@ -10,9 +12,12 @@ import tuwien.dse.notificationstorageservice.persistence.CrashRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BlueLightOrganisationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlueLightOrganisationService.class);
 
     @Autowired
     private CrashRepository crashRepository;
@@ -24,11 +29,10 @@ public class BlueLightOrganisationService {
         List<BlueLightOrgNotificationDto> accidents = new ArrayList<>();
 
         for(CrashEvent event: crashRepository.findAll()) {
-            //TODO: get car and location information from Entity and Event service
             accidents.add(getBlueLightOrgNotificationDto(event));
         }
 
-        return accidents;
+        return accidents.stream().filter(c -> c != null).collect(Collectors.toList());
     }
 
     public List<BlueLightOrgNotificationDto> getAllActiveAccidents() {
@@ -49,7 +53,7 @@ public class BlueLightOrganisationService {
         try {
             event = eventStoreRestClient.getCarEvent(crashEvent.getEventId());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Failure catching the Event with id {}", crashEvent.getEventId(), e);
             return null;
         }
 

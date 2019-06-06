@@ -96,7 +96,7 @@ public class EventStorageController {
             try {
                 notificationStoreRestClient.createCrashEvent(event);
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.warn("Could not send crash event to notification storage", e);
             }
         }
     }
@@ -122,10 +122,14 @@ public class EventStorageController {
         if (limit.isPresent()) {
             events = events.stream().limit(limit.get()).collect(Collectors.toList());
         }
-        List<CarEventDto> result = events.stream().map(e -> convertToCarEventDto(e)).collect(Collectors.toList()); // TODO: Filter null values
+        List<CarEventDto> result = events.stream().map(e -> convertToCarEventDto(e)).collect(Collectors.toList());
         if (oem.isPresent()) {
             result = result.stream().filter(e -> e.getOem().toLowerCase().equals(oem.get().toLowerCase())).collect(Collectors.toList());
         }
+
+        // Remove null values from failing rest calls
+        result = result.stream().filter(e -> e != null).collect(Collectors.toList());
+
         return result;
     }
 
@@ -145,7 +149,6 @@ public class EventStorageController {
         try {
             car = entityStoreRestClient.getCar(event.getChassisnumber());
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
 

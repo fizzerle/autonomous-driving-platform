@@ -1,5 +1,7 @@
 package tuwien.dse.notificationstorageservice.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tuwien.dse.notificationstorageservice.dto.CarEventDto;
@@ -14,6 +16,8 @@ import java.util.List;
 @Service
 public class OemNotificaionService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OemNotificaionService.class);
+
     @Autowired
     private CrashRepository crashRepository;
 
@@ -26,7 +30,7 @@ public class OemNotificaionService {
 
         for (CrashEvent event: events) {
             CarEventDto carEventDto = getCarEvent(event);
-            if (carEventDto.getOem().toLowerCase().equals(oem.toLowerCase())) {
+            if (carEventDto != null && carEventDto.getOem().toLowerCase().equals(oem.toLowerCase())) {
                 notifications.add(getOemNotificationDto(event, carEventDto));
             }
         }
@@ -37,7 +41,7 @@ public class OemNotificaionService {
         try {
             return eventStoreRestClient.getCarEvent(crashEvent.getEventId());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Failure catching the Event with id {}", crashEvent.getEventId(), e);
             return null;
         }
     }
