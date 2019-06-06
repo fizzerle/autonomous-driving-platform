@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import tuwien.dse.notificationstorageservice.dto.*;
 import tuwien.dse.notificationstorageservice.exception.BadRequestException;
+import tuwien.dse.notificationstorageservice.exception.CrashAlreadyInactiveException;
+import tuwien.dse.notificationstorageservice.exception.CrashNotFoundException;
 import tuwien.dse.notificationstorageservice.model.CrashEvent;
 import tuwien.dse.notificationstorageservice.persistence.CrashRepository;
 import tuwien.dse.notificationstorageservice.services.AutonomousCarService;
@@ -33,11 +35,14 @@ public class NotificationStorageControllerTest {
     @Autowired
     private CrashRepository crashRepo;
 
+    private String crashId1;
+    private String crashId2;
+
     @Before
     public void setup() {
         crashRepo.deleteAll();
-        crashRepo.save(new CrashEvent("crash1", "001", new Date(), new Date(), "ran into tree"));
-        crashRepo.save(new CrashEvent("crash2", "002", new Date(), null, "ran into deer"));
+        crashId1 = crashRepo.save(new CrashEvent("crash1", "001", new Date(), new Date(), "ran into tree")).getCrashId();
+        crashId2 = crashRepo.save(new CrashEvent("crash2", "002", new Date(), null, "ran into deer")).getCrashId();
     }
 
     @Test
@@ -128,6 +133,40 @@ public class NotificationStorageControllerTest {
         notificationStorageController.createCrashEvent(crashEventDto);
 
         Assert.assertEquals(3, crashRepo.findAll().size());
+    }
+
+    @Test
+    public void testResolveCrashEvent_ShouldResolveCrash() throws CrashAlreadyInactiveException, CrashNotFoundException {
+        NotificationStorageController notificationStorageController = new NotificationStorageController();
+        notificationStorageController.setCrashRepository(crashRepo);
+
+        CrashNotifyService stompService = mock(CrashNotifyService.class);
+        doNothing().when(stompService).yell(any(CrashEvent.class));
+        notificationStorageController.setStompService(stompService);
+
+        CrashEvent event = crashRepo.findById(crashId2).get();
+        Assert.assertNull(event.getResolveTimestamp());
+        notificationStorageController.resolveCrashEvent(crashId2);
+        event = crashRepo.findById(crashId2).get();
+        Assert.assertNotNull(event.getResolveTimestamp());
+    }
+
+    @Test(expected = CrashAlreadyInactiveException.class)
+    public void testResolveCrashEventAlreadyResolved_ShouldThrowCrashAlreadyInactiveException() throws CrashAlreadyInactiveException, CrashNotFoundException {
+        NotificationStorageController notificationStorageController = new NotificationStorageController();
+        notificationStorageController.setCrashRepository(crashRepo);
+
+        List<CrashEvent> crashes = crashRepo.findAll();
+
+        notificationStorageController.resolveCrashEvent(crashId1);
+    }
+
+    @Test(expected = CrashNotFoundException.class)
+    public void testResolveCrashEventInvalidId_ShouldThrowCrashNotFoundException() throws CrashAlreadyInactiveException, CrashNotFoundException {
+        NotificationStorageController notificationStorageController = new NotificationStorageController();
+        notificationStorageController.setCrashRepository(crashRepo);
+
+        notificationStorageController.resolveCrashEvent("madeUpId");
     }
 
     @After
