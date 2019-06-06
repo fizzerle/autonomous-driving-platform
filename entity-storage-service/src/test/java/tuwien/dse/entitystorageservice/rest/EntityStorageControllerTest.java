@@ -7,8 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import tuwien.dse.entitystorageservice.EntitystorageserviceApplication;
 import tuwien.dse.entitystorageservice.exception.CarAlreadyExistsException;
 import tuwien.dse.entitystorageservice.model.Car;
 import tuwien.dse.entitystorageservice.persistence.CarRepository;
@@ -16,8 +18,9 @@ import tuwien.dse.entitystorageservice.persistence.CarRepository;
 import java.util.List;
 import java.util.Optional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = EntitystorageserviceApplication.class)
+@TestPropertySource(locations = "classpath:application-dev.properties")
 public class EntityStorageControllerTest {
 
     @Autowired

@@ -12,15 +12,20 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
+import tuwien.dse.eventstorageservice.EventstorageserviceApplication;
 import tuwien.dse.eventstorageservice.model.Event;
 import tuwien.dse.eventstorageservice.model.Location;
 
 import java.util.Date;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = EventstorageserviceApplication.class)
+@TestPropertySource(locations = "classpath:application-dev.properties")
 public class EventRepositoryTest {
 
     private String eventId1;

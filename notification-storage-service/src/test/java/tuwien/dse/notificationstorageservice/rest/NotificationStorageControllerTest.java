@@ -7,7 +7,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
+import tuwien.dse.notificationstorageservice.NotificationstorageserviceApplication;
 import tuwien.dse.notificationstorageservice.dto.*;
 import tuwien.dse.notificationstorageservice.exception.BadRequestException;
 import tuwien.dse.notificationstorageservice.exception.CrashAlreadyInactiveException;
@@ -27,8 +31,9 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = NotificationstorageserviceApplication.class)
+@TestPropertySource(locations = "classpath:application-dev.properties")
 public class NotificationStorageControllerTest {
 
 

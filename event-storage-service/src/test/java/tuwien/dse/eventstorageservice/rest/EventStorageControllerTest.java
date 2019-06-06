@@ -7,7 +7,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
+import tuwien.dse.eventstorageservice.EventstorageserviceApplication;
 import tuwien.dse.eventstorageservice.dto.CarDto;
 import tuwien.dse.eventstorageservice.dto.CarEventDto;
 import tuwien.dse.eventstorageservice.exception.EventNotFoundException;
@@ -25,8 +29,9 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = EventstorageserviceApplication.class)
+@TestPropertySource(locations = "classpath:application-dev.properties")
 public class EventStorageControllerTest {
 
     @Autowired
