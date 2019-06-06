@@ -78,7 +78,7 @@
         md6
       >
         <material-card
-          :text="'This is the list of cars for car manufacturersssssssssssss '+ selectedOem"
+          :text="'This is the list of cars for car manufacturer '+ selectedOem"
           :title="'List of Cars for '+ selectedOem"
           color="green"
         >
