@@ -17,12 +17,24 @@ spring:
                     -   Path=/entitystorage/**
                 filters:
                     -   RewritePath=/(?<path>.*), /$\{path}
+                    -   name: Hystrix
+                        args:
+                          name: fallbackcmd
+                          fallbackUri: forward:/hystrixfallback
             -   id: notification-storage
                 uri: lb://notification-storage
                 predicates:
                     -   Path=/notificationstorage/**
                 filters:
                     -   RewritePath=/(?<path>.*), /$\{path}
+
+hystrix:
+    command:
+        fallbackcmd:
+            execution:
+                isolation:
+                    thread:
+                        timeoutInMilliseconds: 5000
 
 logging:
     pattern:
