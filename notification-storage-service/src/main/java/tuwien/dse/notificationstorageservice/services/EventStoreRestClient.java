@@ -1,6 +1,8 @@
 package tuwien.dse.notificationstorageservice.services;
 
 import okhttp3.OkHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -19,12 +21,14 @@ import java.util.List;
 @Service
 public class EventStoreRestClient {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlueLightOrganisationService.class);
+
     private EventStoreService eventStoreService;
 
     public EventStoreRestClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:8081")
+                .baseUrl("http://event-storage")
                 .addConverterFactory(JacksonConverterFactory.create())
                 .client(httpClient.build())
                 .build();
@@ -49,7 +53,7 @@ public class EventStoreRestClient {
                 throw new Exception(resp.message());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Failure catching the affected cars", e);
             return new LinkedList<>();
         }
         return resp.body();

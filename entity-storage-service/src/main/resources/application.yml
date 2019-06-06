@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: entitystorageservice
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@10.132.0.7/${MONGO_DATABASE}
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"

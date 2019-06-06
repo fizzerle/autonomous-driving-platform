@@ -8,17 +8,17 @@ module.exports = {
 
     proxy: {
       '^/eventstorage': {
-        target: 'http://localhost:8081/',
+          target: 'http://35.246.153.101:80',
         ws: true,
         changeOrigin: true
       },
       '/entitystorage': {
-        target: 'http://localhost:8082/',
+          target: 'http://35.246.153.101:80',
         ws: true,
         changeOrigin: true
       },
       '/notificationstorage': {
-        target: 'http://localhost:8083/',
+          target: 'http://35.246.153.101:80',
         ws: true,
         changeOrigin: true
       }

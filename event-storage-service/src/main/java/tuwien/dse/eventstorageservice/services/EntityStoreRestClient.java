@@ -22,7 +22,7 @@ public class EntityStoreRestClient {
     public EntityStoreRestClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:8082")
+                .baseUrl("http://entity-storage")
                 .addConverterFactory(JacksonConverterFactory.create())
                 .client(httpClient.build())
                 .build();

@@ -2,6 +2,8 @@ package tuwien.dse.notificationstorageservice.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import java.util.List;
 @Service
 public class CrashNotifyService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CrashNotifyService.class);
+
     @Autowired
     private EventStoreRestClient eventStoreRestClient;
 
@@ -29,7 +33,7 @@ public class CrashNotifyService {
         try {
             event = eventStoreRestClient.getCarEvent(crashEvent.getEventId());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not fetch data from eventstore", e);
             return;
         }
 
@@ -72,7 +76,7 @@ public class CrashNotifyService {
                 simp.convertAndSend(topic, json);
             }
         } catch (JsonProcessingException e) {
-            // Do nothing
+            LOGGER.warn("Could not send Notification to affected cars", e);
         }
     }
 
@@ -83,7 +87,7 @@ public class CrashNotifyService {
             String topic = "/crash/bluelight";
             simp.convertAndSend(topic, json);
         } catch (JsonProcessingException e) {
-            // Do nothing
+            LOGGER.warn("Could not send Notification to Bluelight", e);
         }
     }
 
@@ -94,7 +98,7 @@ public class CrashNotifyService {
             String topic = "/crash/" + oem.toLowerCase();
             simp.convertAndSend(topic, json);
         } catch (JsonProcessingException e) {
-            // Do nothing
+            LOGGER.warn("Could not send Notification to OEM", e);
         }
     }
 }
