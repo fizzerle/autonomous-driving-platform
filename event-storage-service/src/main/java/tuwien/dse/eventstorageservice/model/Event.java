@@ -24,11 +24,27 @@ public class Event {
     private double spaceBehind;
     private int passengers;
 
+    /**
+     * Default Constructor for a Event.
+     */
     public Event() {
 
     }
 
-    public Event(Location location, String chassisnumber, Date timestamp, int speed, double spaceAhead, double spaceBehind,String crashEvent, int passengers) {
+    /**
+     * Event-model describing a event which is managed in the database.
+     * A event is one set of data sent by the car, including location, speed, sensor-data....
+     *
+     * @param location      Location where the car was at this event.
+     * @param chassisnumber Number identifying the car's chassis.
+     * @param timestamp     Timestamp describing when this event happened/was sent.
+     * @param speed         Speed in km/h.
+     * @param spaceAhead    Space ahead of the car measured by a sensor.
+     * @param spaceBehind   Space behind the car measured by a sensor.
+     * @param crashEvent    Description of a crash event, only set if this event represents a crash.
+     * @param passengers    Number of passengers in the car.
+     */
+    public Event(Location location, String chassisnumber, Date timestamp, int speed, double spaceAhead, double spaceBehind, String crashEvent, int passengers) {
         this.location = new GeoJsonPoint(location.getLng(), location.getLat());
         this.chassisnumber = chassisnumber;
         this.timestamp = timestamp;

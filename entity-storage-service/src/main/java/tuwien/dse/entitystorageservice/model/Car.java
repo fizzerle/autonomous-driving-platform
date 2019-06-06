@@ -11,6 +11,9 @@ public class Car {
     private String oem;
     private String modelType;
 
+    /**
+     * Default constructor for car.
+     */
     public Car() {
 
     }

@@ -14,9 +14,26 @@ public class CarEventDto {
     private double spaceBehind;
     private String crashEvent;
 
+    /**
+     * Default-constructor for a carEventDto.
+     */
     public CarEventDto() {
     }
 
+    /**
+     * Constructor for a CarEventDto which describes a event.
+     * A event describes the possition of the car and additional information.
+     *
+     * @param oem           The OEM of the car.
+     * @param chassisNumber Number describing the car's chassis.
+     * @param modeltype     Type description of the car.
+     * @param passengers    Number of passengers in the car.
+     * @param location      Location where the car is described by latitude and longitude.
+     * @param speed         Speed in km/h.
+     * @param spaceAhead    Space ahead of the car measured by a sensor.
+     * @param spaceBehind   Space behind the car measured by a sensor.
+     * @param crashEvent    Description of a crash event, only set if this event represents a crash.
+     */
     public CarEventDto(String oem, String chassisNumber, String modeltype, int passengers, Location location, int speed, double spaceAhead, double spaceBehind, String crashEvent) {
         this.oem = oem;
         this.chassisNumber = chassisNumber;
