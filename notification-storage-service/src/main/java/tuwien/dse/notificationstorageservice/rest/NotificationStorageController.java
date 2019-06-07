@@ -166,15 +166,18 @@ public class NotificationStorageController {
     public List<?> getCrashEvents(@RequestHeader(value="X-Client-Type") String clientType,
                                   @RequestParam(required = false) Optional<String> oem) throws BadRequestException {
         if (CLIENT_TYPE_CAR.equals(clientType)) {
+            LOGGER.info("Getting active crashevents for cars");
             // Get all active crashes
             return carService.getAllActiveCrashEvents();
         } else if (CLIENT_TYPE_OEM.equals(clientType)) {
             // Get all crashes by oem
             if (oem.isPresent()) {
+                LOGGER.info("Getting crashevents for OEM " + oem);
                 return oemNotificaionService.getOemNotifications(oem.get());
             }
             throw new BadRequestException("Missing parameter \"oem\"!");
         } else if (CLIENT_TYPE_BLUELIGHT.equals(clientType)) {
+            LOGGER.info("Getting all crashevents for BlueLightOrganisations");
             // Get all crashes
             return blueLightOrganisationService.getAllAccidents();
         } else {

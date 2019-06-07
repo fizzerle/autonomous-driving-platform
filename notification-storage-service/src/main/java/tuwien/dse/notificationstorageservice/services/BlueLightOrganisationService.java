@@ -33,9 +33,11 @@ public class BlueLightOrganisationService {
     public List<BlueLightOrgNotificationDto> getAllAccidents() {
         List<BlueLightOrgNotificationDto> accidents = new ArrayList<>();
 
+        LOGGER.info("Getting all crashevents from repo...");
         for(CrashEvent event: crashRepository.findAll()) {
             accidents.add(getBlueLightOrgNotificationDto(event));
         }
+        LOGGER.info(accidents.size() + " accidents found");
 
         return accidents.stream().filter(c -> c != null).collect(Collectors.toList());
     }

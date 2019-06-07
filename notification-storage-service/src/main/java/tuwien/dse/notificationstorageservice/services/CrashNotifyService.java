@@ -86,6 +86,7 @@ public class CrashNotifyService {
      * @param data Crash-infos which can seen by cars.
      */
     public void notifyCars(CarNotificationDto data) {
+        LOGGER.info("Notifying cars about crash at {) {}", data.getLocation().getLat(), data.getLocation().getLng());
         try {
             List<String> affectedCars = eventStoreRestClient.getAffectedCars(data.getLocation());
             ObjectMapper mapper = new ObjectMapper();
@@ -104,6 +105,7 @@ public class CrashNotifyService {
      * @param data Crash-infos which can seen by blue-light-organisations.
      */
     public void notifyBluelights(BlueLightOrgNotificationDto data) {
+        LOGGER.info("Notifying blueLightOrg about crash of {}", data.getChassisnumber());
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
@@ -119,6 +121,7 @@ public class CrashNotifyService {
      * @param data Crash-infos which can seen by oems.
      */
     public void notifyOem(String oem, OemNotificationDto data) {
+        LOGGER.info("Notifying OEM about crash of {}", data.getChassisnumber());
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);

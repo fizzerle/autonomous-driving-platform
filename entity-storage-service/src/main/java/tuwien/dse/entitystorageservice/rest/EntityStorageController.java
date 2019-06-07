@@ -52,9 +52,12 @@ public class EntityStorageController {
      */
     @GetMapping("/entitystorage/cars")
     public List<Car> getAll(@RequestParam(required = false) Optional<String> oem) {
+        ;
         if (oem.isPresent()) {
+            LOGGER.info("Getting all cars of oem: " + oem);
             return carRepository.findAllByOem(oem.get());
         }
+        LOGGER.info("Getting all cars...");
         return carRepository.findAll();
     }
 
@@ -71,7 +74,10 @@ public class EntityStorageController {
             LOGGER.error(err);
             throw new CarAlreadyExistsException(err);
         }
-        return carRepository.save(car);
+        LOGGER.info("Saving new car...");
+        Car saveCar = carRepository.save(car);
+        LOGGER.info("Saved new car: " + saveCar.getChassisnumber());
+        return saveCar;
     }
 
     /**
@@ -81,6 +87,7 @@ public class EntityStorageController {
      */
     @GetMapping("/entitystorage/cars/{chassisnumber}")
     public Car getCarByChassisnumber(@PathVariable String chassisnumber) {
+        LOGGER.info("Searching car " + chassisnumber);
         return carRepository.findByChassisnumber(chassisnumber);
     }
 
@@ -91,6 +98,7 @@ public class EntityStorageController {
      */
     @DeleteMapping("/entitystorage/cars/{chassisnumber}")
     public Long deleteCarByChassisnumber(@PathVariable String chassisnumber) {
+        LOGGER.info("Deleting car " + chassisnumber);
         return carRepository.deleteCarByChassisnumber(chassisnumber);
     }
 
@@ -100,6 +108,7 @@ public class EntityStorageController {
      */
     @GetMapping("/entitystorage/oem")
     public List<String> getOems() {
+        LOGGER.info("Searching all distinct oems in db...");
         return carRepository.findAll().stream().map(car -> car.getOem()).distinct().collect(Collectors.toList());
     }
 }

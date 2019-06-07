@@ -118,6 +118,7 @@ public class EventStorageController {
 
         /* check if event is a crash */
         if (carEventDto.getCrashEvent() != null) {
+            LOGGER.info("Update for car " + carEventDto.getChassisNumber() + "is a crashevent.");
             try {
                 /* create crash in the notificationstorage */
                 notificationStoreRestClient.createCrashEvent(event);
@@ -138,8 +139,10 @@ public class EventStorageController {
     public CarEventDto get(@PathVariable String eventId) throws EventNotFoundException {
         Event event = repository.findById(eventId).orElse(null);
         if (event != null) {
+            LOGGER.info("Getting Event with ID " + eventId);
             return convertToCarEventDto(event);
         }
+        LOGGER.error("Event with Id " + eventId + "not found");
         throw new EventNotFoundException("Event with Id " + eventId + "not found");
     }
 
@@ -160,8 +163,10 @@ public class EventStorageController {
         /* filter by chassisnumber if requested */
         List<Event> events;
         if (chassisnumber.isPresent()) {
+            LOGGER.info("Getting events for car " + chassisnumber);
             events = repository.findAllByChassisnumberOrderByTimestampDesc(chassisnumber.get());
         } else {
+            LOGGER.info("Getting all events");
             events = repository.findAll();
         }
 
@@ -170,6 +175,7 @@ public class EventStorageController {
 
         /* filter by oem if if requested */
         if (oem.isPresent()) {
+            LOGGER.info("Filter events by OEM: " + oem);
             result = result.stream().filter(e -> e.getOem().toLowerCase().equals(oem.get().toLowerCase())).collect(Collectors.toList());
         }
 
@@ -178,6 +184,7 @@ public class EventStorageController {
 
         /* limit number of responses if requested */
         if (limit.isPresent()) {
+            LOGGER.info("Limiting number of returned events to " + limit);
             result = result.stream().limit(limit.get()).collect(Collectors.toList());
         }
         return result;
@@ -192,6 +199,7 @@ public class EventStorageController {
      */
     @GetMapping("/eventstorage/events/radius")
     public List<String> getCarsIn3kmRadius(@RequestParam double lng, @RequestParam double lat) {
+        LOGGER.info("Getting cars in 3km area of {} {}", lat, lng);
         return repository.findByLocationNearOrderByTimestampDesc(
                 new Point(lng, lat),
                 new Distance(3, Metrics.KILOMETERS)

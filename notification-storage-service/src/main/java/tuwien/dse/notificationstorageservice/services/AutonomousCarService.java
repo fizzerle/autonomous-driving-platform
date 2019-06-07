@@ -30,6 +30,7 @@ public class AutonomousCarService {
      * @return List of active crashes
      */
     public List<CarNotificationDto> getAllActiveCrashEvents() {
+        LOGGER.info("Getting car notifications");
         return repo.findAll().stream()
                 .filter(c -> c.getResolveTimestamp() == null)
                 .map(c -> getCarNotificationDto(c))

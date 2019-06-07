@@ -46,6 +46,7 @@ public class EventStoreRestClient {
      * @throws Exception If the call could not be executed successfully.
      */
     public CarEventDto getCarEvent(String eventId) throws Exception {
+        LOGGER.info("Making restcall getEvent for " + eventId);
         Call<CarEventDto> call = eventStoreService.getCarData(eventId);
         Response<CarEventDto> resp = call.execute();
         if (!resp.isSuccessful()) {
@@ -60,6 +61,7 @@ public class EventStoreRestClient {
      * @return List of Cars within the circle.
      */
     public List<String> getAffectedCars(Location location) {
+        LOGGER.info("Makeing restcall getCarsIn3kmRadius at location {} {}", location.getLat(), location.getLng());
         Call<List<String>> call = eventStoreService.getAffectedCars(location.getLat(), location.getLng());
         Response<List<String>> resp = null;
         try {

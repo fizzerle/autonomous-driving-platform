@@ -1,6 +1,8 @@
 package tuwien.dse.eventstorageservice.services;
 
 import okhttp3.OkHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -16,6 +18,8 @@ import tuwien.dse.eventstorageservice.model.Event;
 public class NotificationStoreRestClient {
 
     private NotificationService notificationService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationStoreRestClient.class);
 
     /**
      * Constructor for a Restclient which can send request to the NotificationStorageService.
@@ -38,6 +42,7 @@ public class NotificationStoreRestClient {
      * @throws Exception If the NotificationStorageService call was not successful.
      */
     public void createCrashEvent(Event event) throws Exception {
+        LOGGER.info("Making restcall createCrashEvent for crashed car: " + event.getChassisnumber());
         CrashEventDto crash = new CrashEventDto(
                 event.getChassisnumber(),
                 event.getId(),

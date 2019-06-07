@@ -1,6 +1,8 @@
 package tuwien.dse.eventstorageservice.services;
 
 import okhttp3.OkHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -18,6 +20,8 @@ import tuwien.dse.eventstorageservice.model.Event;
 public class EntityStoreRestClient {
 
     private EntityService entityService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntityStoreRestClient.class);
 
     /**
      * Constructor for a RestClient which can send requests to the EntityStorage.
@@ -43,6 +47,7 @@ public class EntityStoreRestClient {
     public CarDto getCar(String chassis) throws Exception {
         Call<CarDto> call = entityService.getCarData(chassis);
 
+        LOGGER.info("Making restcall getCar for " + chassis);
         Response<CarDto> resp = call.execute();
         if (!resp.isSuccessful()) {
             throw new Exception(resp.message());

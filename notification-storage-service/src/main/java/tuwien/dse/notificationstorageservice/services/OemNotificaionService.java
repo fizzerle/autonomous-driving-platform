@@ -31,7 +31,9 @@ public class OemNotificaionService {
      */
     public List<OemNotificationDto> getOemNotifications(String oem) {
         List<OemNotificationDto> notifications = new ArrayList<>();
+        LOGGER.info("Getting all crashes from DB");
         List<CrashEvent> events = crashRepository.findAll();
+        LOGGER.info("{} crashes found", events.size());
 
         for (CrashEvent event: events) {
             CarEventDto carEventDto = getCarEvent(event);
@@ -39,6 +41,7 @@ public class OemNotificaionService {
                 notifications.add(getOemNotificationDto(event, carEventDto));
             }
         }
+        LOGGER.info("returning {} crashes for oem {}", notifications.size(), oem);
         return notifications;
     }
 
