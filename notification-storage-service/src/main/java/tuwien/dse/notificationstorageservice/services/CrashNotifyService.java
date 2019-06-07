@@ -27,9 +27,17 @@ public class CrashNotifyService {
     @Autowired
     private SimpMessageSendingOperations simp;
 
+    /**
+     * Method to send notifications for a new Crashevent to all differnt frontendcomponents which have insight into crashes.
+     * Specific Dtos for the oems, bluelightorgs and cars are created.
+     * The EventStoreRestClient is used to enrich the crashInvormation with location and car infos.
+     *
+     * @param crashEvent
+     */
     public void yell(CrashEvent crashEvent) {
         CarEventDto event;
 
+        /* get event-information */
         try {
             event = eventStoreRestClient.getCarEvent(crashEvent.getEventId());
         } catch (Exception e) {
@@ -37,10 +45,13 @@ public class CrashNotifyService {
             return;
         }
 
+        /* create Dto for cars */
         CarNotificationDto carDto = new CarNotificationDto(
                 event.getLocation(),
                 crashEvent.getResolveTimestamp() == null
         );
+
+        /* create Dto for bluelightorgs */
         BlueLightOrgNotificationDto bluelightDto = new BlueLightOrgNotificationDto(
                 crashEvent.getCrashId(),
                 event.getOem(),
@@ -51,6 +62,8 @@ public class CrashNotifyService {
                 crashEvent.getCrashTimestamp(),
                 event.getPassengers()
         );
+
+        /* create Dto for oem */
         OemNotificationDto oemDto = new OemNotificationDto(
                 crashEvent.getCrashId(),
                 crashEvent.getCrashTimestamp(),
@@ -60,12 +73,18 @@ public class CrashNotifyService {
                 event.getLocation()
         );
 
+        /* notify the frontend components */
         notifyCars(carDto);
         notifyBluelights(bluelightDto);
         notifyOem(event.getOem(), oemDto);
     }
 
 
+    /**
+     * Method to notify car-ui-views about a new crash through a websocket.
+     *
+     * @param data Crash-infos which can seen by cars.
+     */
     public void notifyCars(CarNotificationDto data) {
         try {
             List<String> affectedCars = eventStoreRestClient.getAffectedCars(data.getLocation());
@@ -80,6 +99,10 @@ public class CrashNotifyService {
         }
     }
 
+    /**
+     * Method to notify bluelight-ui-views about a new crash through a websocket.
+     * @param data Crash-infos which can seen by blue-light-organisations.
+     */
     public void notifyBluelights(BlueLightOrgNotificationDto data) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -91,6 +114,10 @@ public class CrashNotifyService {
         }
     }
 
+    /**
+     * Method to notify oem-ui-views about a new crash through a websocket.
+     * @param data Crash-infos which can seen by oems.
+     */
     public void notifyOem(String oem, OemNotificationDto data) {
         try {
             ObjectMapper mapper = new ObjectMapper();

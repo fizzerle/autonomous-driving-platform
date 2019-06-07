@@ -5,8 +5,10 @@ import tuwien.dse.notificationstorageservice.model.CrashEvent;
 
 import java.util.List;
 
+/**
+ * MongoRepository to access Crashes in the database.
+ */
 public interface CrashRepository extends MongoRepository<CrashEvent,String> {
 
     List<CrashEvent> findAll();
-    CrashEvent findByCrashId();
 }

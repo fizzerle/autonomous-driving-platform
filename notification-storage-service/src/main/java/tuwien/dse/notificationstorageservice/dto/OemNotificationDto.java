@@ -11,10 +11,23 @@ public class OemNotificationDto {
     private Date resolveTimestamp;
     private Location location;
 
+    /**
+     * Default-Constructor for the OemNotificationDto.
+     */
     public OemNotificationDto() {
 
     }
 
+    /**
+     * Constructor for a Dto with the crashInformation a OEM is allowed to see.
+     *
+     * @param crashId          Id of the crash.
+     * @param timestamp        Timestamp describing when the crash happened.
+     * @param description      Description of the crash reasons.
+     * @param chassisnumber    Number identifying the crashed car's chassis.
+     * @param resolveTimestamp Timestamp describing when the crash was resolved. (Null for unresolved crashes)
+     * @param location         Location of the crash.
+     */
     public OemNotificationDto(String crashId, Date timestamp, String description, String chassisnumber, Date resolveTimestamp, Location location) {
         this.crashId = crashId;
         this.timestamp = timestamp;

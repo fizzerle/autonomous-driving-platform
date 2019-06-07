@@ -99,7 +99,7 @@
               slot="items"
               slot-scope="{ item }"
             >
-              <td>{{ item.chassisnumber }}</td>
+              <td>{{ item.chassisnumber }}</td> 
               <td>{{ item.modelType }}</td>
             </template>
           </v-data-table>

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import tuwien.dse.eventstorageservice.dto.CarDto;
 import tuwien.dse.eventstorageservice.dto.CarEventDto;
+import tuwien.dse.eventstorageservice.exception.EventNotFoundException;
 import tuwien.dse.eventstorageservice.model.Event;
 import tuwien.dse.eventstorageservice.model.Location;
 import tuwien.dse.eventstorageservice.persistence.EventRepository;
@@ -18,6 +19,7 @@ import tuwien.dse.eventstorageservice.services.EntityStoreRestClient;
 import tuwien.dse.eventstorageservice.services.EventNotifyService;
 import tuwien.dse.eventstorageservice.services.NotificationStoreRestClient;
 
+import java.beans.Transient;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -27,19 +29,32 @@ import java.util.stream.Collectors;
 @RestController
 public class EventStorageController {
 
-    @Autowired
     private EventRepository repository;
-
-    @Autowired
     private EventNotifyService stompService;
-
-    @Autowired
     private NotificationStoreRestClient notificationStoreRestClient;
-
-    @Autowired
     private EntityStoreRestClient entityStoreRestClient;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventStorageController.class);
+
+    @Autowired
+    public void setRepository(EventRepository repository) {
+        this.repository = repository;
+    }
+
+    @Autowired
+    public void setStompService(EventNotifyService stompService) {
+        this.stompService = stompService;
+    }
+
+    @Autowired
+    public void setNotificationStoreRestClient(NotificationStoreRestClient notificationStoreRestClient) {
+        this.notificationStoreRestClient = notificationStoreRestClient;
+    }
+
+    @Autowired
+    public void setEntityStoreRestClient(EntityStoreRestClient entityStoreRestClient) {
+        this.entityStoreRestClient = entityStoreRestClient;
+    }
 
     @GetMapping("/test/")
     public String test() {
@@ -75,6 +90,14 @@ public class EventStorageController {
         return "deleted all events";
     }
 
+    /**
+     * Rest-endpoint to save a new event in the database.
+     * Position-updates are sent to the Frontend with websockets, so the new position of the car can be displayed in the
+     * car view.
+     * If the event contains a crash-event, the NotificationStorageService is called and a new Crash is created.
+     *
+     * @param carEventDto DTO containing all data for the event.
+     */
     @PostMapping("/eventstorage/events")
     public void create(@RequestBody CarEventDto carEventDto) {
         LOGGER.info("Update from car with chassis {}", carEventDto.getChassisNumber());
@@ -90,10 +113,13 @@ public class EventStorageController {
         );
         event = repository.save(event);
 
+        /* send position update to frontend */
         stompService.yell(carEventDto);
 
+        /* check if event is a crash */
         if (carEventDto.getCrashEvent() != null) {
             try {
+                /* create crash in the notificationstorage */
                 notificationStoreRestClient.createCrashEvent(event);
             } catch (Exception e) {
                 LOGGER.warn("Could not send crash event to notification storage", e);
@@ -101,28 +127,48 @@ public class EventStorageController {
         }
     }
 
+    /**
+     * Rest-endpoint to get all information about a event, by the eventId.
+     *
+     * @param eventId the Id of the event.
+     * @return All event information.
+     * @throws EventNotFoundException If no event with the given Id could be found.
+     */
     @GetMapping("/eventstorage/events/{eventId}")
-    public CarEventDto get(@PathVariable String eventId) {
+    public CarEventDto get(@PathVariable String eventId) throws EventNotFoundException {
         Event event = repository.findById(eventId).orElse(null);
         if (event != null) {
-
+            return convertToCarEventDto(event);
         }
-        return convertToCarEventDto(event);
+        throw new EventNotFoundException("Event with Id " + eventId + "not found");
     }
 
+    /**
+     * Rest-Event to get events from the database.
+     * Events can be filtered by OEM, chassisnumber.
+     * The number of the returned events can also be limited.
+     * The data saved in the eventStoreage is enriched with data saved in the Entitystorage.
+     *
+     * @param oem OEM for who's cars events are searched.
+     * @param chassisnumber Chassisnumber of the car for which events are searched.
+     * @param limit Number of events that should be returned.
+     * @return List of Events.
+     */
     @GetMapping("/eventstorage/events")
     public List<CarEventDto> getEvents(@RequestParam(required = false) Optional<String> oem, @RequestParam(required = false) Optional<String> chassisnumber, @RequestParam(required = false) Optional<Integer> limit) {
+
+        /* filter by chassisnumber if requested */
         List<Event> events;
         if (chassisnumber.isPresent()) {
             events = repository.findAllByChassisnumberOrderByTimestampDesc(chassisnumber.get());
         } else {
-            events = repository.findAll();//OrOrderByTimestampDesc();
+            events = repository.findAll();
         }
 
-        if (limit.isPresent()) {
-            events = events.stream().limit(limit.get()).collect(Collectors.toList());
-        }
+        /* enrich data with oem information and create CarEventDtos */
         List<CarEventDto> result = events.stream().map(e -> convertToCarEventDto(e)).collect(Collectors.toList());
+
+        /* filter by oem if if requested */
         if (oem.isPresent()) {
             result = result.stream().filter(e -> e.getOem().toLowerCase().equals(oem.get().toLowerCase())).collect(Collectors.toList());
         }
@@ -130,9 +176,20 @@ public class EventStorageController {
         // Remove null values from failing rest calls
         result = result.stream().filter(e -> e != null).collect(Collectors.toList());
 
+        /* limit number of responses if requested */
+        if (limit.isPresent()) {
+            result = result.stream().limit(limit.get()).collect(Collectors.toList());
+        }
         return result;
     }
 
+    /**
+     * Rest-Endpoint which returns a list of cars with their last logged position within a 3 km radios of the given point.
+     *
+     * @param lng Longitude of the center of the 3 km circle.
+     * @param lat Latitude of the center of the 3 km circle.
+     * @return List of cars within the 3 km circle.
+     */
     @GetMapping("/eventstorage/events/radius")
     public List<String> getCarsIn3kmRadius(@RequestParam double lng, @RequestParam double lat) {
         return repository.findByLocationNearOrderByTimestampDesc(
@@ -144,6 +201,12 @@ public class EventStorageController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Create a CarEventDto by a Event.
+     * Enriches the data saved in the Eventstorage with inromation saved in the Entitystorage.
+     * @param event Information for the Event.
+     * @return Information for the Event with information for the car.
+     */
     private CarEventDto convertToCarEventDto(Event event) {
         CarDto car;
         try {

@@ -19,6 +19,9 @@ public class EntityStoreRestClient {
 
     private EntityService entityService;
 
+    /**
+     * Constructor for a RestClient which can send requests to the EntityStorage.
+     */
     public EntityStoreRestClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
@@ -29,6 +32,14 @@ public class EntityStoreRestClient {
         this.entityService = retrofit.create(EntityService.class);
     }
 
+    /**
+     * Method to invoke the getCar method of the EntityStorageService to get information to a car identified by the
+     * chassisnumber.
+     *
+     * @param chassis Number identifying the car's chassis.
+     * @return CarDto describing the car.
+     * @throws Exception If the Rest-Endpoint could not be reached successfully.
+     */
     public CarDto getCar(String chassis) throws Exception {
         Call<CarDto> call = entityService.getCarData(chassis);
 
@@ -41,6 +52,12 @@ public class EntityStoreRestClient {
 
     interface EntityService {
 
+        /**
+         * Rest-endpoint of the Entityservice, which returns inormation for a car identified by its chassinumber.
+         *
+         * @param chassis Number identifying the car's chassis.
+         * @return CarDto describing the car.
+         */
         @GET("/entitystorage/cars/{chassis}")
         Call<CarDto> getCarData(@Path("chassis") String chassis);
     }

@@ -13,10 +13,25 @@ public class BlueLightOrgNotificationDto {
     private Date timestamp;
     private int passengers;
 
+    /**
+     * Default-constructor for the BlueLightOrgNotificationDto.
+     */
     public BlueLightOrgNotificationDto() {
 
     }
 
+    /**
+     * Constructor for a DTO containing all the information about a crash which a BlueLightOrg is allowed to see.
+     *
+     * @param crashId          Id of the crash.
+     * @param oem              OEM of the crashed car.
+     * @param chassisnumber    Number identifying the crashed car's chassis.
+     * @param modeltype        Model of the crashed car.
+     * @param location         Location of the crash.
+     * @param resolveTimestamp Timestamp describing when the crash was resolved. (Null for unresolved crashes)
+     * @param timestamp        Timestamp describing when the crash happened.
+     * @param passengers       Number of passengers in the crashed car.
+     */
     public BlueLightOrgNotificationDto(String crashId, String oem, String chassisnumber, String modeltype, Location location, Date resolveTimestamp, Date timestamp, int passengers) {
         this.crashId = crashId;
         this.oem = oem;
