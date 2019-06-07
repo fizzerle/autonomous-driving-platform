@@ -33,5 +33,5 @@ spec:
       name: http
   selector:
     app: swagger-gateway
-type: LoadBalancer
-loadBalancerIP: 35.246.153.101
+  type: LoadBalancer
+  loadBalancerIP: 35.246.153.101
