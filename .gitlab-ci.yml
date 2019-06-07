@@ -11,6 +11,7 @@ cache:
     - .m2/repository
 
 stages:
+  - build
   - test
   - deploy
 
@@ -19,34 +20,6 @@ backend-tests:
   stage: test
   script: "mvn test --quiet"
 
-backend-maven-build:
-  image: maven:3.6.1-ibmjava-8-alpine
-  stage: build
-  script: "mvn install -Ddocker.registry=registry.gitlab.com/fizzerle/dse-2019-ss \
-           -Ddockerfile.username=gitlab-ci-token \
-           -Ddockerfile.password=$CI_BUILD_TOKEN \
-           -DskipTests \ 
-           -B \ 
-           --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
-  only:
-    changes:
-      - apigateway/**/*
-      - entity-storage-service/**/*
-      - event-storage-service/**/*
-      - notification-storage-service/**/*
-      - swaggergateway/**/*
-
-           
-frontend-build:
-    stage: build
-    script:
-        - cd backendui/
-        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN https://registry.gitlab.com
-        - docker build -t registry.gitlab.com/fizzerle/dse-2019-ss/backendui .
-        - docker push registry.gitlab.com/fizzerle/dse-2019-ss/backendui:latest
-    only:
-        changes:
-          - backendui/**/*
         
 
 kubernetes-deploy:
