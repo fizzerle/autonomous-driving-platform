@@ -28,6 +28,19 @@ public class EntityStorageController {
         return "test called entityservice";
     }
 
+    @GetMapping("/failstorage/fisch")
+    public String fisch() {
+        LOGGER.info("fisch called");
+        return "fisch complete";
+    }
+
+    @GetMapping("/failstorage/dead")
+    public String deadfisch() throws InterruptedException {
+        LOGGER.info("dead fisch called");
+        Thread.sleep(10000);
+        return "dead fisch complete";
+    }
+
     @GetMapping("/entitystorage/test")
     public String test2() {
         LOGGER.info("entitystorage test called");
