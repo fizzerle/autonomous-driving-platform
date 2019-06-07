@@ -14,10 +14,26 @@ public class EventNotifyService {
     private SimpMessageSendingOperations simp;
 
     public void yell(CarEventDto data) {
+        yellOem(data);
+        yellCar(data);
+    }
+
+    private void yellOem(CarEventDto data) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
             String topic = "/event/" + data.getOem().toLowerCase();
+            simp.convertAndSend(topic, json);
+        } catch (JsonProcessingException e) {
+            // Do nothing
+        }
+    }
+
+    private void yellCar(CarEventDto data) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(data);
+            String topic = "/event/" + data.getChassisNumber().toLowerCase();
             simp.convertAndSend(topic, json);
         } catch (JsonProcessingException e) {
             // Do nothing

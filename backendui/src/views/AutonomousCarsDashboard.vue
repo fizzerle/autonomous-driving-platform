@@ -131,7 +131,7 @@ export default {
         notificationCrash: null,
 
         wsClient: null,
-        positionUpdateInterval: null
+        wsPositionClient: null
     }),
     methods: {
 
@@ -164,8 +164,13 @@ export default {
             if (this.wsClient !== null) {
                 this.wsClient.close();
             }
+            if (this.wsPositionClient !== null) {
+                this.wsPositionClient.close();
+            }
             this.wsClient = new WebSocketClient();
             this.wsClient.connectCar(this.selectedCar, this.receivedCrashData);
+            this.wsPositionClient = new WebSocketClient();
+            this.wsPositionClient.connectCarEvent(this.selectedCar, this.updateMyPosition);
 
         },
 
@@ -258,56 +263,30 @@ export default {
             this.updateMarkers();            
         },
 
-        stopPositionUpdate: function() {
-            console.info('Stoping position update of interval', this.positionUpdateInterval);
-            clearInterval(this.positionUpdateInterval);
-            this.positionUpdateInterval = null;
-            if (this.positionUpdateInterval !== null) {
-                console.info('Realy stopping!');
-                
+        updateMyPosition: function(data) {
+            let event = JSON.parse(data.body);
+            //console.info('Received event from car', event);
+            if (event.chassisNumber === this.selectedCar) {
+                let loc = event.location;
+                //console.info('My position should be: ', loc);
+                this.myPosition = loc;
+                this.spaceAhead = event.spaceAhead;
+                this.spaceBehind = event.spaceBehind;
+                this.speed = event.speed;
+                this.passengers = event.passengers;
+                this.center = loc;
+                this.updateMarkers();
             }
-        },
-        startPositionUpdate: function() {
-            //this.stopPositionUpdate();
-            this.positionUpdateInterval = setInterval(this.updateMyPosition, 100);                
-        },
-        updateMyPosition: function() {
-            const chassis = this.selectedCar;
-            if (chassis === null) {
-                return;
-            }
-            fetch('/eventstorage/events?limit=1&chassisnumber=' + chassis)
-            .then(resp => {
-                //console.info("Received eventupdates", resp);
-                resp.json().then(data => {
-                    if (data.length > 0) {
-                        let event = data[0];
-                        //console.info('Received event from car', event);
-                        if (event.chassisNumber === this.selectedCar) {
-                            let loc = event.location;
-                            //console.info('My position should be: ', loc);
-                            this.myPosition = loc;
-                            this.spaceAhead = event.spaceAhead;
-                            this.spaceBehind = event.spaceBehind;
-                            this.speed = event.speed;
-                            this.passengers = event.passengers;
-                            this.center = loc;
-                            this.updateMarkers();
-                        }
-                    }
-                });
-            });
         }
 
     },
     mounted: function() {
         this.loadCrashData();
         this.loadOems();
-        this.startPositionUpdate();
     },
     beforeDestroy: function() {
         this.wsClient.close();
-        this.stopPositionUpdate();
+        this.wsPositionClient.close();
     }
 }
 
