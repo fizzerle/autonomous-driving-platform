@@ -170,6 +170,12 @@ public class EventStorageController {
             events = repository.findAll();
         }
 
+        /* limit number of responses if requested */
+        iif (limit.isPresent()) {
+            events = events.stream().limit(limit.get()).collect(Collectors.toList());
+        }
+
+
         /* enrich data with oem information and create CarEventDtos */
         List<CarEventDto> result = events.stream().map(e -> convertToCarEventDto(e)).collect(Collectors.toList());
 
@@ -182,11 +188,6 @@ public class EventStorageController {
         // Remove null values from failing rest calls
         result = result.stream().filter(e -> e != null).collect(Collectors.toList());
 
-        /* limit number of responses if requested */
-        if (limit.isPresent()) {
-            LOGGER.info("Limiting number of returned events to " + limit);
-            result = result.stream().limit(limit.get()).collect(Collectors.toList());
-        }
         return result;
     }
 
