@@ -17,7 +17,7 @@
           label="Please Select a Car Manufacturer"
         >
         </v-select>
-        <Modal
+        <v-btn color=success><Modal
           btnText="Create Car"
           >
             <v-form v-model="valid">
@@ -72,7 +72,7 @@
                     </v-container>
                     
                 </v-form>
-        </Modal>
+        </Modal></v-btn>
       </v-flex>
       <v-flex
         md6
@@ -320,6 +320,7 @@ export default {
                 resp.json().then(data => {
                     console.info("Received bluelight crash events", data);
                     this.crashes = data;
+                    this.sortCrashes();
                 });
             });
     },
@@ -342,11 +343,12 @@ export default {
         })
         console.log("MATCH:",JSON.stringify(updateCrash))
         if (updateCrash == null) {
-          this.crashes.push(crash)
+          this.crashes.splice(0,0,crash);
           this.snack(crash);
         } else {
           Vue.set(updateCrash, 'resolveTimestamp', crash.resolveTimestamp)
         }
+        this.sortCrashes();
     },
     receivedEventData: function(data) {
         let event = JSON.parse(data.body);
@@ -365,6 +367,17 @@ export default {
         }
         Vue.set(updateCar, 'crashEvent', event.crashEvent);
         Vue.set(updateCar, 'location', event.location);
+    },
+    sortCrashes: function() {
+      console.log("Sorting crashes....")
+        this.crashes = this.crashes.sort( (a, b) => {
+            if (a.timestamp > b.timestamp) {
+                return -1;
+            } else if (a.timestamp < b.timestamp) {
+                return 1;
+            }
+            return 0;
+        });
     },
     formatDateSmall: function(date) {
       if (date == null) {
