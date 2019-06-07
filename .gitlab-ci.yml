@@ -18,7 +18,7 @@ stages:
 backend-tests:
   image: maven:3.6.1-ibmjava-8-alpine
   stage: test
-  script: "mvn test --quiet"
+  script: "mvn test -q"
 
         
 
