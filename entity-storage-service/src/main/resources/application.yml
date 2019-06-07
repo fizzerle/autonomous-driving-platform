@@ -8,3 +8,6 @@ spring:
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
+  logging:
+    level:
+      ROOT: DEBUG
