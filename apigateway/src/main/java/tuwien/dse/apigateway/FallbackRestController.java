@@ -12,8 +12,8 @@ public class FallbackRestController {
     private static final Logger LOGGER = LoggerFactory.getLogger(FallbackRestController.class);
 
     @RequestMapping("/hystrixfallback")
-    public String fallback(HttpRequest req) {
-        LOGGER.warn("Circuit Braker called ... WHAAAT ?!?!? With request: {}", req);
-        return req.toString();
+    public String fallback(Throwable throwable) {
+        LOGGER.warn("Circuit Braker called ... WHAAAT ?!?!? With Error: {}", throwable);
+        return throwable.getMessage();
     }
 }
