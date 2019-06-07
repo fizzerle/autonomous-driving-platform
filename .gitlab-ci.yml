@@ -21,6 +21,13 @@ backend-tests:
   tags:
     - ipax
   script: "mvn test"
+  only:
+    changes:
+      - apigateway/**/*
+      - entity-storage-service/**/*
+      - event-storage-service/**/*
+      - notification-storage-service/**/*
+      - swaggergateway/**/*
   
 backend-maven-build:
   image: maven:3.6.1-ibmjava-8-alpine
