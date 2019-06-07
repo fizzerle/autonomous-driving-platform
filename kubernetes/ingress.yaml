@@ -9,7 +9,7 @@ spec:
   rules:
     - http:
         paths:
-        - path: /backendui
+        - path: /swaggergateway
           backend:
-            serviceName: backendui
+            serviceName: swagger-gateway-service
             servicePort: 80
