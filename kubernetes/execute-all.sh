@@ -1,7 +1,7 @@
 #!/bin/bash
-kubectl apply -f mongo-secret.yaml
-kubectl apply -f mongo-configmap.yaml
-kubectl apply -f mongo-deployment.yaml
+kubectl replace --force -f mongo-secret.yaml
+kubectl replace --force -f mongo-configmap.yaml
+kubectl replace --force -f mongo-deployment.yaml
 kubectl replace --force -f entitystorageservice-deployment.yaml
 kubectl replace --force -f eventstorageservice-deployment.yaml
 kubectl replace --force -f notificationstorageservice-deployment.yaml

@@ -34,6 +34,14 @@ public class EntityStorageController {
         return "entitystorage test";
     }
 
+    @GetMapping("/entitystorage/endless")
+    public String endlesshystrixcall() throws InterruptedException {
+        LOGGER.info("Start of endless hystrix call");
+        Thread.sleep(10000);
+        LOGGER.info("End of endless hystrix call");
+        return "i finally processed your request";
+    }
+
 
     /**
      * Rest-Endpoint to get all cars in the database.

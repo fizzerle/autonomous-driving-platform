@@ -23,7 +23,7 @@ public class NotificationStoreRestClient {
     public NotificationStoreRestClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:8083")
+                .baseUrl("http://notification-storage")
                 .addConverterFactory(JacksonConverterFactory.create())
                 .client(httpClient.build())
                 .build();

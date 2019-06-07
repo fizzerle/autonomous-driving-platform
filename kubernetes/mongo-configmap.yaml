@@ -4,3 +4,4 @@ metadata:
   name: mongodb
 data:
   database-name: admin
+  database-host: 10.132.0.7
