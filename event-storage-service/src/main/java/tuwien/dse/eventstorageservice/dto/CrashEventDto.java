@@ -9,10 +9,21 @@ public class CrashEventDto {
     private Date timestamp;
     private String description;
 
+    /**
+     * Default-constructor for a crashEventDto.
+     */
     public CrashEventDto() {
 
     }
 
+    /**
+     * Constructor for a CrashEventDto which represents a event where a crash happened.
+     *
+     * @param chassisNumber Number identifying the car's chassis.
+     * @param eventId       Id of the event linked to this crashEvent.
+     * @param timestamp     Timestamp describing when the crash happened.
+     * @param description   Description of what happened.
+     */
     public CrashEventDto(String chassisNumber, String eventId, Date timestamp, String description) {
         this.chassisNumber = chassisNumber;
         this.eventId = eventId;

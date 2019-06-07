@@ -17,16 +17,26 @@ public class NotificationStoreRestClient {
 
     private NotificationService notificationService;
 
+    /**
+     * Constructor for a Restclient which can send request to the NotificationStorageService.
+     */
     public NotificationStoreRestClient() {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:8083")
+                .baseUrl("http://notification-storage")
                 .addConverterFactory(JacksonConverterFactory.create())
                 .client(httpClient.build())
                 .build();
         this.notificationService = retrofit.create(NotificationService.class);
     }
 
+    /**
+     * Method to call the createCrashEvent-Method of the NotificationStorageService.
+     * Creates a new unresolved CrashEvent.
+     *
+     * @param event Information describing the Event.
+     * @throws Exception If the NotificationStorageService call was not successful.
+     */
     public void createCrashEvent(Event event) throws Exception {
         CrashEventDto crash = new CrashEventDto(
                 event.getChassisnumber(),
@@ -44,6 +54,12 @@ public class NotificationStoreRestClient {
 
     interface NotificationService {
 
+        /**
+         * Rest-endpoint of the NotificationService which is used to create crashEvents.
+         *
+         * @param crash Information for the crashevent.
+         * @return void
+         */
         @POST("/notificationstorage/notifications")
         Call<Void> createCrashEvent(@Body CrashEventDto crash);
     }

@@ -14,6 +14,13 @@ public class TestDataInserter {
 
     private static final Logger log = LoggerFactory.getLogger(TestDataInserter.class);
 
+    /**
+     * Inserts testdata into the EntityRepository.
+     * The cars used in the test scenario are created.
+     *
+     * @param repo CarRepository to save cars
+     * @return void
+     */
     @Bean
     public CommandLineRunner insertTestData(@Autowired CarRepository repo) {
         return args -> {

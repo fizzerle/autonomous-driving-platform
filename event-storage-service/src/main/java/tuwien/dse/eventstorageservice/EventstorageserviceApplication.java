@@ -15,6 +15,11 @@ public class EventstorageserviceApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventstorageserviceApplication.class);
 
+    /**
+     * Starts the application for the EventStorageService.
+     *
+     * @param args Arguments.
+     */
     public static void main(String[] args) {
         SpringApplication.run(EventstorageserviceApplication.class, args
         );

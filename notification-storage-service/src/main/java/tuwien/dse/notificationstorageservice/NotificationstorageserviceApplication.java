@@ -10,6 +10,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class NotificationstorageserviceApplication {
 
+    /**
+     * Start the Application for the Notificationstorageservice.
+     *
+     * @param args Arguments.
+     */
     public static void main(String[] args) {
         SpringApplication.run(NotificationstorageserviceApplication.class, args);
     }

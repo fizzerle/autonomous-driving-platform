@@ -16,10 +16,22 @@ public class CrashEvent {
     private Date resolveTimestamp;
     private String description;
 
+    /**
+     * Default-Constructor for a crashEvent.
+     */
     public CrashEvent() {
 
     }
 
+    /**
+     * Constructor for a CrashEvent-model managed in the database.
+     *
+     * @param eventId          Id of the linked event.
+     * @param chassisnumber    Number identifying the crashed car's chassis
+     * @param crashTimestamp   Timestamp describing when the crash happened.
+     * @param resolveTimestamp Timestamp describing when the crash was resolved.
+     * @param description      Description of the crash reasons.
+     */
     public CrashEvent(String eventId, String chassisnumber, Date crashTimestamp, Date resolveTimestamp, String description) {
         this.eventId = eventId;
         this.chassisnumber = chassisnumber;

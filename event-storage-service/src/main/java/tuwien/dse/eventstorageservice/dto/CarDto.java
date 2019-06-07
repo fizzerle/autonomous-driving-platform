@@ -6,10 +6,20 @@ public class CarDto {
     private String oem;
     private String modelType;
 
+    /**
+     * Default constructor for a carDto.
+     */
     public CarDto() {
 
     }
 
+    /**
+     * Constructor for a carDto.
+     *
+     * @param chassisnumber Number which identifies the chassis of the car
+     * @param oem           Oem which produced the car
+     * @param modelType     Model description of the car
+     */
     public CarDto(String chassisnumber, String oem, String modelType) {
         this.chassisnumber = chassisnumber;
         this.oem = oem;

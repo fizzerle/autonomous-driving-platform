@@ -43,6 +43,13 @@ public class EntityStorageController {
     }
 
 
+    /**
+     * Rest-Endpoint to get all cars in the database.
+     * Optionally the cars can be filtered by the OEM.
+     *
+     * @param oem The oem for which the cars are searched.
+     * @return List of cars. (Filtered, if OEM argument was passed)
+     */
     @GetMapping("/entitystorage/cars")
     public List<Car> getAll(@RequestParam(required = false) Optional<String> oem) {
         if (oem.isPresent()) {
@@ -51,6 +58,12 @@ public class EntityStorageController {
         return carRepository.findAll();
     }
 
+    /**
+     * Rest-Endpoint to insert a car into the database.
+     * @param car Car to be inserted.
+     * @return Inserted car
+     * @throws CarAlreadyExistsException If a car with the same chassisnumber already exists.
+     */
     @PostMapping("/entitystorage/cars")
     public Car insertCar(@RequestBody Car car) throws CarAlreadyExistsException {
         if (carRepository.findByChassisnumber(car.getChassisnumber()) != null) {
@@ -61,16 +74,30 @@ public class EntityStorageController {
         return carRepository.save(car);
     }
 
+    /**
+     * Rest-Endpoint to get a car by its chassisnumber.
+     * @param chassisnumber The chassisnumber of the car that is searched.
+     * @return The car requested.
+     */
     @GetMapping("/entitystorage/cars/{chassisnumber}")
     public Car getCarByChassisnumber(@PathVariable String chassisnumber) {
         return carRepository.findByChassisnumber(chassisnumber);
     }
 
+    /**
+     * Rest-Endpoint to delete cars identified by their chassisnumber.
+     * @param chassisnumber The identifier of the car that should be deleted.
+     * @return 1 if car was found and deleted, 0 else
+     */
     @DeleteMapping("/entitystorage/cars/{chassisnumber}")
     public Long deleteCarByChassisnumber(@PathVariable String chassisnumber) {
         return carRepository.deleteCarByChassisnumber(chassisnumber);
     }
 
+    /**
+     * Rest-Endpoint to get all OEMs that have cars saved in the database
+     * @return List of all existing OEMs
+     */
     @GetMapping("/entitystorage/oem")
     public List<String> getOems() {
         return carRepository.findAll().stream().map(car -> car.getOem()).distinct().collect(Collectors.toList());

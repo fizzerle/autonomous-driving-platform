@@ -24,6 +24,11 @@ public class AutonomousCarService {
     @Autowired
     private CrashRepository repo;
 
+    /**
+     * Method which returns Dtos with crash-information seen by cars for each active crash.
+     *
+     * @return List of active crashes
+     */
     public List<CarNotificationDto> getAllActiveCrashEvents() {
         return repo.findAll().stream()
                 .filter(c -> c.getResolveTimestamp() == null)
@@ -32,9 +37,17 @@ public class AutonomousCarService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Method to create a CarNotificationDto for a crash.
+     * EventStoreRestClient is used to get the crashLocation.
+     *
+     * @param crash the crashInformation.
+     * @return subset of information seen by cars.
+     */
     private CarNotificationDto getCarNotificationDto(CrashEvent crash) {
         CarEventDto event;
 
+        /* get event information */
         try {
             event = eventStoreRestClient.getCarEvent(crash.getEventId());
         } catch (Exception e) {

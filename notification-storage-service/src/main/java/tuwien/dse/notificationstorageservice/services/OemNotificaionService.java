@@ -24,6 +24,11 @@ public class OemNotificaionService {
     @Autowired
     private EventStoreRestClient eventStoreRestClient;
 
+    /**
+     * Method which returns Dtos with crash-information seen by oems for each crash.
+     *
+     * @return List of crashes
+     */
     public List<OemNotificationDto> getOemNotifications(String oem) {
         List<OemNotificationDto> notifications = new ArrayList<>();
         List<CrashEvent> events = crashRepository.findAll();
@@ -37,6 +42,12 @@ public class OemNotificaionService {
         return notifications;
     }
 
+
+    /**
+     * Method to get event information for a crashEvent.
+     * @param crashEvent crashEventInfo
+     * @return Event information
+     */
     private CarEventDto getCarEvent(CrashEvent crashEvent) {
         try {
             return eventStoreRestClient.getCarEvent(crashEvent.getEventId());
@@ -46,6 +57,13 @@ public class OemNotificaionService {
         }
     }
 
+    /**
+     * Method to create a OemNotificationDto for a crash.
+     *
+     * @param crashEvent the crashInformation.
+     * @param carEvent the car and event Information.
+     * @return combined of information seen by oems
+     */
     private OemNotificationDto getOemNotificationDto(CrashEvent crashEvent, CarEventDto carEvent) {
         return new OemNotificationDto(
                 crashEvent.getCrashId(),

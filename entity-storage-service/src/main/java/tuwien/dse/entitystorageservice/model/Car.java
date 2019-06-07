@@ -11,10 +11,20 @@ public class Car {
     private String oem;
     private String modelType;
 
+    /**
+     * Default constructor for car.
+     */
     public Car() {
 
     }
 
+    /**
+     * Constructor for a car-entity.
+     *
+     * @param chassisnumber Number which identifies the chassis of the car
+     * @param oem           Oem which produced the car
+     * @param modelType     Model description of the car
+     */
     public Car(String chassisnumber, String oem, String modelType) {
         this.chassisnumber = chassisnumber;
         this.oem = oem;
