@@ -171,7 +171,7 @@ public class EventStorageController {
         }
 
         /* limit number of responses if requested */
-        iif (limit.isPresent()) {
+        if (limit.isPresent()) {
             events = events.stream().limit(limit.get()).collect(Collectors.toList());
         }
 
