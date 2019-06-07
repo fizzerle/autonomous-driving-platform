@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import tuwien.dse.eventstorageservice.dto.CarEventDto;
-import tuwien.dse.eventstorageservice.exception.EventNotFoundException;
 
 /**
  * Service to notify others about eventUpdates with a websocket.
@@ -27,10 +26,26 @@ public class EventNotifyService {
      */
     public void yell(CarEventDto data) {
         LOGGER.info("Sending positionUpdate via websocket");
+        yellOem(data);
+        yellCar(data);
+    }
+
+    private void yellOem(CarEventDto data) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
             String topic = "/event/" + data.getOem().toLowerCase();
+            simp.convertAndSend(topic, json);
+        } catch (JsonProcessingException e) {
+            // Do nothing
+        }
+    }
+
+    private void yellCar(CarEventDto data) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(data);
+            String topic = "/event/" + data.getChassisNumber().toLowerCase();
             simp.convertAndSend(topic, json);
         } catch (JsonProcessingException e) {
             // Do nothing

@@ -45,6 +45,16 @@ export default class WebSocketClient {
         });
     }
 
+    connectCarEvent(chassis, eventHandler) {
+        this.socket = new SockJS('/eventstorage/websocket');
+        this.client = Stomp.over(this.socket);
+        const that = this;
+        const path = '/event/' + chassis.toLocaleLowerCase();
+        this.client.connect({}, function(frame) {
+            that.subscribe(path, eventHandler);
+        });
+    }
+
     close() {
         const sock = this.socket;
         this.client.disconnect(function() {
