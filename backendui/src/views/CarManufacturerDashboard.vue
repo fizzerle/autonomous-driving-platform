@@ -77,7 +77,7 @@
                                 xs12
                                 md4
                         >
-                            <v-btn @click="addCar">submit</v-btn>
+                            <v-btn color="success" @click="addCar">submit</v-btn>
                         </v-flex>
                       </v-layout>
                   </v-container>
