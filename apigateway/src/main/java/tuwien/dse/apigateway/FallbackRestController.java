@@ -16,7 +16,10 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
 import tuwien.dse.apigateway.cache.RedisService;
 
+import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 public class FallbackRestController {
@@ -27,13 +30,14 @@ public class FallbackRestController {
     private RedisService redisService;
 
     @RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
-    public String fallback(@RequestHeader HttpHeaders headers) {
+    public String fallback(ServerWebExchange serverWebExchange) {
         LOGGER.warn("Circute Breaker");
         /*LOGGER.info("ORIGIN: {}", headers.getOrigin());
         LOGGER.info("LOCATION: {}", headers.getLocation());*/
 
-        LOGGER.info("My own header: X-Origin: {}", headers.get("X-Origin"));
-
+        Set<URI> uris = serverWebExchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR, Collections.emptySet());
+        String originalUri = (uris.isEmpty()) ? "Unknown" : uris.iterator().next().toString();
+        LOGGER.info("YEEEEEEEEEEEEEEEEEEEAH PARTY HARD : "+originalUri);
         return redisService.getCache("/entitystorage/oem");
     }
 
