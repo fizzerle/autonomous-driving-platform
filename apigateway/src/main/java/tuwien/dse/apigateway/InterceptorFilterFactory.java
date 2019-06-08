@@ -1,16 +1,19 @@
 package tuwien.dse.apigateway;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.GatewayFilterFactory;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import tuwien.dse.apigateway.cache.HttpResponse;
 import tuwien.dse.apigateway.cache.ResponseCache;
 import tuwien.dse.apigateway.cache.ResponseCacheKey;
@@ -21,6 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 @Component
@@ -38,40 +42,39 @@ public class InterceptorFilterFactory implements GatewayFilterFactory<Intercepto
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            String body = getBody(exchange);
-            cache.put(new ResponseCacheKey(
-                        exchange.getRequest().getURI().toString(),
-                        exchange.getRequest().getMethodValue()
-                    ), new HttpResponse(
-                        body,
-                        exchange.getResponse().getStatusCode().value()
-                    ));
 
             LOGGER.info("Request goes now to {}", exchange.getRequest().getURI());
 
-            LOGGER.info("Response has http code {} and body: {}", exchange.getResponse().getStatusCode().value(), body);
+            ServerHttpResponse originalResponse = exchange.getResponse();
+      		DataBufferFactory bufferFactory = originalResponse.bufferFactory();
+            ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(originalResponse) {
+                 @Override
+                 public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
+                 	if (body instanceof Flux) {
+                         Flux<? extends DataBuffer> fluxBody = (Flux<? extends DataBuffer>) body;
+                         return super.writeWith(fluxBody.map(dataBuffer -> {
+                         	// probably should reuse buffers
+                         	byte[] content = new byte[dataBuffer.readableByteCount()];
+                         	dataBuffer.read(content);
+                         	String strBody = new String(content, Charset.forName("UTF-8"));
+                             cache.put(new ResponseCacheKey(
+                                     exchange.getRequest().getURI().toString(),
+                                     exchange.getRequest().getMethodValue()
+                             ), new HttpResponse(
+                                     strBody,
+                                     originalResponse.getStatusCode().value()
+                             ));
+                             LOGGER.info("Response has http code {} and body: {}", originalResponse.getStatusCode().value(), strBody);
+                         	return bufferFactory.wrap(content);
+                         }));
+                    }
+                 	return super.writeWith(body); // if body is not a flux. never got there.
+                 }
+            };
 
-            return chain.filter(exchange);
+            return chain.filter(exchange.mutate().response(decoratedResponse).build()); // replace response with decorator
         };
     }
-
-    private String getBody(ServerWebExchange exchange) {
-        InputStream is = exchange.getResponse().bufferFactory().wrap(new byte[4096]).asInputStream();
-        try( BufferedReader br =
-                     new BufferedReader( new InputStreamReader(is, "UTF-8" )))
-        {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while(( line = br.readLine()) != null ) {
-                sb.append( line );
-                sb.append( '\n' );
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            return "";
-        }
-    }
-
 
     @Override
     public Config newConfig() {
