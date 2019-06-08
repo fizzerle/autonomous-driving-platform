@@ -38,6 +38,11 @@ public class FallbackRestController {
         Set<URI> uris = serverWebExchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR, Collections.emptySet());
         String originalUri = (uris.isEmpty()) ? "Unknown" : uris.iterator().next().toString();
         LOGGER.info("YEEEEEEEEEEEEEEEEEEEAH PARTY HARD : "+originalUri);
+        String[] parts = originalUri.split("/", 3);
+        if (parts.length >= 3) {
+            originalUri = "/" + parts[2];
+        }
+        LOGGER.info("YEEEEEEEEEEEEEEEEEEEAH PARTY HARD 2 XXXX : "+originalUri);
         return redisService.getCache("/entitystorage/oem");
     }
 
