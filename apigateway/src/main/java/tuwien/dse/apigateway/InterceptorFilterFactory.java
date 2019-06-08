@@ -56,7 +56,7 @@ public class InterceptorFilterFactory implements GatewayFilterFactory<Intercepto
     }
 
     private String getBody(ServerWebExchange exchange) {
-        InputStream is = exchange.getResponse().bufferFactory().wrap(new byte[Integer.MAX_VALUE]).asInputStream();
+        InputStream is = exchange.getResponse().bufferFactory().wrap(new byte[4096]).asInputStream();
         try( BufferedReader br =
                      new BufferedReader( new InputStreamReader(is, "UTF-8" )))
         {
