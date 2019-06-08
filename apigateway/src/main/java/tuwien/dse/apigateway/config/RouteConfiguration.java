@@ -50,12 +50,8 @@ public class RouteConfiguration {
     public RouteLocator initRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("event-websockets", r -> r.path("/eventsocket/**")
-                        .filters(filter ->
-                                filter.rewritePath("/(?<path>.*)", "/$\\{path}"))
                         .uri("lb://event-storage"))
                 .route("notification-websockets", r -> r.path("/notificationsocket/**")
-                        .filters(filter ->
-                                filter.rewritePath("/(?<path>.*)", "/$\\{path}"))
                         .uri("lb://notification-storage"))
                 .route("entity-storage-route", r -> r.path("/entitystorage/**")
                     .filters(filter ->
