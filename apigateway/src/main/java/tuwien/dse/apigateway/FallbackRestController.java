@@ -22,12 +22,12 @@ public class FallbackRestController {
     private RedisService redisService;
 
     @RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
-    public String fallback(ServerHttpRequest request) {
+    public String fallback(@RequestHeader HttpHeaders headers) {
         LOGGER.warn("Circute Breaker");
-        /*LOGGER.info("ORIGIN: {}", headers.getOrigin());
-        LOGGER.info("LOCATION: {}", headers.getLocation());*/
-        LOGGER.info("URI: {}", request.getURI());
-        LOGGER.info("Request: ", request);
+        LOGGER.info("ORIGIN: {}", headers.getOrigin());
+        LOGGER.info("LOCATION: {}", headers.getLocation());
+        //LOGGER.info("URI: {}", request.getURI());
+        LOGGER.info("Request: ", headers);
         return redisService.getCache("/entitystorage/oem");
     }
 }
