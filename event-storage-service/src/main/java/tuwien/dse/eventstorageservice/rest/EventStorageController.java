@@ -18,6 +18,7 @@ import tuwien.dse.eventstorageservice.persistence.EventRepository;
 import tuwien.dse.eventstorageservice.services.EntityStoreRestClient;
 import tuwien.dse.eventstorageservice.services.EventNotifyService;
 import tuwien.dse.eventstorageservice.services.NotificationStoreRestClient;
+import tuwien.dse.eventstorageservice.services.RedisService;
 
 import java.beans.Transient;
 import java.util.Date;
@@ -33,8 +34,14 @@ public class EventStorageController {
     private EventNotifyService stompService;
     private NotificationStoreRestClient notificationStoreRestClient;
     private EntityStoreRestClient entityStoreRestClient;
+    private RedisService redisService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventStorageController.class);
+
+    @Autowired
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
+    }
 
     @Autowired
     public void setRepository(EventRepository repository) {
@@ -160,11 +167,14 @@ public class EventStorageController {
     @GetMapping("/eventstorage/events")
     public List<CarEventDto> getEvents(@RequestParam(required = false) Optional<String> oem, @RequestParam(required = false) Optional<String> chassisnumber, @RequestParam(required = false) Optional<Integer> limit) {
 
+        String url = "/eventstorage/events?";
+
         /* filter by chassisnumber if requested */
         List<Event> events;
         if (chassisnumber.isPresent()) {
             LOGGER.info("Getting events for car " + chassisnumber);
             events = repository.findAllByChassisnumberOrderByTimestampDesc(chassisnumber.get());
+            url += "chassisnumber="+chassisnumber.get();
         } else {
             LOGGER.info("Getting all events");
             events = repository.findAll();
@@ -173,6 +183,7 @@ public class EventStorageController {
         /* limit number of responses if requested */
         if (limit.isPresent()) {
             events = events.stream().limit(limit.get()).collect(Collectors.toList());
+            url += "&limit=" + limit.get();
         }
 
 
@@ -187,6 +198,8 @@ public class EventStorageController {
 
         // Remove null values from failing rest calls
         result = result.stream().filter(e -> e != null).collect(Collectors.toList());
+
+        redisService.cache(url, result);
 
         return result;
     }
