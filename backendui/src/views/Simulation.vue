@@ -51,7 +51,7 @@
                 <v-expansion-panel>
                     <v-expansion-panel-content v-for="(car, i) in cars" :key="i">
                         <template v-slot:header>
-                            <div style="width: 80%">{{car.name}}</div>
+                            <div style="width: 80%">{{car.chassisNumber}}</div>
                             <v-btn small icon @click.native.stop="removeCar(i)">
                                 <v-icon>delete</v-icon>
                             </v-btn>
@@ -294,7 +294,7 @@ export default {
                 let heading = headingTo(start,destination);
                 let distance = distanceTo(start,destination);
                 this.simulationCars.push({
-                    label: car.name.substring(3),
+                    label: car.chassisNumber,
                     start: start,
                     dest: destination,
                     vel: velocity,
