@@ -33,7 +33,7 @@ public class FallbackRestController {
         LOGGER.info("LOCATION: {}", headers.getLocation());*/
 
         //Get the PathMatchInfo
-        PathPattern.PathMatchInfo pathMatchInfo = serverWebExchange.getAttribute(ServerWebExchangeUtils.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        PathPattern.PathMatchInfo pathMatchInfo = serverWebExchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
 
         //Get the template variables
         Map<String, String> urlTemplateVariables = pathMatchInfo.getUriVariables();
