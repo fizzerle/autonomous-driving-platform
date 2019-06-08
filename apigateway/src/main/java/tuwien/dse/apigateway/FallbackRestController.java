@@ -32,6 +32,12 @@ public class FallbackRestController {
         /*LOGGER.info("ORIGIN: {}", headers.getOrigin());
         LOGGER.info("LOCATION: {}", headers.getLocation());*/
 
+        LOGGER.info("Query all webexchange attributes ------");
+        for (Map.Entry<String, Object> entry : serverWebExchange.getAttributes().entrySet()) {
+            LOGGER.info(""+entry.getKey()+" " + entry.getValue());
+        }
+        LOGGER.info("End Query all webexchange attributes -----");
+
         //Get the PathMatchInfo
         PathPattern.PathMatchInfo pathMatchInfo = serverWebExchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
 
