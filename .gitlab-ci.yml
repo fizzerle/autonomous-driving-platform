@@ -42,6 +42,11 @@ backend-maven-build:
   only:
     changes:
       - apigateway/**/*
+      - entity-storage-service/**/*
+      - event-storage-service/**/*
+      - notification-storage-service/**/*
+      - swaggergateway/**/*
+      - hystrixdashboard/**/*
 
            
 frontend-build:
