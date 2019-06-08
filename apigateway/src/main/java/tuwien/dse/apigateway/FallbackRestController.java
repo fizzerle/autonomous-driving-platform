@@ -36,11 +36,13 @@ public class FallbackRestController {
         PathPattern.PathMatchInfo pathMatchInfo = serverWebExchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
 
         //Get the template variables
+        LOGGER.info("path match info ---" + pathMatchInfo.toString()+"----");
         Map<String, String> urlTemplateVariables = pathMatchInfo.getUriVariables();
-
+        LOGGER.info("Yeah");
         for (Map.Entry<String, String> entry : urlTemplateVariables.entrySet()) {
             LOGGER.info(""+entry.getKey()+" " + entry.getValue());
         }
+        LOGGER.info("NOPE");
         return redisService.getCache("/entitystorage/oem");
     }
 }
