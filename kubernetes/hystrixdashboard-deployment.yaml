@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hystrixdashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hystrixdashboard
+  template:
+    metadata:
+      labels:
+        app: hystrixdashboard
+    spec:
+      containers:
+        - name: hystrixdashboard
+          image: registry.gitlab.com/fizzerle/dse-2019-ss/hystrixdashboard:latest
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+      imagePullSecrets:
+        - name: registry.gitlab.com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hystrixdashboard-service
+spec:
+  ports:
+    - port: 8083
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: hystrixdashboard
+  type: LoadBalancer
+  loadBalancerIP: 35.246.153.101
