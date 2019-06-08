@@ -398,7 +398,9 @@ export default {
             clearInterval(this.autoSimulation)
         },
         onReset: function() {
-            this.running = false;
+            if (this.running == true) {
+                this.onStop();
+            }
             this.createSimulationCars();
             this.started = true;
             this.ended = false;

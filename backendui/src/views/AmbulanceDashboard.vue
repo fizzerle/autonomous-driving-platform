@@ -313,7 +313,7 @@ export default {
             let crash = JSON.parse(data.body);
             crash.timestamp = new Date(crash.timestamp);
             if (crash.resolveTimestamp === null) {
-                this.crashes.push(crash);
+                this.crashes.splice(0,0, crash);
                 this.snack(crash);
             } else {
                 let cr = this.crashes.filter(cr => cr.crashId === crash.crashId).pop();
