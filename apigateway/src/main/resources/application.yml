@@ -11,6 +11,10 @@ spring:
                 -   Path=/eventstorage/**
                 filters:
                 -   RewritePath=/(?<path>.*), /$\{path}
+                -   name: Hystrix
+                    args:
+                        name: cacheFallback
+                        fallbackUri: forward:/hystrixfallback
             -   id: entity-storage
                 uri: lb://entity-storage
                 predicates:
@@ -19,7 +23,7 @@ spring:
                     -   RewritePath=/(?<path>.*), /$\{path}
                     -   name: Hystrix
                         args:
-                          name: fallbackcmd
+                          name: cacheFallback
                           fallbackUri: forward:/hystrixfallback
             -   id: notification-storage
                 uri: lb://notification-storage
@@ -27,6 +31,10 @@ spring:
                     -   Path=/notificationstorage/**
                 filters:
                     -   RewritePath=/(?<path>.*), /$\{path}
+                    -   name: Hystrix
+                        args:
+                            name: cacheFallback
+                            fallbackUri: forward:/hystrixfallback
 
 hystrix:
     command:
