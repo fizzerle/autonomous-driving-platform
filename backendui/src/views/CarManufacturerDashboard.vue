@@ -17,62 +17,74 @@
           label="Please Select a Car Manufacturer"
         >
         </v-select>
-        <v-btn color=success><Modal
-          btnText="Create Car"
-          >
-            <v-form v-model="valid">
-                    <v-container>
-                        <v-layout row wrap>
+        <v-dialog
+          v-model="dialog"
+          width="600">
+          <template v-slot:activator="{ on }">
+            <v-btn
+              color="success"
+              dark
+              v-on="on"
+            >
+            Create Car
+            </v-btn>
+          </template>
+
+          <v-card>
+          <v-form v-model="valid">
+                  <v-container>
+                      <v-layout row wrap>
+                        <v-flex
+                              xs12
+                              md4
+                        >
+                          <v-text-field
+                                  id="oemField"
+                                  v-model="newOem"
+                                  :rules="oemRule"
+                                  label="OEM"
+                                  required
+                          ></v-text-field>
+                        </v-flex>
+
                           <v-flex
-                                xs12
-                                md4
+                              xs12
+                              md4
                           >
                             <v-text-field
-                                    id="oemField"
-                                    v-model="newOem"
-                                    :rules="oemRule"
-                                    label="OEM"
-                                    required
+                                  id="modelTypeField"
+                                  v-model="newModelType"
+                                  :rules="modelRule"
+                                  label="Modeltype"
+                                  required
                             ></v-text-field>
                           </v-flex>
 
-                            <v-flex
+                        <v-flex
                                 xs12
                                 md4
-                            >
-                              <v-text-field
-                                    id="modelTypeField"
-                                    v-model="newModelType"
-                                    :rules="modelRule"
-                                    label="Modeltype"
+                        >
+                            <v-text-field
+                                    id="chassisNumberField"
+                                    v-model="newChassisnumber"
+                                    :rules="chassisRule"
+                                    label="Chassis Number"
                                     required
-                              ></v-text-field>
-                           </v-flex>
+                            ></v-text-field>
+                        </v-flex>
 
-                          <v-flex
-                                  xs12
-                                  md4
-                          >
-                              <v-text-field
-                                      id="chassisNumberField"
-                                      v-model="newChassisnumber"
-                                      :rules="chassisRule"
-                                      label="Chassis Number"
-                                      required
-                              ></v-text-field>
-                          </v-flex>
-
-                          <v-flex
-                                  xs12
-                                  md4
-                          >
-                              <v-btn @click="addCar">submit</v-btn>
-                          </v-flex>
-                        </v-layout>
-                    </v-container>
-                    
-                </v-form>
-        </Modal></v-btn>
+                        <v-flex
+                                xs12
+                                md4
+                        >
+                            <v-btn color="success" @click="addCar">submit</v-btn>
+                        </v-flex>
+                      </v-layout>
+                  </v-container>
+                  
+              </v-form>
+          </v-card>
+        </v-dialog>
       </v-flex>
       <v-flex
         md6
@@ -461,15 +473,5 @@ export default {
 .gmap_canvas {
   height:40em;
   width: auto;
-}
-
-#oemField {
-  color: white !important
-}
-#chassisNumberField {
-  color: white !important
-}
-#modelTypeField {
-  color: white !important
 }
 </style>

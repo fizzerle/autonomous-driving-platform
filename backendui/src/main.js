@@ -22,8 +22,6 @@ import Vuetify from 'vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import * as VueGoogleMaps from 'vue2-google-maps'
 
-import Modal from "@melmacaluso/vue-modal";
-
 
 // Sync store with router
 sync(store, router)

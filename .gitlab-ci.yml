@@ -28,6 +28,7 @@ stages:
 #      - event-storage-service/**/*
 #      - notification-storage-service/**/*
 #      - swaggergateway/**/*
+#      - hystrixdashboard/**/*
   
 backend-maven-build:
   image: maven:3.6.1-ibmjava-8-alpine
@@ -45,6 +46,7 @@ backend-maven-build:
       - event-storage-service/**/*
       - notification-storage-service/**/*
       - swaggergateway/**/*
+      - hystrixdashboard/**/*
 
            
 frontend-build:
@@ -82,4 +84,5 @@ kubernetes-deploy:
       - swaggergateway/**/*
       - apigateway/**/*
       - backendui/**/*
+      - hystrixdashboard/**/*
     
