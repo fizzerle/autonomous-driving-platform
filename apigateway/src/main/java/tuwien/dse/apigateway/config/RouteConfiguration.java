@@ -49,11 +49,11 @@ public class RouteConfiguration {
     @Bean
     public RouteLocator initRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("event-websockets", r -> r.path("/eventstorage/websocket")
+                .route("event-websockets", r -> r.path("/eventsocket/**")
                         .filters(filter ->
                                 filter.rewritePath("/(?<path>.*)", "/$\\{path}"))
                         .uri("lb://event-storage"))
-                .route("notification-websockets", r -> r.path("/notificationstorage/websocket")
+                .route("notification-websockets", r -> r.path("/notificationsocket/**")
                         .filters(filter ->
                                 filter.rewritePath("/(?<path>.*)", "/$\\{path}"))
                         .uri("lb://notification-storage"))
