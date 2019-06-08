@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: hystrixdashboard
-  template:
+  template: 
     metadata:
       labels:
         app: hystrixdashboard
