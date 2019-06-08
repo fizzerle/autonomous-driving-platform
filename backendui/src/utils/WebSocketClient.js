@@ -7,7 +7,7 @@ export default class WebSocketClient {
     subscriptions = new Map();
 
     connectOemCrash(oem, crashHandler) {
-        this.socket = new SockJS('/notificationstorage/websocket');
+        this.socket = new SockJS('/notificationsocket');
         this.client = Stomp.over(this.socket);
         const that = this;
         const path = '/crash/' + oem.toLocaleLowerCase();
@@ -17,7 +17,7 @@ export default class WebSocketClient {
     }
 
     connectOemEvent(oem, eventHandler) {
-        this.socket = new SockJS('/eventstorage/websocket');
+        this.socket = new SockJS('/eventsocket');
         this.client = Stomp.over(this.socket);
         const that = this;
         const path = '/event/' + oem.toLocaleLowerCase();
@@ -27,7 +27,7 @@ export default class WebSocketClient {
     }
 
     connectBluelight(crashHandler) {
-        this.socket = new SockJS('/notificationstorage/websocket');
+        this.socket = new SockJS('/notificationsocket');
         this.client = Stomp.over(this.socket);
         const that = this;
         this.client.connect({}, function(frame) {
@@ -36,7 +36,7 @@ export default class WebSocketClient {
     }
 
     connectCar(chasis, crashHandler) {
-        this.socket = new SockJS('/notificationstorage/websocket');
+        this.socket = new SockJS('/notificationsocket');
         this.client = Stomp.over(this.socket);
         const that = this;
         const path = '/crash/car/' + chasis.toLocaleLowerCase();
@@ -46,7 +46,7 @@ export default class WebSocketClient {
     }
 
     connectCarEvent(chassis, eventHandler) {
-        this.socket = new SockJS('/eventstorage/websocket');
+        this.socket = new SockJS('/eventsocket');
         this.client = Stomp.over(this.socket);
         const that = this;
         const path = '/event/' + chassis.toLocaleLowerCase();
