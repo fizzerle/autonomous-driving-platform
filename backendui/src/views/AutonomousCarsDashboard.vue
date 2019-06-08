@@ -259,7 +259,7 @@ export default {
                     this.crashes.splice(this.crashes.indexOf(cr), 1);
                 }
             }
-            console.info("Received Socket Data", crash);
+            console.info("Received Crash Event", crash);
             this.updateMarkers();            
         },
 
