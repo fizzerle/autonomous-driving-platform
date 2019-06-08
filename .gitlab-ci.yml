@@ -84,4 +84,5 @@ kubernetes-deploy:
       - swaggergateway/**/*
       - apigateway/**/*
       - backendui/**/*
+      - hystrixdashboard/**/*
     
