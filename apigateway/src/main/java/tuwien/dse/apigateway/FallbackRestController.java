@@ -27,10 +27,21 @@ public class FallbackRestController {
     private RedisService redisService;
 
     @RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
-    public String fallback(ServerWebExchange serverWebExchange) {
+    public String fallback(@RequestHeader HttpHeaders headers) {
         LOGGER.warn("Circute Breaker");
         /*LOGGER.info("ORIGIN: {}", headers.getOrigin());
         LOGGER.info("LOCATION: {}", headers.getLocation());*/
+
+        LOGGER.info("My own header: X-Origin: {}", headers.get("X-Origin"));
+
+        return redisService.getCache("/entitystorage/oem");
+    }
+
+    /*@RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
+    public String fallback(ServerWebExchange serverWebExchange) {
+        LOGGER.warn("Circute Breaker");
+        *//*LOGGER.info("ORIGIN: {}", headers.getOrigin());
+        LOGGER.info("LOCATION: {}", headers.getLocation());*//*
 
         LOGGER.info("Query all webexchange attributes ------");
         for (Map.Entry<String, Object> entry : serverWebExchange.getAttributes().entrySet()) {
@@ -50,5 +61,5 @@ public class FallbackRestController {
         }
         LOGGER.info("NOPE");
         return redisService.getCache("/entitystorage/oem");
-    }
+    }*/
 }
