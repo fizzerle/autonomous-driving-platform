@@ -17,6 +17,7 @@ spring:
                     -   Path=/entitystorage/**
                 filters:
                     -   RewritePath=/(?<path>.*), /$\{path}
+                    -   InterceptorFilter
                     -   name: Hystrix
                         args:
                           name: fallbackcmd
