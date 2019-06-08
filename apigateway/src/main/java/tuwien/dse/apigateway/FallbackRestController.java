@@ -42,9 +42,9 @@ public class FallbackRestController {
 
         Set<URI> uris = serverWebExchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR, Collections.emptySet());
         String originalUri = (uris.isEmpty()) ? "Unknown" : uris.iterator().next().toString();
-        String[] parts = originalUri.split("/", 3);
-        if (parts.length >= 3) {
-            originalUri = "/" + parts[2];
+        String[] parts = originalUri.split("/", 4);
+        if (parts.length >= 4) {
+            originalUri = "/" + parts[3];
         }
         LOGGER.info("Looking for cached entry for {}", originalUri);
         return redisService.getCache(originalUri);
