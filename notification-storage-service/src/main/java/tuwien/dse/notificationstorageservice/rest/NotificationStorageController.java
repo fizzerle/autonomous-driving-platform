@@ -22,6 +22,7 @@ import tuwien.dse.notificationstorageservice.services.AutonomousCarService;
 import tuwien.dse.notificationstorageservice.services.BlueLightOrganisationService;
 import tuwien.dse.notificationstorageservice.services.CrashNotifyService;
 import tuwien.dse.notificationstorageservice.services.OemNotificaionService;
+import tuwien.dse.notificationstorageservice.services.RedisService;
 
 import java.util.Date;
 import java.util.List;
@@ -43,6 +44,7 @@ public class NotificationStorageController {
     private OemNotificaionService oemNotificaionService;
     private BlueLightOrganisationService blueLightOrganisationService;
     private AutonomousCarService carService;
+    private RedisService redisService;
 
     @Autowired
     public void setStompService(CrashNotifyService stompService) {
@@ -57,6 +59,11 @@ public class NotificationStorageController {
     @Autowired
     public void setOemNotificaionService(OemNotificaionService oemNotificaionService) {
         this.oemNotificaionService = oemNotificaionService;
+    }
+
+    @Autowired
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
     }
 
     @Autowired
@@ -168,18 +175,24 @@ public class NotificationStorageController {
         if (CLIENT_TYPE_CAR.equals(clientType)) {
             LOGGER.info("Getting active crashevents for cars");
             // Get all active crashes
-            return carService.getAllActiveCrashEvents();
+            List<CarNotificationDto> response = carService.getAllActiveCrashEvents();
+            redisService.cache("/notificationstorage/notifications/car", response);
+            return response;
         } else if (CLIENT_TYPE_OEM.equals(clientType)) {
             // Get all crashes by oem
             if (oem.isPresent()) {
                 LOGGER.info("Getting crashevents for OEM " + oem);
-                return oemNotificaionService.getOemNotifications(oem.get());
+                List<OemNotificationDto> resp = oemNotificaionService.getOemNotifications(oem.get());
+                redisService.cache("/notificationstorage/notifications/" + oem.get(), resp);
+                return resp;
             }
             throw new BadRequestException("Missing parameter \"oem\"!");
         } else if (CLIENT_TYPE_BLUELIGHT.equals(clientType)) {
             LOGGER.info("Getting all crashevents for BlueLightOrganisations");
             // Get all crashes
-            return blueLightOrganisationService.getAllAccidents();
+            List<BlueLightOrgNotificationDto> resp = blueLightOrganisationService.getAllAccidents();
+            redisService.cache("/notificationstorage/notifications/bluelight", resp);
+            return resp;
         } else {
             throw new BadRequestException("Missing header \"X-Client-Type\"");
         }

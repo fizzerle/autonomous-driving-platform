@@ -1,4 +1,4 @@
-package tuwien.dse.entitystorageservice.service;
+package tuwien.dse.notificationstorageservice.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
