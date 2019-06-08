@@ -1,16 +1,20 @@
 package tuwien.dse.apigateway;
 
+import com.sun.xml.internal.ws.client.sei.ResponseBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.cloud.client.loadbalancer.reactive.Response;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
@@ -29,7 +33,11 @@ public class FallbackRestController {
     @Autowired
     private RedisService redisService;
 
-    @RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            value = "/hystrixfallback",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            method = RequestMethod.GET
+    )
     public String fallback(ServerWebExchange serverWebExchange) {
 
         Set<URI> uris = serverWebExchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR, Collections.emptySet());
@@ -37,8 +45,23 @@ public class FallbackRestController {
         String[] parts = originalUri.split("/", 3);
         if (parts.length >= 3) {
             originalUri = "/" + parts[2];
-        } 
+        }
+        LOGGER.info("Looking for cached entry for {}", originalUri);
         return redisService.getCache(originalUri);
+    }
+
+    @RequestMapping(
+            value = "/hystrixfallback",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            method = {
+                    RequestMethod.DELETE,
+                    RequestMethod.POST,
+                    RequestMethod.PATCH,
+                    RequestMethod.PUT
+            }
+    )
+    public String failureFallback() {
+        return "Failure";
     }
 
     /*@RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
