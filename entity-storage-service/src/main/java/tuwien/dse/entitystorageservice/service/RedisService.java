@@ -20,8 +20,13 @@ public class RedisService {
     private ObjectMapper mapper = new ObjectMapper();
 
     public RedisService() {
-        jedis = new Jedis("10.156.0.5", 6379);
-
+        try {
+            jedis = new Jedis("10.156.0.5", 6379);
+            jedis.connect();
+            jedis.auth("Nh77bVjnXDWY");
+        } catch (Exception e) {
+            LOGGER.error("Could not create Jedis Client", e);
+        }
     }
 
     public void cache(String url, Object response) {

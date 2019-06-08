@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import tuwien.dse.entitystorageservice.exception.CarAlreadyExistsException;
 import tuwien.dse.entitystorageservice.model.Car;
 import tuwien.dse.entitystorageservice.persistence.CarRepository;
+import tuwien.dse.entitystorageservice.service.RedisService;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,10 @@ public class EntityStorageController {
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityStorageController.class);
 
     @Autowired
-    CarRepository carRepository;
+    private RedisService redisService;
+
+    @Autowired
+    private CarRepository carRepository;
 
     @GetMapping("/test")
     public String test() {
@@ -50,6 +54,7 @@ public class EntityStorageController {
     @GetMapping("/entitystorage/endless")
     public String endlesshystrixcall() throws InterruptedException {
         LOGGER.info("Start of endless hystrix call");
+        redisService.cache("/entitystorage/endless", "Cached endless response stuff");
         Thread.sleep(10000);
         LOGGER.info("End of endless hystrix call");
         return "i finally processed your request";
@@ -65,13 +70,18 @@ public class EntityStorageController {
      */
     @GetMapping("/entitystorage/cars")
     public List<Car> getAll(@RequestParam(required = false) Optional<String> oem) {
-        ;
+        String url = "/entitystorage/cars";
         if (oem.isPresent()) {
             LOGGER.info("Getting all cars of oem: " + oem);
-            return carRepository.findAllByOem(oem.get());
+            url += "?oem=" + oem.get();
+            List<Car> response = carRepository.findAllByOem(oem.get());
+            redisService.cache(url, response);
+            return response;
         }
         LOGGER.info("Getting all cars...");
-        return carRepository.findAll();
+        List<Car> response = carRepository.findAll();
+        redisService.cache(url, response);
+        return response;
     }
 
     /**
@@ -101,7 +111,9 @@ public class EntityStorageController {
     @GetMapping("/entitystorage/cars/{chassisnumber}")
     public Car getCarByChassisnumber(@PathVariable String chassisnumber) {
         LOGGER.info("Searching car " + chassisnumber);
-        return carRepository.findByChassisnumber(chassisnumber);
+        Car response = carRepository.findByChassisnumber(chassisnumber);
+        redisService.cache("/entitystorage/cars/" + chassisnumber, response);
+        return response;
     }
 
     /**
@@ -122,6 +134,8 @@ public class EntityStorageController {
     @GetMapping("/entitystorage/oem")
     public List<String> getOems() {
         LOGGER.info("Searching all distinct oems in db...");
-        return carRepository.findAll().stream().map(car -> car.getOem()).distinct().collect(Collectors.toList());
+        List<String> respone = carRepository.findAll().stream().map(car -> car.getOem()).distinct().collect(Collectors.toList());
+        redisService.cache("/entitystorage/oem", respone);
+        return respone;
     }
 }
