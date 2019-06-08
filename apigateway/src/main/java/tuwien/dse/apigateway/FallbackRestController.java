@@ -37,7 +37,7 @@ public class FallbackRestController {
         String[] parts = originalUri.split("/", 3);
         if (parts.length >= 3) {
             originalUri = "/" + parts[2];
-        }
+        } 
         return redisService.getCache(originalUri);
     }
 
