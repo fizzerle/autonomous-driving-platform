@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-@Component
+//@Component
 public class InterceptorFilterFactory implements GatewayFilterFactory<InterceptorFilterFactory.Config> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InterceptorFilterFactory.class);

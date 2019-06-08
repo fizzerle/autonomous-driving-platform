@@ -4,30 +4,30 @@ spring:
             discovery:
                 locator:
                     enabled: true
-            routes:
-            -   id: event-storage
-                uri: lb://event-storage
-                predicates:
-                -   Path=/eventstorage/**
-                filters:
-                -   RewritePath=/(?<path>.*), /$\{path}
-            -   id: entity-storage
-                uri: lb://entity-storage
-                predicates:
-                    -   Path=/entitystorage/**
-                filters:
-                    -   RewritePath=/(?<path>.*), /$\{path}
-                    -   InterceptorFilterFactory
-                    -   name: Hystrix
-                        args:
-                          name: fallbackcmd
-                          fallbackUri: forward:/hystrixfallback
-            -   id: notification-storage
-                uri: lb://notification-storage
-                predicates:
-                    -   Path=/notificationstorage/**
-                filters:
-                    -   RewritePath=/(?<path>.*), /$\{path}
+#            routes:
+#            -   id: event-storage
+#                uri: lb://event-storage
+#                predicates:
+#                -   Path=/eventstorage/**
+#                filters:
+#                -   RewritePath=/(?<path>.*), /$\{path}
+#            -   id: entity-storage
+#                uri: lb://entity-storage
+#                predicates:
+#                    -   Path=/entitystorage/**
+#                filters:
+#                    -   RewritePath=/(?<path>.*), /$\{path}
+#                    -   InterceptorFilterFactory
+#                    -   name: Hystrix
+#                        args:
+#                          name: fallbackcmd
+#                          fallbackUri: forward:/hystrixfallback
+#            -   id: notification-storage
+#                uri: lb://notification-storage
+#                predicates:
+#                    -   Path=/notificationstorage/**
+#                filters:
+#                    -   RewritePath=/(?<path>.*), /$\{path}
 
 hystrix:
     command:
