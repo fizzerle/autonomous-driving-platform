@@ -75,7 +75,7 @@ public class InterceptorFilterFactory implements GatewayFilterFactory<Intercepto
 
     @Override
     public Config newConfig() {
-        return new Config("InterceptorFilter");
+        return new Config("InterceptorFilterFactory");
     }
 
     public static class Config {
