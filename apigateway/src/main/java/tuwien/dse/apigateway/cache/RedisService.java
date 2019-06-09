@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
 @Service
+
 public class RedisService {
 
     //port: 6379
@@ -19,11 +21,20 @@ public class RedisService {
     private Jedis jedis;
     private ObjectMapper mapper = new ObjectMapper();
 
+    @Value("${redis.host}")
+    private String host;
+
+    @Value("${redis.port}")
+    private Integer port;
+
+    @Value("${redis.password}")
+    private String password;
+
     public RedisService() {
         try {
-            jedis = new Jedis("10.156.0.5", 6379);
+            jedis = new Jedis(host, port);
             jedis.connect();
-            jedis.auth("Nh77bVjnXDWY");
+            jedis.auth(password);
         } catch (Exception e) {
             LOGGER.error("Could not create Jedis Client", e);
         }
