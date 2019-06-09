@@ -10,6 +10,9 @@ import org.springframework.core.annotation.Order;
 import java.net.URI;
 import java.util.LinkedHashSet;
 
+/**
+ * TODO: Not needed anymore!!
+ */
 @Configuration
 public class OriginRequestHeaderFilter {
 
