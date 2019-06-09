@@ -16,10 +16,6 @@ import redis.clients.jedis.Jedis;
 @Service
 public class RedisService {
 
-    //port: 6379
-    //pw: Nh77bVjnXDWY
-    //host: 10.156.0.5 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisService.class);
 
     private Jedis jedis;
@@ -27,11 +23,8 @@ public class RedisService {
     @Autowired
     public RedisService(@Value("${redis.host}") String host,@Value("${redis.port}") Integer port,@Value("${redis.password}") String password) {
         try {
-            LOGGER.error("host {} ----------", host);
-            LOGGER.error("port {} ----------", port);
             jedis = new Jedis(host, port);
             jedis.connect();
-            LOGGER.error("password {} ----------", password);
             jedis.auth(password);
         } catch (Exception e) {
             LOGGER.error("Could not create Jedis Client", e);

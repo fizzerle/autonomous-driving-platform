@@ -15,11 +15,12 @@ public class RedisService {
     private Jedis jedis;
     private ObjectMapper mapper = new ObjectMapper();
 
-    public RedisService() {
+    @Autowired
+    public RedisService(@Value("${redis.host}") String host,@Value("${redis.port}") Integer port,@Value("${redis.password}") String password) {
         try {
-            jedis = new Jedis("10.156.0.5", 6379);
+            jedis = new Jedis(host, port);
             jedis.connect();
-            jedis.auth("Nh77bVjnXDWY");
+            jedis.auth(password);
         } catch (Exception e) {
             LOGGER.error("Could not create Jedis Client", e);
         }
