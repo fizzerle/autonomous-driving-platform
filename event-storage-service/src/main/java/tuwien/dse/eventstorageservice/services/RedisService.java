@@ -27,6 +27,7 @@ public class RedisService {
             LOGGER.error("Could not create Jedis Client", e);
         }
     }
+
     public void cache(String url, Object response) {
 
         try {
@@ -35,6 +36,12 @@ public class RedisService {
             LOGGER.warn("Error caching get response {}", url);
         }
 
+    }
+
+
+    public String getCache(String url) {
+        LOGGER.info("redis response ------------------- : {}", jedis.get(url));
+        return jedis.get(url);
     }
 
 }

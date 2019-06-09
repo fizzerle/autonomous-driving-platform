@@ -1,8 +1,12 @@
 package tuwien.dse.notificationstorageservice.services;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -15,6 +19,7 @@ import tuwien.dse.notificationstorageservice.dto.CarEventDto;
 import tuwien.dse.notificationstorageservice.dto.Location;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +29,10 @@ public class EventStoreRestClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(BlueLightOrganisationService.class);
 
     private EventStoreService eventStoreService;
+
+    private RedisService redisService;
+
+    private final String BASEURL = "/eventstorage/events/";
 
     /**
      * Constructor for a Restclient to call the EventStorageService.
@@ -38,6 +47,11 @@ public class EventStoreRestClient {
         this.eventStoreService = retrofit.create(EventStoreService.class);
     }
 
+    @Autowired
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
+    }
+
     /**
      * Method to call the Rest-method to get eventinformation by the eventId of the EventService.
      *
@@ -45,6 +59,7 @@ public class EventStoreRestClient {
      * @return Event-information for the information.
      * @throws Exception If the call could not be executed successfully.
      */
+    @HystrixCommand(fallbackMethod = "eventFallback")
     public CarEventDto getCarEvent(String eventId) throws Exception {
         LOGGER.info("Making restcall getEvent for " + eventId);
         Call<CarEventDto> call = eventStoreService.getCarData(eventId);
@@ -55,11 +70,17 @@ public class EventStoreRestClient {
         return resp.body();
     }
 
+    private CarEventDto eventFallback(String eventId) {
+        Gson gson = new Gson();
+        return gson.fromJson(redisService.getCache(BASEURL + eventId), CarEventDto.class);
+    }
+
     /**
      * Method to call the Rest-method to get all cars with most recent location within a 3km radius of the given location.
      * @param location Location representing the 3 km circle.
      * @return List of Cars within the circle.
      */
+    @HystrixCommand(fallbackMethod = "affectedFallback")
     public List<String> getAffectedCars(Location location) {
         LOGGER.info("Makeing restcall getCarsIn3kmRadius at location {} {}", location.getLat(), location.getLng());
         Call<List<String>> call = eventStoreService.getAffectedCars(location.getLat(), location.getLng());
@@ -74,6 +95,13 @@ public class EventStoreRestClient {
             return new LinkedList<>();
         }
         return resp.body();
+    }
+
+    private List<String> affectedFallback(Location location) {
+        String url = BASEURL + "radius?lng=" + location.getLng() + "&lat=" + location.getLat();
+        Gson gson = new Gson();
+        return gson.fromJson(redisService.getCache(url), new TypeToken<ArrayList<String>>() {
+        }.getType());
     }
 
     interface EventStoreService {

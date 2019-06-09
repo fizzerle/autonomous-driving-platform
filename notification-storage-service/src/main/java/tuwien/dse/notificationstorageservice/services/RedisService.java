@@ -35,7 +35,11 @@ public class RedisService {
         } catch (JsonProcessingException e) {
             LOGGER.warn("Error caching get response {}", url);
         }
+    }
 
+    public String getCache(String url) {
+        LOGGER.info("redis response ------------------- : {}", jedis.get(url));
+        return jedis.get(url);
     }
 
 }

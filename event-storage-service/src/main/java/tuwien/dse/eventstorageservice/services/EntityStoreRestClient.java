@@ -1,8 +1,12 @@
 package tuwien.dse.eventstorageservice.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -21,7 +25,11 @@ public class EntityStoreRestClient {
 
     private EntityService entityService;
 
+    private RedisService redisService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityStoreRestClient.class);
+
+    private static final String BASEURL = "/entitystorage/cars/";
 
     /**
      * Constructor for a RestClient which can send requests to the EntityStorage.
@@ -36,6 +44,13 @@ public class EntityStoreRestClient {
         this.entityService = retrofit.create(EntityService.class);
     }
 
+    @Autowired
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
+    }
+
+
+
     /**
      * Method to invoke the getCar method of the EntityStorageService to get information to a car identified by the
      * chassisnumber.
@@ -44,6 +59,7 @@ public class EntityStoreRestClient {
      * @return CarDto describing the car.
      * @throws Exception If the Rest-Endpoint could not be reached successfully.
      */
+    @HystrixCommand(fallbackMethod = "carFallback")
     public CarDto getCar(String chassis) throws Exception {
         Call<CarDto> call = entityService.getCarData(chassis);
 
@@ -55,10 +71,16 @@ public class EntityStoreRestClient {
         return resp.body();
     }
 
+    private CarDto carFallback(String chassis) {
+        Gson gson = new Gson();
+        return gson.fromJson(redisService.getCache(BASEURL + chassis), CarDto.class);
+    }
+
+
     interface EntityService {
 
         /**
-         * Rest-endpoint of the Entityservice, which returns inormation for a car identified by its chassinumber.
+         * Rest-endpoint of the Entityservice, which returns information for a car identified by its chassinumber.
          *
          * @param chassis Number identifying the car's chassis.
          * @return CarDto describing the car.
