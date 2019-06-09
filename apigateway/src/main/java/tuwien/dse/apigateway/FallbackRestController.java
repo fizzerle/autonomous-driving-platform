@@ -39,7 +39,7 @@ public class FallbackRestController {
             method = RequestMethod.GET
     )
     public String fallback(ServerWebExchange serverWebExchange) {
-
+        LOGGER.info("IN FALLBACK FOR GET ");
         Set<URI> uris = serverWebExchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR, Collections.emptySet());
         String originalUri = (uris.isEmpty()) ? "Unknown" : uris.iterator().next().toString();
         String[] parts = originalUri.split("/", 4);
@@ -52,6 +52,7 @@ public class FallbackRestController {
 
     @RequestMapping(
             value = "/hystrixfallback",
+            produces = MediaType.APPLICATION_JSON_VALUE,
             method = {
                     RequestMethod.DELETE,
                     RequestMethod.POST,
@@ -60,7 +61,8 @@ public class FallbackRestController {
             }
     )
     public String failureFallback() {
-        return "Failure";
+        LOGGER.info("POST/PUT Fallback called");
+        return "{}";
     }
 
     /*@RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
