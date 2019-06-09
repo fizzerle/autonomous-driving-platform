@@ -36,10 +36,7 @@ spring:
                             name: cacheFallback
                             fallbackUri: forward:/hystrixfallback
 
-redis:
-    host: test
-    port: ${REDIS_PORT}
-    password: ${REDIS_PASSWORD}
+
 
 hystrix:
     command:
