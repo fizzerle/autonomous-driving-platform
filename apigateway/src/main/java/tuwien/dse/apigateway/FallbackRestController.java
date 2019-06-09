@@ -52,7 +52,6 @@ public class FallbackRestController {
 
     @RequestMapping(
             value = "/hystrixfallback",
-            produces = MediaType.APPLICATION_JSON_VALUE,
             method = {
                     RequestMethod.DELETE,
                     RequestMethod.POST,
