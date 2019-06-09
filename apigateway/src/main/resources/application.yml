@@ -10,11 +10,11 @@ spring:
                 predicates:
                 -   Path=/eventstorage/**
                 filters:
-                -   RewritePath=/(?<path>.*), /$\{path}
-                -   name: Hystrix
+                  - name: Hystrix
                     args:
-                        name: cacheFallback
-                        fallbackUri: forward:/cacheFallback
+                      name: cacheFallback
+                      fallbackUri: forward:/cacheFallback
+                  -   RewritePath=/(?<path>.*), /$\{path}
             -   id: entity-storage
                 uri: lb://entity-storage
                 predicates:
