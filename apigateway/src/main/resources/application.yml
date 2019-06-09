@@ -1,6 +1,13 @@
 spring:
     cloud:
         gateway:
+            globalcors:
+              corsConfigurations:
+                '[/**]':
+                  allowedOrigins: "*"
+                  allowedMethods:
+                    - GET
+                    - POST
             discovery:
                 locator:
                     enabled: true
@@ -14,7 +21,7 @@ spring:
                     args:
                       name: cacheFallback
                       fallbackUri: forward:/cacheFallback
-                  -   RewritePath=/(?<path>.*), /$\{path}
+                  - RewritePath=/(?<path>.*), /$\{path}
             -   id: entity-storage
                 uri: lb://entity-storage
                 predicates:
