@@ -14,9 +14,16 @@ import tuwien.dse.entitystorageservice.EntitystorageserviceApplication;
 import tuwien.dse.entitystorageservice.exception.CarAlreadyExistsException;
 import tuwien.dse.entitystorageservice.model.Car;
 import tuwien.dse.entitystorageservice.persistence.CarRepository;
+import tuwien.dse.entitystorageservice.service.RedisService;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = EntitystorageserviceApplication.class)
@@ -29,9 +36,14 @@ public class EntityStorageControllerTest {
     @Autowired
     private CarRepository carRepo;
 
+    private RedisService redisService;
+
     @Before
     public void setup() {
         insertCarTestData();
+        redisService = mock(RedisService.class);
+        doNothing().when(redisService).cache(anyString(),any(Object.class));
+        entityStorageController.setRedisService(redisService);
     }
 
     @Test

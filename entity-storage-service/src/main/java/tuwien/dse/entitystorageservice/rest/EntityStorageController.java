@@ -20,11 +20,15 @@ public class EntityStorageController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityStorageController.class);
 
-    @Autowired
     private RedisService redisService;
 
     @Autowired
     private CarRepository carRepository;
+
+    @Autowired
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
+    }
 
     @GetMapping("/test")
     public String test() {

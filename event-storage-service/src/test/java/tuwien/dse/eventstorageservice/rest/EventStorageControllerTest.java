@@ -21,6 +21,7 @@ import tuwien.dse.eventstorageservice.persistence.EventRepository;
 import tuwien.dse.eventstorageservice.services.EntityStoreRestClient;
 import tuwien.dse.eventstorageservice.services.EventNotifyService;
 import tuwien.dse.eventstorageservice.services.NotificationStoreRestClient;
+import tuwien.dse.eventstorageservice.services.RedisService;
 
 import java.util.Date;
 import java.util.List;
@@ -38,10 +39,13 @@ public class EventStorageControllerTest {
     private EventRepository eventRepo;
 
     private String eventId1;
+    private RedisService redisService;
 
     @Before
     public void setup() {
         insertEventTestData();
+        redisService = mock(RedisService.class);
+        doNothing().when(redisService).cache(anyString(),any(Object.class));
     }
 
     @Test
@@ -50,6 +54,7 @@ public class EventStorageControllerTest {
         NotificationStoreRestClient notificationStoreRestClient = mock(NotificationStoreRestClient.class);
 
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         controller.setStompService(notifyService);
         controller.setNotificationStoreRestClient(notificationStoreRestClient);
         notifyService.yell(new CarEventDto());
@@ -80,6 +85,7 @@ public class EventStorageControllerTest {
         NotificationStoreRestClient notificationStoreRestClient = mock(NotificationStoreRestClient.class);
 
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         controller.setStompService(notifyService);
         controller.setNotificationStoreRestClient(notificationStoreRestClient);
         notifyService.yell(new CarEventDto());
@@ -107,6 +113,7 @@ public class EventStorageControllerTest {
     @Test
     public void testGetEvent_ShouldReturnCarEventDto() throws EventNotFoundException, Exception {
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         EntityStoreRestClient entityStoreRestClient = mock(EntityStoreRestClient.class);
 
         CarDto carDto = new CarDto();
@@ -133,6 +140,7 @@ public class EventStorageControllerTest {
     @Test(expected = EventNotFoundException.class)
     public void testGetEventInvalid_ShouldThrowEventNotFoundException() throws EventNotFoundException {
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         controller.setRepository(eventRepo);
 
         controller.get("");
@@ -141,6 +149,7 @@ public class EventStorageControllerTest {
     @Test
     public void testGetAllEvents_ShouldReturnAllEvents() throws Exception {
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         EntityStoreRestClient entityStoreRestClient = mock(EntityStoreRestClient.class);
 
         CarDto carDto = new CarDto();
@@ -158,6 +167,7 @@ public class EventStorageControllerTest {
     @Test
     public void testGetEventsFilterOem_ShouldReturnEvents() throws Exception {
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         EntityStoreRestClient entityStoreRestClient = mock(EntityStoreRestClient.class);
 
         CarDto carDto = new CarDto();
@@ -180,6 +190,7 @@ public class EventStorageControllerTest {
     @Test
     public void testGetEventsFilterChassisNumber_ShouldReturnEvents() throws Exception {
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         EntityStoreRestClient entityStoreRestClient = mock(EntityStoreRestClient.class);
 
         CarDto carDto = new CarDto();
@@ -198,6 +209,7 @@ public class EventStorageControllerTest {
     @Test
     public void testGetEventsFilterChassisNumberAndLimit_ShouldReturnEvents() throws Exception {
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         EntityStoreRestClient entityStoreRestClient = mock(EntityStoreRestClient.class);
 
         CarDto carDto = new CarDto();
@@ -216,6 +228,7 @@ public class EventStorageControllerTest {
     @Test
     public void testGetCarsIn3kmRadius_shouldReturnCars() {
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         controller.setRepository(eventRepo);
 
         List<String> cars = controller.getCarsIn3kmRadius(16.3, 48.2);
@@ -234,6 +247,7 @@ public class EventStorageControllerTest {
     @Test
     public void testGetCarsIn3kmRadiusChina_shouldReturnNoCars() {
         EventStorageController controller = new EventStorageController();
+        controller.setRedisService(redisService);
         controller.setRepository(eventRepo);
 
         List<String> cars = controller.getCarsIn3kmRadius(114.005179, 34.561383);

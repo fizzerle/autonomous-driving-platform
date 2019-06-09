@@ -18,10 +18,7 @@ import tuwien.dse.notificationstorageservice.exception.CrashAlreadyInactiveExcep
 import tuwien.dse.notificationstorageservice.exception.CrashNotFoundException;
 import tuwien.dse.notificationstorageservice.model.CrashEvent;
 import tuwien.dse.notificationstorageservice.persistence.CrashRepository;
-import tuwien.dse.notificationstorageservice.services.AutonomousCarService;
-import tuwien.dse.notificationstorageservice.services.BlueLightOrganisationService;
-import tuwien.dse.notificationstorageservice.services.CrashNotifyService;
-import tuwien.dse.notificationstorageservice.services.OemNotificaionService;
+import tuwien.dse.notificationstorageservice.services.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,16 +40,22 @@ public class NotificationStorageControllerTest {
     private String crashId1;
     private String crashId2;
 
+    private RedisService redisService;
+
     @Before
     public void setup() {
         crashRepo.deleteAll();
         crashId1 = crashRepo.save(new CrashEvent("crash1", "001", new Date(), new Date(), "ran into tree")).getCrashId();
         crashId2 = crashRepo.save(new CrashEvent("crash2", "002", new Date(), null, "ran into deer")).getCrashId();
+
+        redisService = mock(RedisService.class);
+        doNothing().when(redisService).cache(anyString(),any(Object.class));
     }
 
     @Test
     public void testGetCrashEventsForCar_ShouldReturnCrashEvents() throws BadRequestException {
         NotificationStorageController notificationStorageController = new NotificationStorageController();
+        notificationStorageController.setRedisService(redisService);
         notificationStorageController.setCrashRepository(crashRepo);
 
         AutonomousCarService carService = mock(AutonomousCarService.class);
@@ -73,7 +76,7 @@ public class NotificationStorageControllerTest {
     public void testGetCrashEventsForOem_ShouldReturnCrashEvents() throws BadRequestException {
         NotificationStorageController notificationStorageController = new NotificationStorageController();
         notificationStorageController.setCrashRepository(crashRepo);
-
+        notificationStorageController.setRedisService(redisService);
         OemNotificaionService oemNotificaionService = mock(OemNotificaionService.class);
 
         List<OemNotificationDto> notifications = new ArrayList<>();
@@ -92,7 +95,7 @@ public class NotificationStorageControllerTest {
     public void testGetCrashEventsWithoutOemArgument_ShouldThrowBadRequestException() throws BadRequestException {
         NotificationStorageController notificationStorageController = new NotificationStorageController();
         notificationStorageController.setCrashRepository(crashRepo);
-
+        notificationStorageController.setRedisService(redisService);
         notificationStorageController.getCrashEvents("OEM", Optional.empty());
     }
 
@@ -100,7 +103,7 @@ public class NotificationStorageControllerTest {
     public void testGetCrashEventsBluelight_ShouldReturnCrashEvents() throws BadRequestException {
         NotificationStorageController notificationStorageController = new NotificationStorageController();
         notificationStorageController.setCrashRepository(crashRepo);
-
+        notificationStorageController.setRedisService(redisService);
         BlueLightOrganisationService blueLightOrganisationService = mock(BlueLightOrganisationService.class);
 
         List<BlueLightOrgNotificationDto> notifications = new ArrayList<>();
@@ -118,6 +121,8 @@ public class NotificationStorageControllerTest {
     @Test(expected = BadRequestException.class)
     public void testGetCrashEventsWithInvalidClientTypeHeader_ShouldThowBadRequestException() throws BadRequestException {
         NotificationStorageController notificationStorageController = new NotificationStorageController();
+        notificationStorageController.setRedisService(redisService);
+
         notificationStorageController.getCrashEvents("madeUpHeader", Optional.empty());
     }
 
@@ -127,6 +132,7 @@ public class NotificationStorageControllerTest {
 
         NotificationStorageController notificationStorageController = new NotificationStorageController();
         notificationStorageController.setCrashRepository(crashRepo);
+        notificationStorageController.setRedisService(redisService);
 
         CrashNotifyService stompService = mock(CrashNotifyService.class);
         doNothing().when(stompService).yell(any(CrashEvent.class));
@@ -144,6 +150,7 @@ public class NotificationStorageControllerTest {
     public void testResolveCrashEvent_ShouldResolveCrash() throws CrashAlreadyInactiveException, CrashNotFoundException {
         NotificationStorageController notificationStorageController = new NotificationStorageController();
         notificationStorageController.setCrashRepository(crashRepo);
+        notificationStorageController.setRedisService(redisService);
 
         CrashNotifyService stompService = mock(CrashNotifyService.class);
         doNothing().when(stompService).yell(any(CrashEvent.class));
@@ -160,6 +167,7 @@ public class NotificationStorageControllerTest {
     public void testResolveCrashEventAlreadyResolved_ShouldThrowCrashAlreadyInactiveException() throws CrashAlreadyInactiveException, CrashNotFoundException {
         NotificationStorageController notificationStorageController = new NotificationStorageController();
         notificationStorageController.setCrashRepository(crashRepo);
+        notificationStorageController.setRedisService(redisService);
 
         List<CrashEvent> crashes = crashRepo.findAll();
 
@@ -170,6 +178,7 @@ public class NotificationStorageControllerTest {
     public void testResolveCrashEventInvalidId_ShouldThrowCrashNotFoundException() throws CrashAlreadyInactiveException, CrashNotFoundException {
         NotificationStorageController notificationStorageController = new NotificationStorageController();
         notificationStorageController.setCrashRepository(crashRepo);
+        notificationStorageController.setRedisService(redisService);
 
         notificationStorageController.resolveCrashEvent("madeUpId");
     }
