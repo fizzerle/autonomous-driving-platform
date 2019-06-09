@@ -37,7 +37,7 @@ spring:
                             fallbackUri: forward:/hystrixfallback
 
 redis:
-      host: ${REDIS_HOST}
+      host: test
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
