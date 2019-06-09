@@ -56,7 +56,7 @@ hystrix:
             execution:
                 isolation:
                     thread:
-                        timeoutInMilliseconds: 1
+                        timeoutInMilliseconds: 5000
 
 logging:
     pattern:
