@@ -3,6 +3,7 @@ package tuwien.dse.eventstorageservice.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,9 @@ public class EntityStoreRestClient {
      * @return CarDto describing the car.
      * @throws Exception If the Rest-Endpoint could not be reached successfully.
      */
-    @HystrixCommand(fallbackMethod = "carFallback")
+    @HystrixCommand(fallbackMethod = "carFallback", commandProperties = {
+            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "5000")
+    })
     public CarDto getCar(String chassis) throws Exception {
         Call<CarDto> call = entityService.getCarData(chassis);
 
