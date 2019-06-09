@@ -72,8 +72,12 @@ public class EntityStoreRestClient {
     }
 
     private CarDto carFallback(String chassis) {
+        LOGGER.info("Fallback for car " + chassis);
         Gson gson = new Gson();
-        return gson.fromJson(redisService.getCache(BASEURL + chassis), CarDto.class);
+        String cachedValue = redisService.getCache(BASEURL + chassis);
+        LOGGER.info("Cached value " + cachedValue);
+        if(cachedValue == null) return null;
+        return gson.fromJson(cachedValue, CarDto.class);
     }
 
 
