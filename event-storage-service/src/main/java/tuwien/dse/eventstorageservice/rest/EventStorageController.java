@@ -147,7 +147,8 @@ public class EventStorageController {
         Event event = repository.findById(eventId).orElse(null);
         if (event != null) {
             LOGGER.info("Getting Event with ID " + eventId);
-            return convertToCarEventDto(event);
+            CarEventDto ev = convertToCarEventDto(event);
+            redisService.cache("/eventstorage/events/" + eventId, ev);
         }
         LOGGER.error("Event with Id " + eventId + "not found");
         throw new EventNotFoundException("Event with Id " + eventId + "not found");
@@ -214,13 +215,16 @@ public class EventStorageController {
     @GetMapping("/eventstorage/events/radius")
     public List<String> getCarsIn3kmRadius(@RequestParam double lng, @RequestParam double lat) {
         LOGGER.info("Getting cars in 3km area of {} {}", lat, lng);
-        return repository.findByLocationNearOrderByTimestampDesc(
+        List<String> cars = repository.findByLocationNearOrderByTimestampDesc(
                 new Point(lng, lat),
                 new Distance(3, Metrics.KILOMETERS)
         ).stream()
                 .map(e -> e.getChassisnumber())
                 .distinct()
                 .collect(Collectors.toList());
+
+        redisService.cache("eventstorage/events/radius?lng=" + lng + "&lat=" + lat, cars);
+        return cars;
     }
 
     /**
