@@ -40,6 +40,7 @@ public class FallbackRestController {
         if (parts.length >= 4) {
             originalUri = "/" + parts[3];
         }
+        if(originalUri.contains("websocket")) return "websocket unavailable";
         LOGGER.info("Looking for cached entry for {}", originalUri);
         return redisService.getCache(originalUri);
     }
