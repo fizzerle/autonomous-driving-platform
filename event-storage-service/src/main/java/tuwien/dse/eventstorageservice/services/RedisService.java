@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
@@ -16,7 +18,7 @@ public class RedisService {
     private ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    public RedisService(@Value("${redis.host}") String host,@Value("${redis.port}") Integer port,@Value("${redis.password}") String password) {
+    public RedisService(@Value("${redis.host}") String host, @Value("${redis.port}") Integer port, @Value("${redis.password}") String password) {
         try {
             jedis = new Jedis(host, port);
             jedis.connect();
