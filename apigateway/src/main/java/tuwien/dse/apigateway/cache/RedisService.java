@@ -32,6 +32,8 @@ public class RedisService {
 
     public RedisService() {
         try {
+            LOGGER.error("host {} ----------", host);
+            LOGGER.error("port {} ----------", host);
             jedis = new Jedis(host, port);
             jedis.connect();
             jedis.auth(password);
