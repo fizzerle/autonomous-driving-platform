@@ -39,7 +39,7 @@ public class FallbackRestController {
             method = RequestMethod.GET
     )
     public String fallback(ServerWebExchange serverWebExchange) {
-
+        LOGGER.info("IN FALLBACK FOR GET {}", originalUri);
         Set<URI> uris = serverWebExchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR, Collections.emptySet());
         String originalUri = (uris.isEmpty()) ? "Unknown" : uris.iterator().next().toString();
         String[] parts = originalUri.split("/", 4);
