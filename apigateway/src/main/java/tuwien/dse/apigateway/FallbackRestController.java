@@ -34,26 +34,11 @@ public class FallbackRestController {
     private RedisService redisService;
 
     @RequestMapping(
-            value = "/hystrixfallback",
-            method = RequestMethod.GET
+            value = "/hystrixfallback"
     )
     public String fallback() {
         LOGGER.info("IN FALLBACK FOR GET ");
         return "GET FALLBACK";
-    }
-
-    @RequestMapping(
-            value = "/hystrixfallback",
-            method = {
-                    RequestMethod.DELETE,
-                    RequestMethod.POST,
-                    RequestMethod.PATCH,
-                    RequestMethod.PUT
-            }
-    )
-    public String failureFallback() {
-        LOGGER.info("POST/PUT Fallback called");
-        return "POST FALLBACK";
     }
 
     /*@RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
