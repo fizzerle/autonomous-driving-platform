@@ -336,7 +336,7 @@ export default {
                 });
             });
     },
-    loadActualEventsForCars: function(car) {
+      loadActualEventsForCars: function () {
       this.cars.forEach(car => {
         fetch('eventstorage/events?chassisnumber=' + car.chassisnumber + '&limit=1')
         .then(resp => {

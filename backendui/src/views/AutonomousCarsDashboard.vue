@@ -159,8 +159,6 @@ export default {
         },
         carChanged: function() {
             console.info("Car Changed: ", this.selectedCar);
-            //this.stopPositionUpdate();
-            //this.startPositionUpdate();
             if (this.wsClient !== null) {
                 this.wsClient.close();
             }
@@ -171,7 +169,29 @@ export default {
             this.wsClient.connectCar(this.selectedCar, this.receivedCrashData);
             this.wsPositionClient = new WebSocketClient();
             this.wsPositionClient.connectCarEvent(this.selectedCar, this.updateMyPosition);
+            this.loadActualEventsForCar(this.selectedCar);
+        }
+    ,
 
+        loadActualEventsForCar: function (car) {
+            fetch('eventstorage/events?chassisnumber=' + car + '&limit=1')
+                .then(resp = > {
+                resp.json().then(data = > {
+                let event = data[0];
+            console.log(event)
+            let loc = event.location;
+            //console.info('My position should be: ', loc);
+            this.myPosition = loc;
+            this.spaceAhead = event.spaceAhead;
+            this.spaceBehind = event.spaceBehind;
+            this.speed = event.speed;
+            this.passengers = event.passengers;
+            this.center = loc;
+            this.updateMarkers();
+        })
+            ;
+        })
+            ;
         },
 
         snack: function(crash) {
@@ -183,7 +203,7 @@ export default {
         updateMarkers: function() {
             this.markers = [];
             let count = 0;
-            this.crashes.forEach(cr => {
+            Array.from(this.crashes).forEach(cr = > {
                 if (!this.isInRadiusOf3Km(cr.location)) {
                     return;
                 }
@@ -265,7 +285,7 @@ export default {
 
         updateMyPosition: function(data) {
             let event = JSON.parse(data.body);
-            //console.info('Received event from car', event);
+            console.info('Received event from car', event);
             if (event.chassisNumber === this.selectedCar) {
                 let loc = event.location;
                 //console.info('My position should be: ', loc);
