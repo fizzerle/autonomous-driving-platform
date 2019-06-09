@@ -18,7 +18,7 @@ public class RedisService {
 
     //port: 6379
     //pw: Nh77bVjnXDWY
-    //host: 10.156.0.5
+    //host: 10.156.0.5 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisService.class);
 
