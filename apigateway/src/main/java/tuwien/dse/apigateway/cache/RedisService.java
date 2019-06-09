@@ -28,9 +28,10 @@ public class RedisService {
     public RedisService(@Value("${redis.host}") String host,@Value("${redis.port}") Integer port,@Value("${redis.password}") String password) {
         try {
             LOGGER.error("host {} ----------", host);
-            LOGGER.error("port {} ----------", host);
+            LOGGER.error("port {} ----------", port);
             jedis = new Jedis(host, port);
             jedis.connect();
+            LOGGER.error("password {} ----------", password);
             jedis.auth(password);
         } catch (Exception e) {
             LOGGER.error("Could not create Jedis Client", e);
