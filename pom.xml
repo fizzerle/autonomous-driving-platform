@@ -7,6 +7,11 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>entity-storage-service</module>
+		<module>event-storage-service</module>
+		<module>notification-storage-service</module>
+		<module>swaggergateway</module>
+		<module>hystrixdashboard</module>
 		<module>apigateway</module>
 	</modules>
 	
