@@ -37,7 +37,7 @@ public class FallbackRestController {
             value = "/hystrixfallback",
             method = RequestMethod.GET
     )
-    public String fallback(ServerWebExchange serverWebExchange) {
+    public String fallback() {
         LOGGER.info("IN FALLBACK FOR GET ");
         return "GET FALLBACK";
     }
