@@ -170,28 +170,25 @@ export default {
             this.wsPositionClient = new WebSocketClient();
             this.wsPositionClient.connectCarEvent(this.selectedCar, this.updateMyPosition);
             this.loadActualEventsForCar(this.selectedCar);
-        }
-    ,
+        },
 
         loadActualEventsForCar: function (car) {
             fetch('eventstorage/events?chassisnumber=' + car + '&limit=1')
-                .then(resp = > {
-                resp.json().then(data = > {
-                let event = data[0];
-            console.log(event)
-            let loc = event.location;
-            //console.info('My position should be: ', loc);
-            this.myPosition = loc;
-            this.spaceAhead = event.spaceAhead;
-            this.spaceBehind = event.spaceBehind;
-            this.speed = event.speed;
-            this.passengers = event.passengers;
-            this.center = loc;
-            this.updateMarkers();
-        })
-            ;
-        })
-            ;
+                .then(resp => {
+                    resp.json().then(data => {
+                    let event = data[0];
+                    console.log(event)
+                    let loc = event.location;
+                    //console.info('My position should be: ', loc);
+                    this.myPosition = loc;
+                    this.spaceAhead = event.spaceAhead;
+                    this.spaceBehind = event.spaceBehind;
+                    this.speed = event.speed;
+                    this.passengers = event.passengers;
+                    this.center = loc;
+                    this.updateMarkers();
+                });
+            });
         },
 
         snack: function(crash) {
@@ -203,7 +200,7 @@ export default {
         updateMarkers: function() {
             this.markers = [];
             let count = 0;
-            Array.from(this.crashes).forEach(cr = > {
+            Array.from(this.crashes).forEach(cr => {
                 if (!this.isInRadiusOf3Km(cr.location)) {
                     return;
                 }
