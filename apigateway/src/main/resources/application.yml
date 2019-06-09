@@ -14,7 +14,7 @@ spring:
                 -   name: Hystrix
                     args:
                         name: cacheFallback
-                        fallbackUri: forward:/hystrixfallback
+                        fallbackUri: forward:/cacheFallback
             -   id: entity-storage
                 uri: lb://entity-storage
                 predicates:
@@ -24,7 +24,7 @@ spring:
                     -   name: Hystrix
                         args:
                           name: cacheFallback
-                          fallbackUri: forward:/hystrixfallback
+                          fallbackUri: forward:/cacheFallback
             -   id: notification-storage
                 uri: lb://notification-storage
                 predicates:
@@ -34,7 +34,7 @@ spring:
                     -   name: Hystrix
                         args:
                             name: cacheFallback
-                            fallbackUri: forward:/hystrixfallback
+                            fallbackUri: forward:/cacheFallback
 
 redis:
     host: ${REDIS_HOST}
