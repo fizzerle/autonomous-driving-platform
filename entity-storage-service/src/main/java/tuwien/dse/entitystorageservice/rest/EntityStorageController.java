@@ -54,8 +54,8 @@ public class EntityStorageController {
     @GetMapping("/entitystorage/endless")
     public String endlesshystrixcall() throws InterruptedException {
         LOGGER.info("Start of endless hystrix call");
-        redisService.cache("/entitystorage/endless", "Cached endless response stuff");
         Thread.sleep(10000);
+        redisService.cache("/entitystorage/endless", "Number 2 try of caching endless");
         LOGGER.info("End of endless hystrix call");
         return "i finally processed your request";
     }
