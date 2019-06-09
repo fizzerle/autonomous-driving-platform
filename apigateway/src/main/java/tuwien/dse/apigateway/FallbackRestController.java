@@ -35,24 +35,15 @@ public class FallbackRestController {
 
     @RequestMapping(
             value = "/hystrixfallback",
-            produces = MediaType.APPLICATION_JSON_VALUE,
             method = RequestMethod.GET
     )
     public String fallback(ServerWebExchange serverWebExchange) {
         LOGGER.info("IN FALLBACK FOR GET ");
-        Set<URI> uris = serverWebExchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR, Collections.emptySet());
-        String originalUri = (uris.isEmpty()) ? "Unknown" : uris.iterator().next().toString();
-        String[] parts = originalUri.split("/", 4);
-        if (parts.length >= 4) {
-            originalUri = "/" + parts[3];
-        }
-        LOGGER.info("Looking for cached entry for {}", originalUri);
-        return redisService.getCache(originalUri);
+        return "GET FALLBACK";
     }
 
     @RequestMapping(
             value = "/hystrixfallback",
-            produces = MediaType.APPLICATION_JSON_VALUE,
             method = {
                     RequestMethod.DELETE,
                     RequestMethod.POST,
@@ -62,7 +53,7 @@ public class FallbackRestController {
     )
     public String failureFallback() {
         LOGGER.info("POST/PUT Fallback called");
-        return "{}";
+        return "POST FALLBACK";
     }
 
     /*@RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
