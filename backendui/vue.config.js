@@ -2,7 +2,7 @@ module.exports = {
   devServer: {
     disableHostCheck: true,
 
-    // Various Dev Server settings
+    // Various Dev Server settings; Not needed anymore
     host: 'localhost', // can be overwritten by process.env.HOST
     port: 3000, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
 
