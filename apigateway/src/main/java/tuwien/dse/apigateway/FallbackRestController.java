@@ -7,15 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.cloud.client.loadbalancer.reactive.Response;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
 import tuwien.dse.apigateway.cache.RedisService;
@@ -50,6 +44,7 @@ public class FallbackRestController {
         return redisService.getCache(originalUri);
     }
 
+
     @RequestMapping(
             value = "/cacheFallback",
             method = {
@@ -59,8 +54,9 @@ public class FallbackRestController {
                     RequestMethod.PUT
             }
     )
-    public String failureFallback() {
-        return "Failure";
+    @ResponseBody
+    public ResponseEntity failureFallback() {
+        return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     /*@RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
