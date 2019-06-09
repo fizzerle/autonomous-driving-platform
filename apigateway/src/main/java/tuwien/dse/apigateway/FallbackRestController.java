@@ -35,8 +35,7 @@ public class FallbackRestController {
 
     @RequestMapping(
             value = "/hystrixfallback",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = RequestMethod.GET
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     public String fallback(ServerWebExchange serverWebExchange) {
         LOGGER.info("IN FALLBACK FOR GET ");
@@ -48,21 +47,6 @@ public class FallbackRestController {
         }
         LOGGER.info("Looking for cached entry for {}", originalUri);
         return redisService.getCache(originalUri);
-    }
-
-    @RequestMapping(
-            value = "/hystrixfallback",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            method = {
-                    RequestMethod.DELETE,
-                    RequestMethod.POST,
-                    RequestMethod.PATCH,
-                    RequestMethod.PUT
-            }
-    )
-    public String failureFallback() {
-        LOGGER.info("POST/PUT Fallback called");
-        return "{}";
     }
 
     /*@RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
