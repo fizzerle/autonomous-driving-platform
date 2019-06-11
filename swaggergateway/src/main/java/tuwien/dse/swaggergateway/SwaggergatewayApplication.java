@@ -12,6 +12,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggergatewayApplication {
 
+    /**
+     * Starts the Application for the Swaggergateway.
+     * @param args Args
+     */
     public static void main(String[] args) {
         SpringApplication.run(SwaggergatewayApplication.class, args);
     }

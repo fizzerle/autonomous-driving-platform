@@ -1,6 +1,5 @@
 package tuwien.dse.eventstorageservice.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
@@ -13,13 +12,9 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
 import retrofit2.http.Path;
 import tuwien.dse.eventstorageservice.dto.CarDto;
-import tuwien.dse.eventstorageservice.dto.CrashEventDto;
-import tuwien.dse.eventstorageservice.model.Event;
 
 @Service
 public class EntityStoreRestClient {
@@ -74,6 +69,11 @@ public class EntityStoreRestClient {
         return resp.body();
     }
 
+    /**
+     * Fallback for get car. Loads cached response from the Redis-store.
+     * @param chassis Chassis number of the requested car
+     * @return cached response
+     */
     private CarDto carFallback(String chassis) {
         LOGGER.info("Fallback for car " + chassis);
         Gson gson = new Gson();

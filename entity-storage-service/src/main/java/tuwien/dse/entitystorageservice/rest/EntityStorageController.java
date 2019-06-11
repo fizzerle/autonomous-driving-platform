@@ -30,41 +30,6 @@ public class EntityStorageController {
         this.redisService = redisService;
     }
 
-    @GetMapping("/test")
-    public String test() {
-        LOGGER.info("test called");
-        return "test called entityservice";
-    }
-
-    @GetMapping("/failstorage/fisch")
-    public String fisch() {
-        LOGGER.info("fisch called");
-        return "fisch complete";
-    }
-
-    @GetMapping("/failstorage/dead")
-    public String deadfisch() throws InterruptedException {
-        LOGGER.info("dead fisch called");
-        Thread.sleep(10000);
-        return "dead fisch complete";
-    }
-
-    @GetMapping("/entitystorage/test")
-    public String test2() {
-        LOGGER.info("entitystorage test called");
-        return "entitystorage test";
-    }
-
-    @GetMapping("/entitystorage/endless")
-    public String endlesshystrixcall() throws InterruptedException {
-        LOGGER.info("Start of endless hystrix call");
-        Thread.sleep(10000);
-        redisService.cache("/entitystorage/endless", "Number 2 try of caching endless");
-        LOGGER.info("End of endless hystrix call");
-        return "i finally processed your request";
-    }
-
-
     /**
      * Rest-Endpoint to get all cars in the database.
      * Optionally the cars can be filtered by the OEM.

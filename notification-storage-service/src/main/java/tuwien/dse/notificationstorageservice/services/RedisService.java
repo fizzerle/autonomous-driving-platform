@@ -28,6 +28,11 @@ public class RedisService {
         }
     }
 
+    /**
+     * Method to cache responses by saving them in the Redis-Store.
+     * @param url Request url for which a response will be cached.
+     * @param response Response for the cached Request.
+     */
     public void cache(String url, Object response) {
 
         try {
