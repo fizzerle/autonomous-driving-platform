@@ -40,6 +40,7 @@ public class CrashNotifyService {
         /* get event-information */
         try {
             event = eventStoreRestClient.getCarEvent(crashEvent.getEventId());
+            if(event == null) return;
         } catch (Exception e) {
             LOGGER.warn("Could not fetch data from eventstore", e);
             return;

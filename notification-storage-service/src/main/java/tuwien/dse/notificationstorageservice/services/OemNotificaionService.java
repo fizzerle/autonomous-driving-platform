@@ -53,7 +53,9 @@ public class OemNotificaionService {
      */
     private CarEventDto getCarEvent(CrashEvent crashEvent) {
         try {
-            return eventStoreRestClient.getCarEvent(crashEvent.getEventId());
+            CarEventDto carEvent = eventStoreRestClient.getCarEvent(crashEvent.getEventId());
+            if(carEvent == null) return null;
+            return carEvent;
         } catch (Exception e) {
             LOGGER.warn("Failure catching the Event with id {}", crashEvent.getEventId(), e);
             return null;

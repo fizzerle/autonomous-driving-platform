@@ -72,7 +72,9 @@ public class EventStoreRestClient {
 
     private CarEventDto eventFallback(String eventId) {
         Gson gson = new Gson();
-        return gson.fromJson(redisService.getCache(BASEURL + eventId), CarEventDto.class);
+        String cache = redisService.getCache(BASEURL + eventId);
+        if(cache == null) return null;
+        return gson.fromJson(cache, CarEventDto.class);
     }
 
     /**

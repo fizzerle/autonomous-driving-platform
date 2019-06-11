@@ -55,6 +55,7 @@ public class BlueLightOrganisationService {
         /* get additional event information */
         try {
             event = eventStoreRestClient.getCarEvent(crashEvent.getEventId());
+            if(event == null) return null;
         } catch (Exception e) {
             LOGGER.warn("Failure catching the Event with id {}", crashEvent.getEventId(), e);
             return null;

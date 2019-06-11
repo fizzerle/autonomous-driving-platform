@@ -51,6 +51,7 @@ public class AutonomousCarService {
         /* get event information */
         try {
             event = eventStoreRestClient.getCarEvent(crash.getEventId());
+            if(event == null) return null;
         } catch (Exception e) {
             LOGGER.warn("Failure catching the Event with id {}", crash.getEventId(), e);
             return null;
