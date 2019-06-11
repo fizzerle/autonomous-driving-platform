@@ -114,7 +114,7 @@ public class EventStorageController {
         if (event != null) {
             LOGGER.info("Getting Event with ID " + eventId);
             CarEventDto ev = convertToCarEventDto(event);
-            if(ev == null) throw new EventNotFoundException();
+            if(ev == null) throw new EventNotFoundException("Event with id " + eventId + "not found.");
             redisService.cache("/eventstorage/events/" + eventId, ev);
             return ev;
         }
