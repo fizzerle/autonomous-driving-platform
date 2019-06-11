@@ -26,7 +26,7 @@ public class RedisService {
             jedis = new Jedis(host, port);
             jedis.connect();
             jedis.auth(password);
-        } catch (Exception e) {
+        } catch (Exception e) { 
             LOGGER.error("Could not create Jedis Client", e);
         }
     }
