@@ -100,6 +100,8 @@ public class EventStoreRestClient {
     private List<String> affectedFallback(Location location) {
         String url = BASEURL + "radius?lng=" + location.getLng() + "&lat=" + location.getLat();
         Gson gson = new Gson();
+        String cache = redisService.getCache(url);
+        if(cache == null) return null;
         return gson.fromJson(redisService.getCache(url), new TypeToken<ArrayList<String>>() {
         }.getType());
     }
