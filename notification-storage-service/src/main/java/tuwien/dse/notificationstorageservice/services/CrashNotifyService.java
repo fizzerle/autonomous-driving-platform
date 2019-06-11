@@ -89,6 +89,7 @@ public class CrashNotifyService {
         LOGGER.info("Notifying cars about crash at {) {}", data.getLocation().getLat(), data.getLocation().getLng());
         try {
             List<String> affectedCars = eventStoreRestClient.getAffectedCars(data.getLocation());
+            if(affectedCars ==  null) return;
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(data);
             for (String chassis: affectedCars) {

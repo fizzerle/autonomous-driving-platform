@@ -114,6 +114,7 @@ public class EventStorageController {
         if (event != null) {
             LOGGER.info("Getting Event with ID " + eventId);
             CarEventDto ev = convertToCarEventDto(event);
+            if(ev == null) throw new EventNotFoundException();
             redisService.cache("/eventstorage/events/" + eventId, ev);
             return ev;
         }
@@ -196,7 +197,7 @@ public class EventStorageController {
 
     /**
      * Create a CarEventDto by a Event.
-     * Enriches the data saved in the Eventstorage with inromation saved in the Entitystorage.
+     * Enriches the data saved in the Eventstorage with information saved in the Entitystorage.
      * @param event Information for the Event.
      * @return Information for the Event with information for the car.
      */
@@ -204,6 +205,7 @@ public class EventStorageController {
         CarDto car;
         try {
             car = entityStoreRestClient.getCar(event.getChassisnumber());
+            if(car == null) return null;
         } catch (Exception e) {
             return null;
         }
