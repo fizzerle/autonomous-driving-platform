@@ -63,40 +63,6 @@ public class EventStorageController {
         this.entityStoreRestClient = entityStoreRestClient;
     }
 
-    @GetMapping("/test/")
-    public String test() {
-        LOGGER.info("test called");
-        return "test called";
-    }
-
-    @GetMapping("/eventstorage/test")
-    public String test2() {
-        LOGGER.info("eventstorage test called");
-        return "eventstorage test";
-    }
-
-    @GetMapping("/eventstorage/stomp")
-    public String stompTest() {
-        LOGGER.info("stomptest test called");
-        CarEventDto data = new CarEventDto();
-        data.setOem("Audi");
-        data.setChassisNumber("B567GK");
-        data.setLocation(new Location(45, 48));
-        data.setModeltype("A8");
-        data.setPassengers(1);
-        data.setSpaceAhead(50);
-        data.setSpaceBehind(30);
-        data.setSpeed(30);
-        stompService.yell(data);
-        return "stomp request sent";
-    }
-
-    @DeleteMapping("/eventstorage/clean")
-    public String clean() {
-        repository.deleteAll();
-        return "deleted all events";
-    }
-
     /**
      * Rest-endpoint to save a new event in the database.
      * Position-updates are sent to the Frontend with websockets, so the new position of the car can be displayed in the

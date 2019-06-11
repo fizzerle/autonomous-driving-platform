@@ -17,6 +17,12 @@ public class RedisService {
     private Jedis jedis;
     private ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * Constructor for the RedisService which opens a connection to the Redis-Store used for caching.
+     * @param host Address where the store is hosted
+     * @param port Port where the store can be reached
+     * @param password Password for the store
+     */
     @Autowired
     public RedisService(@Value("${redis.host}") String host, @Value("${redis.port}") Integer port, @Value("${redis.password}") String password) {
         try {
@@ -28,8 +34,12 @@ public class RedisService {
         }
     }
 
+    /**
+     * Method to cache responses by saving them in the Redis-Store.
+     * @param url Request url for which a response will be cached.
+     * @param response Response for the cached Request.
+     */
     public void cache(String url, Object response) {
-
         try {
             jedis.set(url, mapper.writeValueAsString(response));
         } catch (JsonProcessingException e) {

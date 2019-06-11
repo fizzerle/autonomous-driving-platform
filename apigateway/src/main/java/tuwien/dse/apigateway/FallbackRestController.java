@@ -27,6 +27,13 @@ public class FallbackRestController {
     @Autowired
     private RedisService redisService;
 
+    /**
+     * Fallback for GET-Requests.
+     *
+     * Extracts the url from the requests and invokes the redisService to get a cached response.
+     * @param serverWebExchange ServerWebExchange
+     * @return Cached Response
+     */
     @RequestMapping(
             value = "/cacheFallback",
             produces = MediaType.APPLICATION_JSON_VALUE,
@@ -45,6 +52,10 @@ public class FallbackRestController {
     }
 
 
+    /**
+     * Fallback for POST-Requests, that responses with a 503 Service Unavailable error response.
+     * @return Error response
+     */
     @RequestMapping( 
             value = "/cacheFallback",
             method = {
@@ -58,30 +69,4 @@ public class FallbackRestController {
     public ResponseEntity failureFallback() {
         return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
     }
-
-    /*@RequestMapping(value = "/hystrixfallback",produces = MediaType.APPLICATION_JSON_VALUE)
-    public String fallback(ServerWebExchange serverWebExchange) {
-        LOGGER.warn("Circute Breaker");
-        *//*LOGGER.info("ORIGIN: {}", headers.getOrigin());
-        LOGGER.info("LOCATION: {}", headers.getLocation());*//*
-
-        LOGGER.info("Query all webexchange attributes ------");
-        for (Map.Entry<String, Object> entry : serverWebExchange.getAttributes().entrySet()) {
-            LOGGER.info(""+entry.getKey()+" " + entry.getValue());
-        }
-        LOGGER.info("End Query all webexchange attributes -----");
-
-        //Get the PathMatchInfo
-        PathPattern.PathMatchInfo pathMatchInfo = serverWebExchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
-
-        //Get the template variables
-        LOGGER.info("path match info ---" + pathMatchInfo.toString()+"----");
-        Map<String, String> urlTemplateVariables = pathMatchInfo.getUriVariables();
-        LOGGER.info("Yeah");
-        for (Map.Entry<String, String> entry : urlTemplateVariables.entrySet()) {
-            LOGGER.info(""+entry.getKey()+" " + entry.getValue());
-        }
-        LOGGER.info("NOPE");
-        return redisService.getCache("/entitystorage/oem");
-    }*/
 }

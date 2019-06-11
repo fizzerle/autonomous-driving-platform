@@ -12,6 +12,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCircuitBreaker
 public class ApigatewayApplication {
 
+    /**
+     * Starts the Apllication for the ApiGateway.
+     * @param args args
+     */
     public static void main(String[] args) {
         SpringApplication.run(ApigatewayApplication.class, args);
     }

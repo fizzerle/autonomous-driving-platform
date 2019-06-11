@@ -70,6 +70,11 @@ public class EventStoreRestClient {
         return resp.body();
     }
 
+    /**
+     * Fallback method for the getEvent command. Returns cached response from the Redis-Store.
+     * @param eventId id of the event
+     * @return cached response
+     */
     private CarEventDto eventFallback(String eventId) {
         Gson gson = new Gson();
         return gson.fromJson(redisService.getCache(BASEURL + eventId), CarEventDto.class);
@@ -97,6 +102,11 @@ public class EventStoreRestClient {
         return resp.body();
     }
 
+    /**
+     * Fallback methtod for the getAffectedCars command. Returns cached response from the Redis-Store.
+     * @param location center of the affected area
+     * @return cached response
+     */
     private List<String> affectedFallback(Location location) {
         String url = BASEURL + "radius?lng=" + location.getLng() + "&lat=" + location.getLat();
         Gson gson = new Gson();

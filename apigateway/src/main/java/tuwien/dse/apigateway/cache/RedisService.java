@@ -1,15 +1,9 @@
 package tuwien.dse.apigateway.cache;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
@@ -20,6 +14,12 @@ public class RedisService {
 
     private Jedis jedis;
 
+    /**
+     * Constructor for the RedisService which opens a connection to the Redis-Store used for caching.
+     * @param host Address where the store is hosted
+     * @param port Port where the store can be reached
+     * @param password Password for the store
+     */
     @Autowired
     public RedisService(@Value("${redis.host}") String host,@Value("${redis.port}") Integer port,@Value("${redis.password}") String password) {
         try {
@@ -31,6 +31,11 @@ public class RedisService {
         }
     }
 
+    /**
+     * Gets the cached response from the Redis-store.
+     * @param url Key for the cached entries.
+     * @return Response for the cached entry.
+     */
     public String getCache(String url) {
         LOGGER.info("redis response ------------------- : {}", jedis.get(url));
         return jedis.get(url);

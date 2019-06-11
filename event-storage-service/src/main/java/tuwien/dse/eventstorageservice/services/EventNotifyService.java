@@ -19,6 +19,7 @@ public class EventNotifyService {
     private SimpMessageSendingOperations simp;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventNotifyService.class);
+
     /**
      * Sends the new CarEvent with the websocket.
      *

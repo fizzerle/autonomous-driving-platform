@@ -9,6 +9,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class CarAlreadyExistsExceptionHandler extends ResponseEntityExceptionHandler {
 
+    /**
+     * Maps the thrown Exception to a proper error response with Http-Error-Status
+     * @param e the Exception
+     * @return Error response
+     */
     @ExceptionHandler(CarAlreadyExistsException.class)
     protected ResponseEntity<ErrorDto> handleCarAlreadyExistsException(CarAlreadyExistsException e) {
         return ResponseEntity.badRequest().body(new ErrorDto(HttpStatus.BAD_REQUEST.value(),e.getMessage()));
