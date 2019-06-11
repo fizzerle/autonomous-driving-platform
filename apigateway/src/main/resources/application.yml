@@ -9,6 +9,7 @@ spring:
                     - GET
                     - PUT
                     - POST
+                    - PATCH
                     - DELETE
             discovery:
                 locator:
