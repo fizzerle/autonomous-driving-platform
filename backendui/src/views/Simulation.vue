@@ -55,6 +55,9 @@
                             <v-btn small icon @click.native.stop="removeCar(i)">
                                 <v-icon>delete</v-icon>
                             </v-btn>
+                            <v-btn small icon @click.native.stop="onEditCar(i)">
+                                <v-icon>edit</v-icon>
+                            </v-btn>
                         </template>
                         <v-card>
                             <v-card-text>Start: {{car.start}}<br>
@@ -62,6 +65,7 @@
                                 Speed: {{car.speed}}<br>
                                 OEM: {{car.oem}}<br>
                                 Chassis number: {{car.chassisNumber}}<br>
+                                Model Type: {{car.modeltype}}<br>
                                 <template v-if="car.crash">Crashes at destination</template></v-card-text>
                         </v-card>
                     </v-expansion-panel-content>
@@ -153,6 +157,7 @@
                         </v-layout>
                     </v-container>
                     <v-btn @click="addCar">submit</v-btn>
+                    <v-btn @click="editCar">edit</v-btn>
                 </v-form>
             </v-flex>
         </v-layout>
@@ -163,6 +168,7 @@
 /* eslint-disable */
 import {createLocation,toLatLng, moveTo, headingTo, distanceTo, getLatitude, getLongitude} from 'geolocation-utils';
 import WebSocketClient from '../utils/WebSocketClient';
+import Vue from 'vue';
 export default {
     data: () => ({
         started: false,
@@ -233,7 +239,7 @@ export default {
             },
             {
                 name: "car4",
-                start: " 40.742530, -73.988865",
+                start: "40.742530, -73.988865",
                 end:  "40.803244, -73.944627",
                 speed: 40,
                 crash: false,
@@ -243,7 +249,7 @@ export default {
             },
             {
                 name: "car5",
-                start: " 40.746545, -73.986014",
+                start: "40.746545, -73.986014",
                 end:  "40.803244, -73.944627",
                 speed: 40,
                 crash: false,
@@ -253,7 +259,7 @@ export default {
             },
             {
                 name: "car6",
-                start: " 40.709557, -73.297039",
+                start: "40.709557, -73.297039",
                 end:  "40.719489, -73.267445",
                 speed: 10,
                 crash: false,
@@ -278,10 +284,31 @@ export default {
         removeCar: function (index) {
             this.cars.splice(index, 1);
         },
+        onEditCar: function (index) {
+            this.startCoord = this.cars[index].start;
+            this.endCoord = this.cars[index].end;
+            this.speed = this.cars[index].speed;
+            this.crash = this.cars[index].crash;
+            this.oem = this.cars[index].oem;
+            this.chassisNumber = this.cars[index].chassisNumber;
+            this.modeltype = this.cars[index].modeltype;
+        },
         addCar: function () {
             if (this.valid) {
-                this.cars.push({name: "car"+ (this.cars.length+1), startCoord: this.start, endCoord: this.end, speed: this.speed, crash: this.crash, oem: this.oem, chassisNumber: this.chassisNumber, modelType: this.modeltype});
+                this.cars.push({name: "car"+ (this.cars.length+1), start: this.startCoord, end: this.endCoord, speed: this.speed, crash: this.crash, oem: this.oem, chassisNumber: this.chassisNumber, modeltype: this.modeltype});
             }
+        },
+        editCar: function() {
+            var updateCar = this.cars.find(car => {
+                return car.chassisNumber === this.chassisNumber
+            })
+            Vue.set(updateCar, 'start', this.startCoord)
+            Vue.set(updateCar, 'end', this.endCoord)
+            Vue.set(updateCar, 'speed', this.speed)
+            Vue.set(updateCar, 'crash', this.crash)
+            Vue.set(updateCar, 'oem', this.oem)
+            Vue.set(updateCar, 'chassisNumber', this.chassisNumber)
+            Vue.set(updateCar, 'modeltype', this.modeltype)
         },
         createSimulationCars: function () {
             this.simulationCars = [];
