@@ -20,6 +20,10 @@ public class GatewayApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GatewayApi.class);
 
+    /**
+     * Aggregate all Swagger endpoints of microservices
+     * @return all Swagger Resources
+     */
     @Primary
     @Bean
     public SwaggerResourcesProvider swaggerResourcesProvider() {
@@ -32,6 +36,12 @@ public class GatewayApi {
         };
     }
 
+    /**
+     * Creates the Swagger resources
+     * @param location where the resource can be found
+     * @param version version of the resource
+     * @return the resources
+     */
     private SwaggerResource createResource(String location, String version) {
         LOGGER.info("LOCATION: "+ location);
         SwaggerResource swaggerResource = new SwaggerResource();
