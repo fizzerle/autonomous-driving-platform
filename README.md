@@ -1,8 +1,5 @@
 # Autonomous Driving Platform
-A highly scalable protoytpe of a autonomous driving platform. Millions of autonomous cars are simulated for evaluation
-purposes to send their location to car manufactures and get notified about nearby crash events. Car manufactures can
-view all their autonomous navigating cars on a map and are notified about crash events. Furthermore there are blue light
-organistions that get notified about crash events and they can resolve them.
+A scalable fault tolerant protoytpe of a autonomous driving platform deployed on GCP in a kubernets cluster. Build with a microservice architecture. Autonomous cars are simulated for evaluation purposes to send their location, crash events and other telemetry data to the infrastructure. Car manufactures and blue light organizations then operate on this data.
 
 Key facts:
 * Automtic CI/CD to deploy to a kubernetes cluster in the google cloud.
