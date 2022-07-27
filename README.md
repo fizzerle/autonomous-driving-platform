@@ -5,7 +5,8 @@ Key facts:
 * Automtic CI/CD to deploy to a kubernetes cluster in the google cloud.
 * Technologies used: Spring Cloud, Spring Data, Vue, Hystrix, MongoDB, Redis, GCP, kubernetes, docker
 * Latency and Fault Tolerance: Implemented with Hystrix, fallback is a Redis Cache which returns previous results of the method called
-
+#### Architecture Overview
+![image5](https://user-images.githubusercontent.com/14179713/181215460-b635df64-0ba8-46bf-b796-7532680843f9.png)
 #### Dashboard for Car manufacturers where they can view all their cars, also in a map and notfications about crash events
 ![image](https://user-images.githubusercontent.com/14179713/180953439-6cd67541-71dd-4b90-94e3-7293b6c7dff0.png)
 #### Simulation UI to simulate car movement and crashes
